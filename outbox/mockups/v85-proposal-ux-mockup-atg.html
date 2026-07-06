@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="sv" class="active-game-type-v85" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <title>V85 Proposal — ATG UX Mockup</title>
+  <!-- ATG production stylesheet (buttons, game-type tokens, typography utilities) -->
+  <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: ATGRubrik;
+      src: url("https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/fonts/atgrubrik-font.woff") format("woff");
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    /* V85 tokens extracted from ATG frame-main.css */
+    :root,
+    [data-theme="light"] {
+      --v85-gradient: linear-gradient(180deg, #006db6 0%, #004f9f 100%);
+      --v85-dark: #00366c;
+      --v85-mid: #004f9f;
+      --v85-light: #006db6;
+      --v85-headline: #0067b1;
+      --atg-text: #595953;
+      --atg-link: #014991;
+      --atg-border: #dce0e7;
+      --atg-bg: #f7fafc;
+      --atg-surface: #ffffff;
+      --atg-muted-bg: #eaeff5;
+      --atg-horse-bg: linear-gradient(180deg, #fff 0%, #dbe4ef 100%);
+      --atg-horse-border: #bacbdf;
+      --atg-logo-bg: #ffffff;
+      --atg-logo-text: #004f9f;
+      --atg-banner-bg: #fff8e6;
+      --atg-banner-border: #f39332;
+      --atg-approved-bg: #e8f5ee;
+      --atg-approved-text: #218f0b;
+      --atg-step-done-bg: #e8f5ee;
+      --atg-step-done-border: #a7d4b8;
+      --atg-step-current-bg: linear-gradient(180deg, #fff 0%, #dbe4ef 100%);
+      --atg-shadow: 0 2px 8px rgba(0, 79, 159, 0.08);
+      --atg-green: linear-gradient(180deg, #22ac07 0%, #218f0b 100%);
+      --atg-blue-btn: linear-gradient(180deg, #006db6 0%, #004f9f 100%);
+    }
+
+    [data-theme="dark"] {
+      --v85-gradient: linear-gradient(180deg, #2e96dd 0%, #004f9f 100%);
+      --v85-dark: #001c39;
+      --v85-mid: #006db6;
+      --v85-light: #79bae5;
+      --v85-headline: #79bae5;
+      --atg-text: #c8d4e0;
+      --atg-link: #9ecff0;
+      --atg-border: #324c69;
+      --atg-bg: #0f1a24;
+      --atg-surface: #1a2d3d;
+      --atg-muted-bg: #243447;
+      --atg-horse-bg: linear-gradient(180deg, #2a3f55 0%, #1e3448 100%);
+      --atg-horse-border: #3a556f;
+      --atg-logo-bg: #15374e;
+      --atg-logo-text: #79bae5;
+      --atg-banner-bg: #2a2418;
+      --atg-banner-border: #b36d1a;
+      --atg-approved-bg: #1a3d22;
+      --atg-approved-text: #4ebb35;
+      --atg-step-done-bg: #1a3d22;
+      --atg-step-done-border: #2a724e;
+      --atg-step-current-bg: linear-gradient(180deg, #2a3f55 0%, #1e3448 100%);
+      --atg-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Roboto, sans-serif;
+      background: var(--atg-bg);
+      color: var(--atg-text);
+      line-height: 1.45;
+      padding: 24px;
+    }
+
+    .mockup-banner {
+      max-width: 1180px;
+      margin: 0 auto 16px;
+      background: var(--atg-banner-bg);
+      border: 1px solid var(--atg-banner-border);
+      color: var(--atg-text);
+      padding: 8px 14px;
+      font-size: 12px;
+      text-align: center;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .app {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--atg-surface);
+      border: 1px solid var(--atg-border);
+      box-shadow: var(--atg-shadow);
+    }
+
+    /* V85 game header — mirrors .active-game-type-v85 .game-header */
+    .game-header {
+      background: var(--v85-gradient);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      min-height: 72px;
+      border-bottom: 2px solid var(--v85-dark);
+    }
+    .game-header__brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 20px;
+    }
+    .game-header__logo {
+      width: 52px;
+      height: 52px;
+      background: var(--atg-logo-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ATGRubrik, sans-serif;
+      font-size: 22px;
+      color: var(--atg-logo-text);
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      border: 1px solid var(--atg-border);
+    }
+    .game-header__title .ATGheadline {
+      color: #fff;
+      font-size: 28px;
+      padding: 0;
+      text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
+    }
+    .game-header__sub {
+      font-size: 13px;
+      opacity: 0.92;
+      margin-top: 2px;
+    }
+    .game-header__meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .game-header__pill {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 6px 12px;
+    }
+
+    /* Theme toggle — ATG segmented control */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-right: 4px;
+    }
+    .theme-toggle__label {
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+    .theme-toggle__btn {
+      font-family: Roboto, sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-align: center;
+      font-weight: 900;
+      cursor: pointer;
+      text-transform: uppercase;
+      user-select: none;
+      padding: 6px 12px;
+      font-size: 11px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.75);
+      -webkit-appearance: none;
+    }
+    .theme-toggle__btn:first-of-type { border-right: none; }
+    .theme-toggle__btn.active {
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--v85-mid);
+      border-color: #fff;
+      box-shadow: 0 0 0 1px #fff;
+    }
+    [data-theme="dark"] .theme-toggle__btn.active {
+      color: #004f9f;
+    }
+    .theme-toggle__btn:not(.active):hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    .theme-toggle__icon { font-size: 13px; line-height: 1; }
+
+    .meta-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--atg-border);
+      border-bottom: 1px solid var(--atg-border);
+    }
+    .meta-item {
+      background: var(--atg-surface);
+      padding: 12px 16px;
+    }
+    .meta-item label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--atg-text);
+      margin-bottom: 3px;
+      font-weight: 700;
+    }
+    .meta-item strong {
+      font-size: 14px;
+      color: var(--v85-headline);
+      font-weight: 700;
+    }
+    .status-approved {
+      display: inline-block;
+      background: var(--atg-approved-bg);
+      color: var(--atg-approved-text);
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    /* Mode tabs — ATG toggle button pattern */
+    .mode-tabs {
+      display: flex;
+      gap: 0;
+      padding: 12px 20px 0;
+      background: var(--atg-muted-bg);
+      border-bottom: 1px solid var(--atg-border);
+    }
+    .mode-tabs .button {
+      border-radius: 0;
+      margin-right: 4px;
+      margin-bottom: -1px;
+      min-width: 120px;
+    }
+    .mode-tabs .button.button--toggle.active {
+      background-image: var(--v85-gradient);
+      border-color: var(--v85-light);
+      color: #fff;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      min-height: 500px;
+    }
+
+    .legs-panel {
+      padding: 20px;
+      background: var(--atg-surface);
+    }
+    .section-title {
+      font-family: ATGRubrik, sans-serif;
+      font-size: 18px;
+      color: var(--v85-headline);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      letter-spacing: 0.02em;
+    }
+    .section-title span {
+      font-family: Roboto, sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--atg-text);
+      text-transform: none;
+      margin-left: 8px;
+    }
+
+    .legs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Leg cards styled like ATG startlist division columns */
+    .leg-card {
+      border: 1px solid var(--atg-border);
+      background: var(--atg-surface);
+      display: grid;
+      grid-template-columns: 36px 1fr;
+    }
+    .leg-col {
+      background: var(--v85-gradient);
+      color: #fff;
+      font-family: ATGRubrik, sans-serif;
+      font-size: 18px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
+      border-bottom: 2px solid var(--v85-dark);
+    }
+    .leg-body {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--atg-border);
+    }
+    .race-info {
+      font-size: 11px;
+      color: var(--atg-text);
+      margin-bottom: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .horses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .horse {
+      min-width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
+      border: 1px solid var(--atg-horse-border);
+      background-image: var(--atg-horse-bg);
+      color: var(--atg-link);
+    }
+    .horse.spik {
+      background-image: var(--v85-gradient);
+      border-color: var(--v85-light);
+      color: #fff;
+      text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
+    }
+    .reserves {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--atg-text);
+    }
+
+    .sidebar {
+      background: var(--atg-bg);
+      border-left: 1px solid var(--atg-border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .summary-card {
+      background: var(--atg-surface);
+      border: 1px solid var(--atg-border);
+      padding: 14px;
+    }
+    .summary-card h3 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--atg-text);
+      margin: 0 0 10px;
+      font-weight: 900;
+    }
+    .cost-big {
+      font-family: ATGRubrik, sans-serif;
+      font-size: 34px;
+      color: var(--v85-headline);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .cost-big span {
+      font-family: Roboto, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--atg-border);
+      font-size: 13px;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row strong { color: var(--v85-headline); font-variant-numeric: tabular-nums; }
+
+    .hit-bars { margin-top: 6px; }
+    .hit-row {
+      display: grid;
+      grid-template-columns: 48px 1fr 44px;
+      gap: 6px;
+      align-items: center;
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+    .bar-bg {
+      height: 8px;
+      background: var(--atg-muted-bg);
+      border: 1px solid var(--atg-border);
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--v85-gradient);
+    }
+
+    .checklist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 12px;
+    }
+    .checklist li {
+      padding: 7px 0 7px 22px;
+      position: relative;
+      border-bottom: 1px solid var(--atg-border);
+    }
+    .checklist li::before {
+      content: "☐";
+      position: absolute;
+      left: 0;
+      color: var(--atg-text);
+    }
+    .checklist li.done::before { content: "☑"; color: var(--atg-approved-text); }
+
+    .sidebar .button { width: 100%; margin-bottom: 6px; }
+    .sidebar-note {
+      font-size: 10px;
+      color: var(--atg-text);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .rationale {
+      padding: 16px 20px 20px;
+      border-top: 1px solid var(--atg-border);
+      background: var(--atg-bg);
+    }
+    .rationale h2 {
+      font-family: ATGRubrik, sans-serif;
+      font-size: 16px;
+      color: var(--v85-headline);
+      text-transform: uppercase;
+      margin: 0 0 6px;
+    }
+    .rationale p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--atg-text);
+      max-width: 860px;
+    }
+
+    .airup-strip {
+      max-width: 1180px;
+      margin: 16px auto 0;
+      background: var(--atg-surface);
+      border: 1px solid var(--atg-border);
+      padding: 16px 20px;
+    }
+    .airup-strip h2 {
+      font-family: ATGRubrik, sans-serif;
+      font-size: 16px;
+      color: var(--v85-headline);
+      text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+    .pipeline {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 10px 6px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      border: 1px solid var(--atg-border);
+      color: var(--atg-text);
+      background: var(--atg-bg);
+    }
+    .step.done {
+      background: var(--atg-step-done-bg);
+      border-color: var(--atg-step-done-border);
+      color: var(--atg-approved-text);
+    }
+    .step.current {
+      background-image: var(--atg-step-current-bg);
+      border-color: var(--v85-mid);
+      color: var(--v85-headline);
+      box-shadow: 0 0 0 1px var(--v85-mid);
+    }
+    .arrow { color: var(--atg-text); font-size: 16px; }
+
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--atg-text);
+      margin-top: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    @media print {
+      body { padding: 0; background: #fff; }
+      .mockup-banner { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-banner">UX Mockup v0.3 · ATG.se färger &amp; typsnitt · Ljus/mörk växling · Ingen affärslogik</div>
+
+  <div class="app active-game-type-v85">
+    <header class="game-header">
+      <div class="game-header__brand">
+        <div class="game-header__logo">ATG</div>
+        <div class="game-header__title">
+          <div class="ATGheadline">V85 Proposal</div>
+          <div class="game-header__sub">Beslutstöd för manuell inmatning på atg.se</div>
+        </div>
+      </div>
+      <div class="game-header__meta">
+        <div class="theme-toggle" role="group" aria-label="Tema">
+          <span class="theme-toggle__label">Tema</span>
+          <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true">
+            <span class="theme-toggle__icon" aria-hidden="true">☀</span> Ljus
+          </button>
+          <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false">
+            <span class="theme-toggle__icon" aria-hidden="true">☽</span> Mörk
+          </button>
+        </div>
+        <span class="game-header__pill">Mockup v0.3</span>
+        <span class="game-header__pill">2026-07-06</span>
+      </div>
+    </header>
+
+    <div class="meta-bar">
+      <div class="meta-item"><label>Bana</label><strong>Halmstad</strong></div>
+      <div class="meta-item"><label>Datum</label><strong>2026-07-05</strong></div>
+      <div class="meta-item"><label>Spelform</label><strong>V85</strong></div>
+      <div class="meta-item"><label>Läge</label><strong>Quantitative</strong></div>
+      <div class="meta-item"><label>AIRUP</label><strong><span class="status-approved">Approved</span></strong></div>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="button button--toggle" type="button">Random</button>
+      <button class="button button--toggle" type="button">Expert</button>
+      <button class="button button--toggle active" type="button">Quantitative</button>
+    </div>
+
+    <div class="content">
+      <section class="legs-panel">
+        <h2 class="section-title">Avdelningar <span>8 rätt · välj vinnare per lopp</span></h2>
+        <div class="legs-grid">
+          <div class="leg-card">
+            <div class="leg-col">1</div>
+            <div class="leg-body">
+              <div class="race-info">V85-1 · 15:00</div>
+              <div class="horses"><span class="horse spik">3</span></div>
+              <div class="reserves">Reserver: 7, 12</div>
+            </div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-col">2</div>
+            <div class="leg-body">
+              <div class="race-info">V85-2 · 15:20</div>
+              <div class="horses"><span class="horse">4</span><span class="horse">9</span><span class="horse">11</span></div>
+            </div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-col">3</div>
+            <div class="leg-body">
+              <div class="race-info">V85-3 · 15:40</div>
+              <div class="horses"><span class="horse spik">1</span></div>
+            </div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-col">4</div>
+            <div class="leg-body">
+              <div class="race-info">V85-4 · 16:00</div>
+              <div class="horses"><span class="horse">2</span><span class="horse">6</span></div>
+            </div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-col">5</div>
+            <div class="leg-body">
+              <div class="race-info">V85-5 · 16:20</div>
+              <div class="horses"><span class="horse spik">8</span></div>
+            </div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-col">6</div>
+            <div class="leg-body">
+              <div class="race-info">V85-6 · 16:40</div>
+              <div class="horses"><span class="horse">3</span><span class="horse">5</span><span class="horse">10</span><span class="horse">13</span></div>
+            </div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-col">7</div>
+            <div class="leg-body">
+              <div class="race-info">V85-7 · 17:00</div>
+              <div class="horses"><span class="horse spik">2</span></div>
+            </div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-col">8</div>
+            <div class="leg-body">
+              <div class="race-info">V85-8 · 17:20</div>
+              <div class="horses"><span class="horse">1</span><span class="horse">4</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="summary-card">
+          <h3>Systemkostnad</h3>
+          <div class="cost-big">24,00 <span>SEK</span></div>
+          <div class="stat-row"><span>Rader</span><strong>48</strong></div>
+          <div class="stat-row"><span>Radpris</span><strong>0,50 SEK</strong></div>
+          <div class="stat-row"><span>Beräkning</span><strong>1×3×1×2×1×4×1×2</strong></div>
+        </div>
+        <div class="summary-card">
+          <h3>Träffsannolikhet (modell)</h3>
+          <div class="hit-bars">
+            <div class="hit-row"><span>8 rätt</span><div class="bar-bg"><div class="bar-fill" style="width:12%"></div></div><span>0,12%</span></div>
+            <div class="hit-row"><span>≥7 rätt</span><div class="bar-bg"><div class="bar-fill" style="width:45%"></div></div><span>1,01%</span></div>
+            <div class="hit-row"><span>≥6 rätt</span><div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div><span>4,2%</span></div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <h3>Innan spel på atg.se</h3>
+          <ul class="checklist">
+            <li class="done">8 avdelningar ifyllda</li>
+            <li class="done">Kostnad verifierad</li>
+            <li>Kontrollera strukna hästar</li>
+            <li>Reserver aktiva</li>
+          </ul>
+        </div>
+        <button class="button" type="button">Exportera förslag (PDF)</button>
+        <button class="button button--blue" type="button">Öppna atg.se/v85 ↗</button>
+        <p class="sidebar-note">Placerar inte spel automatiskt</p>
+      </aside>
+    </div>
+
+    <div class="rationale">
+      <h2>Rationale — Quantitative</h2>
+      <p>Maximerar P(≥7 rätt) inom budget 25 SEK. Oberoende ben antaget. Poolandelar enligt v85.md v1.0 (30/20/15/35 från 2026-07-02). Odds källa: ATG (exempeldata).</p>
+    </div>
+  </div>
+
+  <div class="airup-strip">
+    <h2>AIRUP — artefaktstatus</h2>
+    <div class="pipeline">
+      <div class="step done">A Analyze</div>
+      <span class="arrow">→</span>
+      <div class="step done">I Inbox</div>
+      <span class="arrow">→</span>
+      <div class="step done">R Review</div>
+      <span class="arrow">→</span>
+      <div class="step done">U Update</div>
+      <span class="arrow">→</span>
+      <div class="step current">P Publish → outbox</div>
+    </div>
+  </div>
+
+  <p class="footer-note">ATG Trotting Betting Systems · Mockup för Kricke/Jonte · Färger från atg.se frame-main.css</p>
+
+  <script>
+    (function () {
+      var storageKey = "atg-mockup-theme";
+      var root = document.documentElement;
+      var buttons = document.querySelectorAll("[data-theme-set]");
+
+      function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        buttons.forEach(function (btn) {
+          var active = btn.getAttribute("data-theme-set") === theme;
+          btn.classList.toggle("active", active);
+          btn.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+        try { localStorage.setItem(storageKey, theme); } catch (e) {}
+      }
+
+      var params = new URLSearchParams(window.location.search);
+      var queryTheme = params.get("theme");
+      var saved = null;
+      try { saved = localStorage.getItem(storageKey); } catch (e) {}
+      var initial = (queryTheme === "dark" || queryTheme === "light") ? queryTheme : saved;
+      if (initial === "dark" || initial === "light") {
+        applyTheme(initial);
+      }
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          applyTheme(btn.getAttribute("data-theme-set"));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
