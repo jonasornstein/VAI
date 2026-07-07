@@ -529,6 +529,34 @@
       margin: 0 0 10px;
       font-weight: 900;
     }
+    .summary-card__title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .summary-card__title-row h3 { margin: 0; }
+    .help-tip {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid var(--atg-border);
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 14px;
+      padding: 0;
+      cursor: help;
+      flex-shrink: 0;
+      font-family: Roboto, sans-serif;
+    }
+    .help-tip:hover,
+    .help-tip:focus-visible {
+      border-color: var(--v85-light);
+      box-shadow: 0 0 0 2px rgba(0, 109, 182, 0.25);
+      outline: none;
+    }
     .stake-input-wrap { display: flex; align-items: baseline; gap: 8px; }
     .stake-input {
       font-family: ATGRubrik, sans-serif;
@@ -825,9 +853,22 @@
           </div>
         </div>
         <div class="summary-card">
-          <h3>Träffsannolikhet (modell)</h3>
+          <div class="summary-card__title-row">
+            <h3>Träffsannolikhet (modell)</h3>
+            <button
+              type="button"
+              class="help-tip"
+              id="hit-summary-help-btn"
+              aria-label="Hjälp om träffsannolikhet"
+              aria-describedby="hit-summary-help-text"
+              title="Baserat på ATG:s V85-andelar per häst. Summan av andelar i ditt val per avdelning ≈ sannolikhet att vinna avdelningen. Visar P(8), P(≥7), P(≥6) och P(≥5) rätt under antagande att avdelningarna är oberoende. Förenklad modell — inte utdelning eller garanterad vinst."
+            >?</button>
+          </div>
+          <p class="stake-hint" id="hit-summary-help-text" hidden>
+            Baserat på ATG:s V85-andelar. Förenklad modell — inte utdelning eller garanterad vinst.
+          </p>
           <p class="stake-hint" id="hit-summary-placeholder" style="margin-top:0">Laddas efter generering när ATG andelar finns.</p>
-          <div class="hit-bars" id="hit-bars" hidden></div>
+          <div class="hit-bars" id="hit-bars" hidden aria-describedby="hit-summary-help-text"></div>
         </div>
         <button class="button button--blue btn-action btn-generate" id="btn-generate" type="button">Generera system</button>
         <div class="summary-card">
