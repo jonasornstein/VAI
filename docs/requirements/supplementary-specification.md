@@ -2,10 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.2 |
-| **Status** | DRAFT |
-| **Last updated** | 2026-07-06 |
+| **Version** | 1.0 |
+| **Status** | APPROVED |
+| **Reviewer** | Jonte (operator), Povl (constraints), Nisse (compliance) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Owner** | Jonte (M-004) |
+| **Specs** | [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md), [ux-workflow](./ux-workflow.md) |
 | **Supersedes** | SRS §4–§5, §7 (non-functional and cross-cutting) |
 
 Requirements that do not fit a single use-case narrative. Organized with the **FURPS+** model (RUP).
@@ -24,8 +27,8 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 | SUP-F-006 | All artifacts SHALL follow [AIRUP](../AIRUP.md) | Must | UC-02 |
 | SUP-F-007 | Significant decisions SHALL be logged in [TRACE-LOG.md](../TRACE-LOG.md) | Should | UC-02 |
 | SUP-F-008 | Race card SHALL be collected automatically from ATG website or API when available | Must | UC-01, UC-09 |
-| SUP-F-009 | Operator SHALL mark candidate horses per leg before model run | Must | UC-10, F-026 |
-| SUP-F-010 | Model SHALL produce betting slip and hit probabilities after generation | Must | UC-10–13 |
+| SUP-F-009 | Operator MAY mark horses per leg; unmarked legs filled randomly (Hari v1.1) | Must | UC-10, F-026 |
+| SUP-F-010 | Model SHALL produce betting slip and cost; hit summary when data available (F-052 basic Hari; full UC-13 deferred) | Must | UC-10–13 |
 | SUP-F-011 | SYSTEMKOSTNAD (stake budget) SHALL be operator-entered; default **500 SEK** | Must | F-025 |
 
 **Legacy mapping:** FR-010–016, FR-050–051, FR-000, FR-001d.
@@ -39,8 +42,8 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 | SUP-U-001 | Operator SHALL read a proposal in under 2 minutes | Must | Kricke/Jonte |
 | SUP-U-002 | Leg-by-leg horse numbers SHALL be unambiguous for ATG entry | Must | Kricke/Jonte |
 | SUP-U-003 | Total cost and row count SHALL be visible before publish | Must | Kricke/Jonte |
-| SUP-U-004 | Proposal UI SHALL support light and dark display modes | Should | Jonte (mockup v0.3) |
-| SUP-U-005 | Pre-entry checklist SHALL remind operator of scratches and reserves | Should | Nisse |
+| SUP-U-004 | Proposal UI SHALL support light and dark display modes | Should | Mockup variants; theme toggle F-092 |
+| SUP-U-005 | Pre-entry checklist SHALL remind operator of scratches and reserves | Should | F-071 wired in local UI v1.1 |
 | SUP-U-006 | On DATUM change, BANA and SPELFORM dropdowns SHALL repopulate from ATG schedule | Must | UC-09 |
 | SUP-U-007 | Default DATUM SHALL be next relevant V85: today if unsettled, else next future round | Must | F-027 |
 | SUP-U-008 | SYSTEMKOSTNAD input SHALL be visible in sidebar; default 500 SEK | Must | UX mockup |
@@ -53,7 +56,7 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 
 | ID | Requirement | Priority | Notes |
 |----|-------------|----------|-------|
-| SUP-R-001 | Race card fetch SHALL use cached copy when offline; stale cache flagged | Should | UC-09 fallback |
+| SUP-R-001 | When ATG unreachable, system SHALL fall back to manual YAML or cached card; stale cache flagged | Should | UC-09; disk cache v1.2 |
 | SUP-R-005 | Fetched race cards SHALL be cached under `inbox/race-cards/` for replay | Must | F-001 after F-007 |
 | SUP-R-002 | Random mode SHOULD support seedable RNG for reproducibility | Should | UC-11 |
 | SUP-R-003 | Cost formula SHALL match ATG: ∏(horses per leg) × min stake | Must | Verified in quantitative.md |
@@ -67,7 +70,7 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 
 | ID | Requirement | Priority | Notes |
 |----|-------------|----------|-------|
-| SUP-P-001 | Single V85 proposal generation SHOULD complete in &lt; 5 s on operator hardware | Should | TBD — measure at implementation |
+| SUP-P-001 | Single V85 proposal generation SHOULD complete in &lt; 5 s on operator hardware | Should | v1.1 try-outs meet target; no formal benchmark |
 | SUP-P-002 | Monte Carlo runs SHOULD be configurable (iterations cap) | Should | Povl — UC-13 |
 
 *v1 has no hard latency SLA beyond operator tolerance on race day.*
@@ -131,7 +134,7 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 |----|-------------|-----------|-------|
 | SUP-C-001 | Betting rules in `docs/betting/` SHALL align with official ATG regulations | Nisse | Flag discrepancies for reconciliation |
 | SUP-C-002 | Tool is decision support only; operators place bets under ATG T&C | Jonte | Not a gambling operator |
-| SUP-C-003 | ATG data fetch (race card, odds) SHALL comply with ATG ToS; document source in manifest | Povl / Jonte | `pending/specs/atg-data-source.md` |
+| SUP-C-003 | ATG data fetch (race card, odds) SHALL comply with ATG ToS; document source in manifest | Povl / Jonte | [atg-data-source.md](../../outbox/specs/atg-data-source.md) APPROVED |
 | SUP-C-004 | V85 pool percentages SHALL follow effective date rules (e.g. 2026-07-02 change) | Nisse | [v85.md](../betting/v85.md) v1.0 |
 
 ---
@@ -140,11 +143,12 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 
 | Item | Waiting on | Linked UC/SUP |
 |------|------------|---------------|
-| ATG API vs scrape implementation | `pending/specs/atg-data-source.md` | F-006–F-009 |
 | Legal review of ATG read access | Jonte / Nisse | SUP-C-003 |
 | Expert template catalog | Nisse | UC-12 |
 | Monte Carlo iteration defaults | Povl | UC-13, SUP-P-002 |
-| Performance baseline measurement | Implementation | SUP-P-001 |
+| Disk cache / stale-while-revalidate | v1.2 | SUP-R-001, atg-data-source |
+
+**Resolved (v1.1):** ATG API primary with HTML scrape fallback — [atg-data-source.md](../../outbox/specs/atg-data-source.md).
 
 ---
 
@@ -152,5 +156,6 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — v1.1 alignments; optional horse marks; F-071 checklist; ATG source resolved |
 | 0.2 | 2026-07-06 | ATG auto-fetch, UX workflow, SYSTEMKOSTNAD default 500 SEK |
 | 0.1 | 2026-07-06 | Initial supplementary spec; migrated from SRS §4–§5, FURPS+ layout |

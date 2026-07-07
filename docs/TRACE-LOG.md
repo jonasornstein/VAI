@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-07 | P | Jonte, Povl, Nisse | **supplementary-specification APPROVED** — FURPS+ v1.0; v1.1 NFR alignments | [supplementary-specification.md](./requirements/supplementary-specification.md), [REVIEW_supplementary-specification.md](../../outbox/reviews/REVIEW_supplementary-specification.md) |
 | 2026-07-07 | P | Povl, Jonte | **functions.md APPROVED** — v1.0 F-* catalog; shipped vs deferred; module map | [functions.md](./requirements/functions.md), [REVIEW_functions.md](../../outbox/reviews/REVIEW_functions.md) |
 | 2026-07-07 | P | Jonte, Povl, Nisse | **All use cases APPROVED** — 13 UCs v1.0; Phase 2b complete; UC-12/13 spec-only | [use-cases/](./requirements/use-cases/), [REVIEW_use-cases_v1.0.md](../../outbox/reviews/REVIEW_use-cases_v1.0.md) |
 | 2026-07-07 | U | Assistant | **functions.md refreshed** — v0.4 shipped vs deferred; v1.1 ATG fetch, F-052 basic, module map | [functions.md](./requirements/functions.md) |

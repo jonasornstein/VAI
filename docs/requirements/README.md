@@ -3,8 +3,10 @@
 | Field | Value |
 |-------|-------|
 | **Version** | 1.0 |
-| **Status** | DRAFT |
-| **Last updated** | 2026-07-06 |
+| **Status** | APPROVED |
+| **Reviewer** | Jonte |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Methodology** | IBM RUP + [AIRUP](../AIRUP.md) |
 | **Owner** | Jonte (M-004) |
 
@@ -60,6 +62,8 @@ The monolithic [SRS](../SRS.md) is split into three RUP artifacts. Each has a si
 | [race-card-schema.md](./race-card-schema.md) | Race card YAML format (auto-fetched from ATG) |
 | [ux-workflow.md](./ux-workflow.md) | Operator UX: DATUM, BANA, horse picks, SYSTEMKOSTNAD |
 
-## Next step
+## Status (2026-07-07)
 
-Operator review of use cases (UC-20 checklist, UC-22 flow); Povl review of F-053 optimizer; Nisse review of UC-12 templates. Draft changes in `pending/requirements/` before APPROVED promotion.
+RUP trilogy **APPROVED** for v1.1: Vision, use-case model + all UCs, functions catalog, supplementary spec, ux-workflow, race-card-schema.
+
+**Next:** v1.2 specs (reduced-stake, disk cache); UC-12/13 implementation when modes enabled.
