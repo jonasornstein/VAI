@@ -2,14 +2,18 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.3 |
-| **Status** | DRAFT |
+| **Version** | 1.0 |
+| **Status** | APPROVED |
+| **Reviewer** | Povl (format), Nisse (scratches/reserves) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Owner** | Povl (format), Nisse (scratches/reserves) |
 | **Glossary** | [VISION.md §8 — Race card](../VISION.md#8-glossary) |
+| **Spec** | [atg-data-source.md](../../outbox/specs/atg-data-source.md) (ATG mapping) |
 
 Canonical file location: `inbox/race-cards/<YYYY-MM-DD>-<track>.yaml`
 
-**v1 primary ingestion:** **manual YAML** (operator or agent). **v1.1+:** automatic via F-007 `fetch_race_card_from_atg` (UC-09).
+**v1.1 ingestion:** ATG `game_id` via F-007 (primary in local UI). **Fallback:** manual YAML in `inbox/race-cards/`.
 
 ---
 
@@ -21,7 +25,7 @@ Canonical file location: `inbox/race-cards/<YYYY-MM-DD>-<track>.yaml`
 | `date` | ISO date | Race day `YYYY-MM-DD` |
 | `track` | string | Track name (e.g. `Halmstad`) |
 | `legs` | array[8] | Exactly 8 leg objects for V85 |
-| `source` | enum | `atg-api` \| `atg-web` \| `manual` |
+| `source` | enum | `atg` \| `atg-api` \| `atg-web` \| `manual` |
 | `fetched_at` | ISO datetime | When card was collected |
 | `settled` | boolean | All legs have official results (drives F-027 default date) |
 
@@ -78,6 +82,7 @@ legs:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — v1.1 ATG primary; `source: atg` aligned with implementation |
 | 0.3 | 2026-07-07 | v1 primary ingestion = manual YAML; ATG fetch v1.1+ |
 | 0.2 | 2026-07-06 | Primary ingestion via ATG auto-fetch; source enum |
 | 0.1 | 2026-07-06 | Initial YAML schema for v1 |
