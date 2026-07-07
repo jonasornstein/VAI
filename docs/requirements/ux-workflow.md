@@ -2,8 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.3 |
-| **Status** | DRAFT |
+| **Version** | 1.0 |
+| **Status** | APPROVED |
+| **Reviewer** | Jonte (operator) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Owner** | Jonte (M-004) |
 | **Use cases** | UC-09, UC-10, UC-11–13, UC-14 |
 | **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` (v1.1) |
@@ -79,6 +82,7 @@ flowchart TD
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — v1.1 operator flow; matches shipped mockup and local UI |
 | 0.3 | 2026-07-07 | v1.1: ATG schedule/cards, Hari, exact budget, nearest stake, F-052 |
 | 0.2 | 2026-07-07 | v1: manual YAML, Random default; ATG fetch deferred |
 | 0.1 | 2026-07-06 | Initial workflow per operator specification |
