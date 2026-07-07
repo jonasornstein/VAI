@@ -18,6 +18,10 @@ def pools_from_race_card(race_card: RaceCard) -> dict[int, list[int]]:
     return {leg.leg: list(leg.horses) for leg in race_card.legs}
 
 
+def empty_operator_pools() -> dict[int, list[int]]:
+    return {leg: [] for leg in range(1, 9)}
+
+
 def load_operator_pools(path: str | Path) -> dict[int, list[int]]:
     data = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     if not isinstance(data, dict):

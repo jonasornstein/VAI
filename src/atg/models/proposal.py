@@ -35,3 +35,5 @@ class RandomError:
     combinations: int | None = None
     selections: dict[int, list[int]] | None = None
     shrink_steps_used: int | None = None
+    suggested_stake_sek: float | None = None
+    suggested_combinations: int | None = None

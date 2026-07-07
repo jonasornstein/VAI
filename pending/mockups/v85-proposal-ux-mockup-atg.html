@@ -1280,9 +1280,24 @@
           .catch(function (e) { setApiStatus(false, "card load"); console.error(e); });
       }
 
-      function generate() {
+      function offerSuggestedStake(err, budget, onAccept) {
+        if (!err || err.code !== "BUDGET_NOT_MET" || err.suggested_stake_sek == null) return false;
+        var suggested = err.suggested_stake_sek;
+        var rows = err.suggested_combinations;
+        var msg =
+          "Kan inte nå exakt systemkostnad " + fmtSek(budget) + " SEK med nuvarande markeringar.\n\n" +
+          "Närmaste möjliga kostnad är " + fmtSek(suggested) + " SEK";
+        if (rows != null) msg += " (" + fmtNum(rows) + " rader)";
+        msg += ".\n\nVill du ändra systemkostnad och generera igen?";
+        if (confirm(msg)) {
+          document.getElementById("stake-input").value = String(suggested);
+          onAccept(suggested);
+        }
+        return true;
+      }
+
+      function generateWithBudget(budget) {
         if (!currentCard) return;
-        var budget = parseFloat(document.getElementById("stake-input").value, 10);
         var seed = readSeed();
         if (seed === undefined) return;
         var operatorPools = collectPools();
@@ -1311,7 +1326,10 @@
           .then(function (res) {
             document.getElementById("btn-generate").disabled = false;
             if (!res.ok) {
-              alert((res.j.error && res.j.error.message) || "Generering misslyckades");
+              var err = res.j.error;
+              if (!offerSuggestedStake(err, budget, generateWithBudget)) {
+                alert((err && err.message) || "Generering misslyckades");
+              }
               return;
             }
             applyGeneratedSelections(operatorPools, res.j.selections);
@@ -1323,6 +1341,11 @@
             alert("API fel — kör python -m atg serve");
             console.error(e);
           });
+      }
+
+      function generate() {
+        var budget = parseFloat(document.getElementById("stake-input").value, 10);
+        generateWithBudget(budget);
       }
 
       document.getElementById("bana").addEventListener("change", loadSelectedCard);
