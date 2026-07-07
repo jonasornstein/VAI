@@ -111,7 +111,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 | **2 — Quant specs** | **I**→**R**→**P** specs | Povl approves `docs/strategies/quantitative.md` ✓ |
 | **2b — Requirements** | **R** use cases | RUP trilogy; enter UC narratives *(current)* |
 | **3 — Generators** | **R** code via `pending/specs/` | Random v1 ✓ in `src/`; expert/quant on hold |
-| **3b — Local UI** | **R**→**P** | Mockup wired to generator ([local-ui-v1.1](../pending/specs/local-ui-v1.1.md)) |
+| **3b — Local UI** | **R**→**P** | Mockup wired to generator ([local-ui-v1.1](../outbox/specs/local-ui-v1.1.md)) ✓ |
 | **4 — Race day** | **I** race cards → **P** proposals | Operators use `outbox/proposals/` ✓ (sample) |
 | **5 — More games** | AIRUP per game | V86, V64, etc. (V75 discontinued) |
 
