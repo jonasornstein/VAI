@@ -2,67 +2,69 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.1 |
+| **Version** | 0.2 |
 | **Status** | APPROVED |
 | **AIRUP phase** | R → P |
 | **Reviewer** | Jonte |
 | **Last updated** | 2026-07-07 |
-| **Parent** | [scope-lock-v1-random.md](../../outbox/specs/scope-lock-v1-random.md) |
+| **Parent** | [scope-lock-v1-random.md](./scope-lock-v1-random.md) |
+| **Related** | [random-v1.1.md](./random-v1.1.md), [atg-data-source.md](./atg-data-source.md) |
 
 ---
 
 ## 1. Purpose
 
-Wire the **v0.5 ATG mockup** to the **random v1 generator** via a local HTTP API — no ATG fetch, no expert/quant.
+Wire the **ATG mockup** to the **Hari (random) generator** via a local HTTP API, with live ATG schedule and race cards.
 
 ## 2. Architecture
 
 ```
 Browser (mockup HTML + JS)  →  localhost:8765  →  atg.server
+                              GET  /api/v1/schedule/v85
                               GET  /api/v1/race-cards
                               GET  /api/v1/race-cards/{id}
                               POST /api/v1/generate/random
-                              GET  /mockup/…  (static files)
 ```
 
-- **Stack:** Python `http.server` (stdlib only), existing `generate_random_v1`.
-- **Race cards:** `inbox/race-cards/*.yaml`
-- **Mockup:** `outbox/mockups/v85-proposal-ux-mockup-atg.html` (+ JS inline)
+- **Stack:** Python `http.server` (stdlib), `generate_random_v1`, ATG fetch helpers.
+- **Race cards:** ATG `game_id` (primary) or `inbox/race-cards/*.yaml`
+- **Mockup:** `outbox/mockups/v85-proposal-ux-mockup-atg.html`
 
 ## 3. API
 
-### GET `/api/v1/race-cards`
+### GET `/api/v1/schedule/v85`
 
-```json
-{"race_cards": [{"id": "2026-07-05-halmstad", "date": "2026-07-05", "track": "Halmstad"}]}
-```
+Schedule dates and rounds (`game_id`, track, `default_date`).
 
 ### GET `/api/v1/race-cards/{id}`
 
-Full card JSON (legs, horses, scratches, reserves).
+Full card JSON. ATG ids include optional `leg_distributions` for F-052.
 
 ### POST `/api/v1/generate/random`
 
 ```json
 {
-  "race_card_id": "2026-07-05-halmstad",
-  "pools": {"1": [2, 3], "2": [1], "...": "..."},
+  "race_card_id": "V85_2026-07-11_31_5",
+  "pools": {"1": [], "2": [5], "...": "..."},
   "budget": 500,
-  "seed": 42
+  "seed": 42,
+  "frozen_legs": [3]
 }
 ```
 
-Success `200`: selections, combinations, cost_sek, cost_breakdown, shrink_steps_used.
+Success `200`: selections, `cost_sek`, `cost_breakdown`, optional `hit_summary`.
 
-Error `400`: `{ "error": { "code", "message", "hint" } }`.
+Error `400`: `BUDGET_NOT_MET` may include `suggested_stake_sek`, `suggested_combinations`.
 
 ## 4. UX behaviour (v1.1)
 
-1. On load: list race cards; default first card.
-2. Render leg grid from API (horse toggles, scratches disabled).
-3. All horses **pool-selected** by default (full pool).
-4. **Generera system** → POST → update slip + cost sidebar.
-5. Expert/Kvant tabs remain disabled.
+1. On load: fetch V85 schedule; populate DATUM/BANA; load race card.
+2. Horse toggles: optional operator marks (orange); random fill on generate.
+3. **Frys avd.** — frozen legs require marks.
+4. **Generera system** — exact SYSTEMKOSTNAD; nearest-stake confirm on failure.
+5. **Träffsannolikhet** — bars when `leg_distributions` present.
+6. **Hari** tab active; Expert/Kvant disabled.
+7. **Skriv ut spelkvitto** / **Öppna ATG/{spelform}** — manual entry only.
 
 ## 5. Run
 
@@ -74,10 +76,10 @@ python -m atg serve
 
 ## 6. Out of scope
 
-- ATG live fetch (UC-09)
-- PDF export button
 - Expert / quant modes
+- V75 schedule API (spelform selector enabled for title/ATG link only)
 - Hosted deployment / auth
+- Automated bet placement
 
 ---
 
@@ -85,4 +87,5 @@ python -m atg serve
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2 | 2026-07-07 | ATG schedule/cards, Hari UX, exact budget, hit summary, nearest stake |
 | 0.1 | 2026-07-07 | Initial spec — Option B |

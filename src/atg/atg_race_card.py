@@ -110,8 +110,47 @@ def parse_atg_game(game_id: str, payload: dict[str, Any]) -> RaceCard:
     )
 
 
+def extract_leg_distributions(payload: dict[str, Any]) -> dict[int, dict[int, float]]:
+    """Map leg -> horse -> V85 bet fraction from ATG game JSON."""
+    races = payload.get("races")
+    if not isinstance(races, list):
+        return {}
+
+    distributions: dict[int, dict[int, float]] = {}
+    for index, race in enumerate(races, start=1):
+        if not isinstance(race, dict):
+            continue
+        starts = race.get("starts")
+        if not isinstance(starts, list):
+            continue
+        leg_map: dict[int, float] = {}
+        for start in starts:
+            if not isinstance(start, dict):
+                continue
+            number = start.get("number")
+            if not isinstance(number, int):
+                continue
+            pools = start.get("pools")
+            if not isinstance(pools, dict):
+                continue
+            v85_pool = pools.get("V85")
+            if not isinstance(v85_pool, dict):
+                continue
+            bet_distribution = v85_pool.get("betDistribution")
+            if isinstance(bet_distribution, (int, float)):
+                leg_map[number] = float(bet_distribution) / 10000.0
+        if leg_map:
+            distributions[index] = leg_map
+    return distributions
+
+
 def fetch_race_card_from_atg(game_id: str) -> RaceCard:
+    card, _ = fetch_atg_race_card_bundle(game_id)
+    return card
+
+
+def fetch_atg_race_card_bundle(game_id: str) -> tuple[RaceCard, dict[int, dict[int, float]]]:
     if not is_atg_game_id(game_id):
         raise ValueError(f"Invalid ATG game id: {game_id}")
     payload = fetch_v85_game(game_id)
-    return parse_atg_game(game_id, payload)
+    return parse_atg_game(game_id, payload), extract_leg_distributions(payload)

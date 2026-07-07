@@ -752,7 +752,7 @@
         <label for="spelform">Spelform</label>
         <select class="meta-select" id="spelform">
           <option value="V85" selected>V85</option>
-          <option value="V75" disabled>V75 (kommande)</option>
+          <option value="V75">V75</option>
         </select>
       </div>
       <div class="meta-item">
@@ -826,7 +826,8 @@
         </div>
         <div class="summary-card">
           <h3>Träffsannolikhet (modell)</h3>
-          <p class="stake-hint" style="margin-top:0">Ej tillgänglig i Random v1 (valfritt senare med odds).</p>
+          <p class="stake-hint" id="hit-summary-placeholder" style="margin-top:0">Laddas efter generering när ATG andelar finns.</p>
+          <div class="hit-bars" id="hit-bars" hidden></div>
         </div>
         <button class="button button--blue btn-action btn-generate" id="btn-generate" type="button">Generera system</button>
         <div class="summary-card">
@@ -844,7 +845,7 @@
     </div>
 
     <div class="rationale">
-      <h2>Rationale — Random</h2>
+      <h2>Rationale — Hari</h2>
       <p id="rationale-text">Slumpmässigt urval ur operatörens kandidatpool per avdelning.</p>
     </div>
   </div>
@@ -854,7 +855,9 @@
   <script>
     (function () {
       var API = "";
-      var ATG_V85_URL = "https://www.atg.se/v85";
+      function atgGameUrl(game) {
+        return "https://www.atg.se/" + String(game || "V85").toLowerCase();
+      }
       var storageKey = "atg-mockup-theme";
       var root = document.documentElement;
       var themeBtns = document.querySelectorAll("[data-theme-set]");
@@ -1049,6 +1052,7 @@
         document.title = title + " — ATG UX v1.1 (Local UI)";
         var logo = document.getElementById("app-logo");
         if (logo) logo.setAttribute("title", title);
+        updateOpenAtgButton();
       }
 
       function getSlipMeta() {
@@ -1186,8 +1190,50 @@
         window.print();
       }
 
+      function updateOpenAtgButton() {
+        var game = selectedGameType();
+        var btn = document.getElementById("btn-open-atg");
+        if (btn) btn.textContent = "Öppna ATG/" + game;
+      }
+
       function openAtg() {
-        window.open(ATG_V85_URL, "_blank", "noopener,noreferrer");
+        window.open(atgGameUrl(selectedGameType()), "_blank", "noopener,noreferrer");
+      }
+
+      function formatHitPct(value) {
+        return (value * 100).toFixed(2).replace(".", ",") + " %";
+      }
+
+      function resetHitSummary() {
+        var bars = document.getElementById("hit-bars");
+        var placeholder = document.getElementById("hit-summary-placeholder");
+        if (bars) {
+          bars.hidden = true;
+          bars.innerHTML = "";
+        }
+        if (placeholder) placeholder.hidden = false;
+      }
+
+      function renderHitSummary(summary) {
+        var bars = document.getElementById("hit-bars");
+        var placeholder = document.getElementById("hit-summary-placeholder");
+        if (!bars || !placeholder) return;
+        if (!summary) {
+          resetHitSummary();
+          return;
+        }
+        placeholder.hidden = true;
+        bars.hidden = false;
+        var rows = [
+          ["8 rätt", summary.p8],
+          ["≥7 rätt", summary.p7plus],
+          ["≥6 rätt", summary.p6plus],
+          ["≥5 rätt", summary.p5plus]
+        ];
+        bars.innerHTML = rows.map(function (row) {
+          var pct = Math.min(100, Math.max(0, row[1] * 100));
+          return '<div class="hit-row"><span>' + row[0] + '</span><div class="bar-bg"><div class="bar-fill" style="width:' + pct + '%"></div></div><span>' + formatHitPct(row[1]) + "</span></div>";
+        }).join("");
       }
 
       function renderSlip(selections, seed) {
@@ -1223,17 +1269,23 @@
       }
 
       function updateCost(data, budget) {
+        var exact = Math.abs(data.cost_sek - budget) < 0.001;
         var ok = data.cost_sek <= budget + 0.001;
+        var budgetLabel = exact ? "= budget" : (ok ? "≤ budget" : "");
         document.getElementById("cost-big").innerHTML =
-          fmtSek(data.cost_sek) + ' <span>SEK</span>' + (ok ? '<span class="cost-ok">≤ budget</span>' : "");
+          fmtSek(data.cost_sek) + ' <span>SEK</span>' + (budgetLabel ? '<span class="cost-ok">' + budgetLabel + "</span>" : "");
         document.getElementById("stat-rows-count").textContent = fmtNum(data.combinations);
         document.getElementById("stat-breakdown").textContent = data.cost_breakdown;
         document.getElementById("stat-shrink").textContent = String(data.shrink_steps_used);
         updateSlipFooter(data.combinations, data.cost_sek);
         updateOperatorChecklist(data.selections, data.cost_sek, budget);
+        renderHitSummary(data.hit_summary || null);
         document.getElementById("rationale-text").textContent =
-          "Markerade hästar låses. Slumpen fyller på med " + data.shrink_steps_used +
-          " hästar till budget. " + (data.seed != null ? "Seed " + data.seed + "." : "");
+          RATIONALE_DEFAULT +
+          " Markerade hästar låses. Slumpen fyller på med " +
+          data.shrink_steps_used +
+          " hästar till budget." +
+          (data.seed != null ? " Seed " + data.seed + "." : "");
       }
 
       function populateDropdowns(data) {
@@ -1276,6 +1328,7 @@
             currentCard = card;
             document.getElementById("source-badge").textContent = (card.source || "yaml").toUpperCase();
             renderLegs(card);
+            resetHitSummary();
           })
           .catch(function (e) { setApiStatus(false, "card load"); console.error(e); });
       }
@@ -1355,6 +1408,8 @@
       document.getElementById("btn-open-atg").addEventListener("click", openAtg);
       document.getElementById("spelform").addEventListener("change", updateAppTitle);
       updateAppTitle();
+      updateOpenAtgButton();
+      resetHitSummary();
       resetOperatorChecklist();
 
       fetch(API + "/api/v1/schedule/v85")

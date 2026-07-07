@@ -13,7 +13,8 @@ from typing import Any
 from urllib.parse import urlparse
 
 from atg.atg_fetch import AtgFetchError
-from atg.atg_race_card import fetch_race_card_from_atg, is_atg_game_id
+from atg.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
+from atg.hit_summary import compute_hit_summary
 from atg.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
 from atg.models.proposal import RandomError, RandomResult
 from atg.schedule import fetch_atg_schedule, schedule_to_dict
@@ -95,7 +96,7 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_ID", "message": card_id}})
                 return
             try:
-                card = fetch_race_card_from_atg(card_id)
+                card, leg_distributions = fetch_atg_race_card_bundle(card_id)
             except AtgFetchError as exc:
                 self._send_json(
                     HTTPStatus.BAD_GATEWAY,
@@ -110,6 +111,11 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
                 return
             payload = race_card_to_dict(card)
             payload["id"] = card_id
+            if leg_distributions:
+                payload["leg_distributions"] = {
+                    str(leg): {str(horse): value for horse, value in horses.items()}
+                    for leg, horses in leg_distributions.items()
+                }
             self._send_json(HTTPStatus.OK, payload)
             return
 
@@ -125,10 +131,10 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
         payload["id"] = card_id
         self._send_json(HTTPStatus.OK, payload)
 
-    def _load_race_card(self, card_id: str):
+    def _load_race_card_bundle(self, card_id: str) -> tuple:
         if is_atg_game_id(card_id):
-            return fetch_race_card_from_atg(card_id)
-        return load_race_card_by_id(self.race_cards_dir, card_id)
+            return fetch_atg_race_card_bundle(card_id)
+        return load_race_card_by_id(self.race_cards_dir, card_id), None
 
     def _handle_generate_random(self) -> None:
         try:
@@ -143,7 +149,7 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            card = self._load_race_card(card_id)
+            card, leg_distributions = self._load_race_card_bundle(card_id)
         except FileNotFoundError:
             self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": card_id}})
             return
@@ -212,17 +218,18 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
             return
 
         assert isinstance(outcome, RandomResult)
-        self._send_json(
-            HTTPStatus.OK,
-            {
-                "selections": {str(k): v for k, v in outcome.selections.items()},
-                "combinations": outcome.combinations,
-                "cost_sek": outcome.cost_sek,
-                "cost_breakdown": outcome.cost_breakdown,
-                "shrink_steps_used": outcome.shrink_steps_used,
-                "seed": outcome.manifest.seed,
-            },
-        )
+        response: dict[str, Any] = {
+            "selections": {str(k): v for k, v in outcome.selections.items()},
+            "combinations": outcome.combinations,
+            "cost_sek": outcome.cost_sek,
+            "cost_breakdown": outcome.cost_breakdown,
+            "shrink_steps_used": outcome.shrink_steps_used,
+            "seed": outcome.manifest.seed,
+        }
+        hit_summary = compute_hit_summary(outcome.selections, leg_distributions)
+        if hit_summary is not None:
+            response["hit_summary"] = hit_summary
+        self._send_json(HTTPStatus.OK, response)
 
     def _read_json_body(self) -> dict[str, Any]:
         length = int(self.headers.get("Content-Length", "0"))

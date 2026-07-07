@@ -64,7 +64,7 @@ def format_proposal_markdown(
 
 ## Rationale
 
-Random draw from operator pools; greedy shrink if over SYSTEMKOSTNAD ({result.shrink_steps_used} shrink step(s) used).
+Hari (random): operator marks locked; slumpen fyller på till exakt SYSTEMKOSTNAD ({result.shrink_steps_used} hästar tillagda av slumpen).
 
 ## Manifest
 

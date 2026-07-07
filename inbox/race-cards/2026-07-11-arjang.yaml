@@ -1,0 +1,141 @@
+game: v85
+date: '2026-07-11'
+track: Årjäng
+source: atg
+fetched_at: '2026-07-07T10:37:58.459024+00:00'
+settled: false
+legs:
+- leg: 1
+  race_label: V85-5
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  start_time: '16:10'
+- leg: 2
+  race_label: V85-6
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  start_time: '16:32'
+- leg: 3
+  race_label: V85-7
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  start_time: '16:54'
+- leg: 4
+  race_label: V85-8
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  start_time: '17:16'
+- leg: 5
+  race_label: V85-9
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  start_time: '17:38'
+- leg: 6
+  race_label: V85-10
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  start_time: '18:05'
+- leg: 7
+  race_label: V85-11
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  start_time: '18:25'
+- leg: 8
+  race_label: V85-12
+  horses:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  start_time: '18:45'

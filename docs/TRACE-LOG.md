@@ -14,6 +14,11 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-07 | P | Povl | **Random v1.1 + ATG data source APPROVED** — exact-budget Hari, nearest stake, F-052 basic | [random-v1.1.md](../../outbox/specs/random-v1.1.md), [atg-data-source.md](../../outbox/specs/atg-data-source.md) |
+| 2026-07-07 | P | Jonte | **V85 Årjäng 2026-07-11 proposal APPROVED** — Hari seed 42, 500 SEK, 1 000 rader | [proposal.md](../../outbox/proposals/v85/2026-07-11-arjang/proposal.md) |
+| 2026-07-07 | P | Jonte | **V75 spelform v1.1** — selector enabled for title/ATG link; V85 schedule API unchanged until `docs/betting/v75.md` | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
+| 2026-07-07 | R | Assistant | **Random v1.1 spec + ATG data source** — exact-budget Hari, nearest stake, F-052 basic; docs and UX workflow updated | [random-v1.1.md](../../pending/specs/random-v1.1.md), [atg-data-source.md](../../pending/specs/atg-data-source.md) |
+| 2026-07-07 | R | Assistant | **Race-day draft** — Årjäng 2026-07-11 inbox card + pending proposal (seed 42, 500 SEK) | [pending/proposals/v85/2026-07-11-arjang/](../../pending/proposals/v85/2026-07-11-arjang/) |
 | 2026-07-07 | U | Jonte | **Hästar labels** — legend `Slumpens hästar`; stat `Antal hästar tillagda`; rationale uses `hästar till budget` (seed help unchanged) | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
 | 2026-07-07 | U | Jonte | **Rationale text** — default `Slumpmässigt urval ur operatörens kandidatpool per avdelning.`; after generate appends `Markerade hästar låses. Slumpen fyller på med x hästar till budget.` | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
 | 2026-07-07 | U | Jonte | **Hari mode + action buttons** — Random tab renamed `Hari`; `GENERERA SYSTEM` and `ÖPPNA ATG/V85` matched size via `.btn-action` | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
