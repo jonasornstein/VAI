@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <title>ATG V85 Proposal — UX Mockup</title>
+  <style>
+    :root {
+      --atg-blue: #014f9f;
+      --atg-blue-light: #e8f1fa;
+      --green: #1a7f4b;
+      --amber: #b45309;
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --text: #1a1f2e;
+      --muted: #5c6578;
+      --border: #d8dee8;
+      --radius: 12px;
+      --shadow: 0 8px 28px rgba(1, 79, 159, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding: 32px;
+    }
+    .mockup-banner {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #664d03;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 24px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .app {
+      max-width: 1180px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    header {
+      background: linear-gradient(135deg, var(--atg-blue) 0%, #0369b5 100%);
+      color: white;
+      padding: 20px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    header .sub { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+    .badge {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .meta-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .meta-item {
+      background: #fafbfc;
+      padding: 14px 18px;
+    }
+    .meta-item label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .meta-item strong { font-size: 15px; }
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 16px 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      padding: 10px 18px;
+      border-radius: 8px 8px 0 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      border: 1px solid transparent;
+      border-bottom: none;
+      background: transparent;
+    }
+    .tab.active {
+      color: var(--atg-blue);
+      background: white;
+      border-color: var(--border);
+      margin-bottom: -1px;
+    }
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 0;
+      min-height: 520px;
+    }
+    .legs-panel { padding: 24px 28px; }
+    .legs-panel h2 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .leg-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      background: #fff;
+    }
+    .leg-card .leg-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .leg-num {
+      background: var(--atg-blue);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .race-info { font-size: 12px; color: var(--muted); text-align: right; }
+    .horses {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .horse {
+      background: var(--atg-blue-light);
+      color: var(--atg-blue);
+      border: 1px solid #b8d4f0;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .horse.spik { background: var(--atg-blue); color: white; border-color: var(--atg-blue); }
+    .reserves {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .sidebar {
+      background: #f8fafc;
+      border-left: 1px solid var(--border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .summary-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .summary-card h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .cost-big {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--atg-blue);
+      letter-spacing: -0.03em;
+    }
+    .cost-big span { font-size: 16px; font-weight: 600; }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eef1f5;
+      font-size: 14px;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row strong { font-variant-numeric: tabular-nums; }
+    .hit-bars { margin-top: 8px; }
+    .hit-row {
+      display: grid;
+      grid-template-columns: 52px 1fr 48px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .bar-bg {
+      height: 8px;
+      background: #e8edf3;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar-fill { height: 100%; background: var(--atg-blue); border-radius: 4px; }
+    .checklist { list-style: none; font-size: 13px; }
+    .checklist li {
+      padding: 8px 0 8px 28px;
+      position: relative;
+      border-bottom: 1px solid #eef1f5;
+    }
+    .checklist li::before {
+      content: "☐";
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+    }
+    .checklist li.done::before { content: "☑"; color: var(--green); }
+    .btn-primary {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--atg-blue);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      margin-top: auto;
+    }
+    .btn-secondary {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: white;
+      color: var(--atg-blue);
+      border: 2px solid var(--atg-blue);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .rationale {
+      padding: 20px 28px 28px;
+      border-top: 1px solid var(--border);
+      background: #fafbfc;
+    }
+    .rationale h2 { font-size: 15px; margin-bottom: 8px; }
+    .rationale p { font-size: 14px; color: var(--muted); max-width: 900px; }
+    .airup-strip {
+      margin-top: 28px;
+      max-width: 1180px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 28px;
+      box-shadow: var(--shadow);
+    }
+    .airup-strip h2 { font-size: 15px; margin-bottom: 16px; }
+    .pipeline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 12px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: #fafbfc;
+    }
+    .step.done { background: #e8f5ee; border-color: #a7d4b8; color: var(--green); }
+    .step.current { background: var(--atg-blue-light); border-color: #7eb8e8; color: var(--atg-blue); }
+    .arrow { color: var(--muted); font-size: 18px; }
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+    .status-approved {
+      display: inline-block;
+      background: #e8f5ee;
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    @media print {
+      body { padding: 0; background: white; }
+      .mockup-banner { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-banner">UX MOCKUP — Ingen funktionalitet · Endast visuell design · ATG-projektet</div>
+
+  <div class="app">
+    <header>
+      <div>
+        <h1>V85 Proposal</h1>
+        <div class="sub">Beslutstöd för manuell inmatning på atg.se</div>
+      </div>
+      <div class="badge">Mockup v0.1 · 2026-07-06</div>
+    </header>
+
+    <div class="meta-bar">
+      <div class="meta-item"><label>Bana</label><strong>Halmstad</strong></div>
+      <div class="meta-item"><label>Datum</label><strong>2026-07-05</strong></div>
+      <div class="meta-item"><label>Spelform</label><strong>V85</strong></div>
+      <div class="meta-item"><label>Läge</label><strong>Quantitative</strong></div>
+      <div class="meta-item"><label>AIRUP</label><strong><span class="status-approved">APPROVED</span></strong></div>
+    </div>
+
+    <div class="mode-tabs">
+      <div class="tab">Random</div>
+      <div class="tab">Expert</div>
+      <div class="tab active">Quantitative</div>
+    </div>
+
+    <div class="content">
+      <section class="legs-panel">
+        <h2>Avdelningar <span style="font-weight:400;color:var(--muted);font-size:13px;">8 rätt · välj vinnare per lopp</span></h2>
+        <div class="legs-grid">
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">1</div><div class="race-info">V85-1 · 15:00</div></div>
+            <div class="horses"><span class="horse spik">3</span></div>
+            <div class="reserves">Reserver: 7, 12</div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">2</div><div class="race-info">V85-2 · 15:20</div></div>
+            <div class="horses"><span class="horse">4</span><span class="horse">9</span><span class="horse">11</span></div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">3</div><div class="race-info">V85-3 · 15:40</div></div>
+            <div class="horses"><span class="horse spik">1</span></div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">4</div><div class="race-info">V85-4 · 16:00</div></div>
+            <div class="horses"><span class="horse">2</span><span class="horse">6</span></div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">5</div><div class="race-info">V85-5 · 16:20</div></div>
+            <div class="horses"><span class="horse spik">8</span></div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">6</div><div class="race-info">V85-6 · 16:40</div></div>
+            <div class="horses"><span class="horse">3</span><span class="horse">5</span><span class="horse">10</span><span class="horse">13</span></div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">7</div><div class="race-info">V85-7 · 17:00</div></div>
+            <div class="horses"><span class="horse spik">2</span></div>
+          </div>
+          <div class="leg-card">
+            <div class="leg-head"><div class="leg-num">8</div><div class="race-info">V85-8 · 17:20</div></div>
+            <div class="horses"><span class="horse">1</span><span class="horse">4</span></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="summary-card">
+          <h3>Systemkostnad</h3>
+          <div class="cost-big">24,00 <span>SEK</span></div>
+          <div class="stat-row"><span>Rader</span><strong>48</strong></div>
+          <div class="stat-row"><span>Radpris</span><strong>0,50 SEK</strong></div>
+          <div class="stat-row"><span>Beräkning</span><strong>1×3×1×2×1×4×1×2</strong></div>
+        </div>
+        <div class="summary-card">
+          <h3>Träffsannolikhet (modell)</h3>
+          <div class="hit-bars">
+            <div class="hit-row"><span>8 rätt</span><div class="bar-bg"><div class="bar-fill" style="width:12%"></div></div><span>0,12%</span></div>
+            <div class="hit-row"><span>≥7 rätt</span><div class="bar-bg"><div class="bar-fill" style="width:45%"></div></div><span>1,01%</span></div>
+            <div class="hit-row"><span>≥6 rätt</span><div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div><span>4,2%</span></div>
+          </div>
+        </div>
+        <div class="summary-card">
+          <h3>Innan spel på atg.se</h3>
+          <ul class="checklist">
+            <li class="done">8 avdelningar ifyllda</li>
+            <li class="done">Kostnad verifierad</li>
+            <li>Kontrollera strukna hästar</li>
+            <li>Reserver aktiva</li>
+          </ul>
+        </div>
+        <button class="btn-secondary" type="button">Exportera förslag (PDF)</button>
+        <button class="btn-primary" type="button">Öppna atg.se/v85 ↗</button>
+        <p style="font-size:11px;color:var(--muted);text-align:center;">Placerar inte spel automatiskt</p>
+      </aside>
+    </div>
+
+    <div class="rationale">
+      <h2>Rationale — Quantitative</h2>
+      <p>Maximerar P(≥7 rätt) inom budget 25 SEK. Oberoende ben antaget. Poolandelar enligt v85.md v1.0 (30/20/15/35 från 2026-07-02). Odds källa: ATG (exempeldata).</p>
+    </div>
+  </div>
+
+  <div class="airup-strip">
+    <h2>AIRUP — artefaktstatus</h2>
+    <div class="pipeline">
+      <div class="step done">A Analyze</div>
+      <span class="arrow">→</span>
+      <div class="step done">I Inbox</div>
+      <span class="arrow">→</span>
+      <div class="step done">R Review</div>
+      <span class="arrow">→</span>
+      <div class="step done">U Update</div>
+      <span class="arrow">→</span>
+      <div class="step current">P Publish → outbox</div>
+    </div>
+  </div>
+
+  <p class="footer-note">ATG Trotting Betting Systems · Mockup för Kricke/Jonte · Ingen affärslogik</p>
+</body>
+</html>

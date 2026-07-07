@@ -1,0 +1,41 @@
+game: v85
+date: 2026-07-05
+track: Halmstad
+source: manual
+fetched_at: 2026-07-05T10:00:00+02:00
+settled: false
+legs:
+  - leg: 1
+    race_label: V85-1
+    start_time: "15:00"
+    horses: [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12]
+    scratches: [5]
+    reserves: [7, 12]
+  - leg: 2
+    race_label: V85-2
+    start_time: "15:20"
+    horses: [1, 3, 4, 6, 8, 9, 11]
+  - leg: 3
+    race_label: V85-3
+    start_time: "15:40"
+    horses: [2, 3, 5, 6, 7, 8, 10, 12]
+  - leg: 4
+    race_label: V85-4
+    start_time: "16:00"
+    horses: [1, 2, 4, 5, 9]
+  - leg: 5
+    race_label: V85-5
+    start_time: "16:20"
+    horses: [1, 3, 6, 7, 8, 11, 12]
+  - leg: 6
+    race_label: V85-6
+    start_time: "16:40"
+    horses: [2, 4, 5, 6, 9, 10]
+  - leg: 7
+    race_label: V85-7
+    start_time: "17:00"
+    horses: [1, 3, 5, 7, 8, 9, 11]
+  - leg: 8
+    race_label: V85-8
+    start_time: "17:20"
+    horses: [2, 3, 4, 6, 8, 10, 12]

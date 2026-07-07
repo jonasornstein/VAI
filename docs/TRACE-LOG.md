@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | Jonte |
-| **Last updated** | 2026-07-06 (EOD) |
+| **Last updated** | 2026-07-07 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. Jonte requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,13 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-07 | P | Jonte | **UX mockup v0.5** published — Random default; Expert/Kvant disabled | [outbox/mockups/](../../outbox/mockups/) |
+| 2026-07-07 | P | Jonte | **First random v1 proposal APPROVED** — Halmstad 2026-07-05 → `outbox/proposals/` | [proposal.md](../../outbox/proposals/v85/2026-07-05-halmstad/proposal.md) |
+| 2026-07-07 | R | Assistant | **Operator review** sample proposal Halmstad 2026-07-05 — READY FOR OPERATOR | [REVIEW_proposal_2026-07-05-halmstad.md](../../pending/reviews/REVIEW_proposal_2026-07-05-halmstad.md) |
+| 2026-07-07 | R | Assistant | **UX mockup v0.5:** Random default; Expert/Kvant disabled (*Kommer senare*) | [pending/mockups/](../../pending/mockups/) |
+| 2026-07-07 | R | Assistant | **Random v1 implementation:** `src/atg/` vertical slice + CLI + 13 tests; sample proposal | [src/](../../src/) |
+| 2026-07-07 | R | Jonte + Assistant | **Random v1 spec:** dynamic max_horses_per_leg = pool size; greedy shrink; uniform draw | [random-v1.md](../../pending/specs/random-v1.md) |
+| 2026-07-07 | R | Jonte + Assistant | **v1 scope lock:** Random-only implementation; manual YAML race cards; Expert/Quant UX-only (deferred) | [scope-lock-v1-random.md](../../pending/specs/scope-lock-v1-random.md) |
 | 2026-07-06 | P | Assistant | RUP requirements package (UC-01–UC-31, F-001–F-103, UX workflow) → `docs/requirements/` | [requirements/](./requirements/) |
 | 2026-07-06 | P | Assistant | UX mockup v0.4 (ATG fetch UX, horse pools, SYSTEMKOSTNAD, logo) → `outbox/mockups/` | [outbox/mockups/](../../outbox/mockups/) |
 | 2026-07-06 | R | Assistant | UC-09 ATG auto-fetch; UX workflow; SYSTEMKOSTNAD default 500 SEK | [ux-workflow.md](./requirements/ux-workflow.md) |
@@ -68,11 +75,15 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | ID | Item | Owner |
 |----|------|-------|
+| **SL-*** | **v1 scope lock** — approve `pending/specs/scope-lock-v1-random.md` | Jonte |
+| — | Step 2: `pending/specs/random-v1.md` (close Povl open items in `random.md`) | Povl |
+| — | Step 3–4: `src/atg/` random vertical slice + sample YAML + golden test | Dev |
+| — | Step 5: Mockup — Random default; Expert/Quant disabled (*Kommer senare*) | Jonte |
 | OI-001 | Ingest S-009b Swedish *Spelregler Häst* when ATG updates PDF | Nisse |
 | OI-004 | Spelstopp after Sept 2026 schedule change — TBD | Nisse |
 | — | Commit remaining project scaffold (`.grok/`, `AGENTS.md`, `src/`, etc.) | Jonte |
-| — | Implementation: quant/random/expert generators per approved specs | Povl / dev |
-| — | Enter use-case narratives and function backlog (Phase 2b) | Jonte |
+| — | ATG auto-fetch spec (`pending/specs/atg-data-source.md`) — **deferred post-v1** | Povl |
+| — | Expert / Quant generators — **on hold** until Jonte directs | Povl |
 | — | First race-day proposal via `/generate-proposal` or `/v85-system` | Kricke / Jonte |
 
 ### Notes

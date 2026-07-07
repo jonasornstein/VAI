@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.pytest_cache/
+
+# Agent / local session artifacts
+agent-tools/
+terminals/
+README.md.workspace
+
+# Inbox — large or sensitive raw inputs
+inbox/odds/*.csv
+inbox/race-cards/*.csv
+inbox/research/*.pdf
+*.parquet
+*.db
+*.sqlite
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Local overrides
+CLAUDE.local.md
+AGENTS.local.md

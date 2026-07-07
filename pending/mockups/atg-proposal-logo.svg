@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="V85 Proposal">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#006db6"/>
+      <stop offset="100%" stop-color="#004f9f"/>
+    </linearGradient>
+    <linearGradient id="mane" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f39332"/>
+      <stop offset="100%" stop-color="#ee7202"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="10" fill="url(#bg)"/>
+  <ellipse cx="32" cy="52" rx="22" ry="4" fill="rgba(0,0,0,0.15)"/>
+  <!-- sulky -->
+  <path d="M14 38h28l4 8H10z" fill="#fff" opacity="0.95"/>
+  <circle cx="18" cy="46" r="3.5" fill="#dce0e7" stroke="#00366c" stroke-width="1"/>
+  <circle cx="46" cy="46" r="3.5" fill="#dce0e7" stroke="#00366c" stroke-width="1"/>
+  <!-- horse body -->
+  <path d="M22 36c2-8 8-14 16-14 6 0 10 4 11 10l-3 2c-1-4-4-6-8-6-5 0-9 4-10 9l-6-1z" fill="#fff"/>
+  <!-- head -->
+  <path d="M38 18c4 0 8 3 9 8-2 1-4 1-6 0-1-3-2-5-3-6-1-1-0-2 0-2z" fill="#fff"/>
+  <path d="M44 24c2 2 2 5 0 7" fill="none" stroke="url(#mane)" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- leg -->
+  <path d="M26 36v6M30 36v7" stroke="#00366c" stroke-width="2" stroke-linecap="round"/>
+  <!-- V85 badge -->
+  <rect x="8" y="8" width="30" height="14" rx="3" fill="#22ac07"/>
+  <text x="23" y="18" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="9" font-weight="900" fill="#fff">V85</text>
+  <!-- sparkle -->
+  <path d="M52 12l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z" fill="#79bae5"/>
+</svg>
