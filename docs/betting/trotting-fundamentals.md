@@ -62,7 +62,7 @@ ATG runs several **multi-leg** games where the same principles apply: pick winne
 | Game | Legs | Notes |
 |------|------|-------|
 | V85 | 8 | Priority for this project |
-| V75 | 7 | Wednesday flagship (historically) |
+| ~~V75~~ | 7 | **Discontinued** at ATG (no longer offered) |
 | V86 | 8 | Variant schedule — TBD |
 | V64 | 6 | Smaller pool — TBD |
 
@@ -72,7 +72,7 @@ ATG runs several **multi-leg** games where the same principles apply: pick winne
 
 - [ ] Disqualification and betting settlement
 - [ ] Reserve horse rules per ST/ATG
-- [ ] V85 vs V75 structural differences for system builders
+- [x] V75 discontinued — no separate v75.md planned
 - [ ] 2026 jackpot rule changes
 
 ---

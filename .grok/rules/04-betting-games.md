@@ -19,7 +19,7 @@ Full rules: [docs/betting/v85.md](../../docs/betting/v85.md) (Nisse-maintained).
 
 | Game | Legs | Status |
 |------|------|--------|
-| V75 | 7 | Planned — doc TBD |
+| ~~V75~~ | 7 | **Discontinued** at ATG |
 | V86 | 8 | Planned — doc TBD |
 | V64 | 6 | Planned — doc TBD |
 | DD (Daily Double) | 2 | Planned — doc TBD |

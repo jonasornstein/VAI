@@ -21,7 +21,7 @@ Full spec: [docs/AIRUP.md](docs/AIRUP.md). Rule summary: [.grok/rules/05-airup.m
 ## Priority and scope
 
 - **Primary game:** V85 (8-race Pick8 pool, Saturdays).
-- **Future games:** V75, V86, V64, DD — add via AIRUP research path.
+- **Future games:** V86, V64, DD — add via AIRUP research path (V75 discontinued at ATG).
 - **Three proposal modes:** `random`, `expert`, `quantitative` — see `docs/strategies/`.
 
 ## Domain experts (personas)

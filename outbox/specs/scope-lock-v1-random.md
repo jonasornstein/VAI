@@ -21,7 +21,7 @@
 | Generation mode | **Random only** (UC-11) | Expert (UC-12), Quantitative (UC-13) |
 | Default mode in UX | **Random** | — |
 | Race card ingestion | **Manual YAML** (`inbox/race-cards/`) | ATG auto-fetch (UC-09, F-006–F-009) |
-| Game | **V85** | V75, V86, V64, DD |
+| Game | **V85** | V86, V64, DD (V75 discontinued at ATG) |
 | Output | Proposal artifact in `pending/` → `outbox/` after operator approval | Web app / ATG integration |
 
 This document **supersedes** conflicting v1 assumptions in [ux-workflow.md](../../docs/requirements/ux-workflow.md) (mode default) and [race-card-schema.md](../../docs/requirements/race-card-schema.md) (primary ingestion) **for implementation planning only**. Canonical requirements docs are updated after **APPROVED** promotion.

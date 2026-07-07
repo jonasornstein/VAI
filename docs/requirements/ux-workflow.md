@@ -65,7 +65,7 @@ flowchart TD
 |-------------------|-------------|----------------|
 | DATUM | ISO date | ATG `default_date` |
 | BANA | Track / game_id | From schedule |
-| SPELFORM | Game dropdown | V85 (V75 title only) |
+| SPELFORM | Game dropdown | V85 only (V75 discontinued at ATG) |
 | Läge | Hari / Expert / Kvantitativ | **Hari** |
 | Avdelningar | Leg grid; horse toggles | From race card |
 | SYSTEMKOSTNAD | Operator budget SEK | **500** |

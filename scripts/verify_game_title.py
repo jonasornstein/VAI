@@ -1,4 +1,4 @@
-"""Verify app title updates when spelform (game type) changes."""
+"""Verify app title shows VAI V85 (V85-only spelform; V75 discontinued at ATG)."""
 
 from __future__ import annotations
 
@@ -17,7 +17,8 @@ def read_title_state(page) -> dict[str, str]:
           headline: document.getElementById('app-headline').textContent.trim(),
           pageTitle: document.title,
           logoTitle: document.getElementById('app-logo').getAttribute('title'),
-          spelform: document.getElementById('spelform').value
+          spelform: document.getElementById('spelform').value,
+          spelformOptions: Array.from(document.getElementById('spelform').options).map(o => o.value)
         })"""
     )
 
@@ -29,54 +30,20 @@ def main() -> int:
         page.goto(URL, wait_until="domcontentloaded", timeout=30000)
         page.wait_for_selector("#app-headline", timeout=20000)
 
-        initial = read_title_state(page)
-        page.locator(".game-header").screenshot(
-            path=str(OUT_DIR / "test-title-v85.png")
-        )
+        state = read_title_state(page)
+        page.locator(".game-header").screenshot(path=str(OUT_DIR / "test-title-v85.png"))
 
-        # V75 is disabled in UI today; enable briefly to verify title wiring.
-        page.evaluate(
-            """() => {
-              const opt = document.querySelector('#spelform option[value="V75"]');
-              if (opt) opt.disabled = false;
-              const sel = document.getElementById('spelform');
-              sel.value = 'V75';
-              sel.dispatchEvent(new Event('change', { bubbles: true }));
-            }"""
-        )
-        v75 = read_title_state(page)
-        page.locator(".game-header").screenshot(
-            path=str(OUT_DIR / "test-title-v75.png")
-        )
-
-        page.select_option("#spelform", "V85")
-        back = read_title_state(page)
-
-        print("=== Initial (V85) ===")
-        print(initial)
+        print("=== V85 title state ===")
+        print(state)
         print("Screenshot:", OUT_DIR / "test-title-v85.png")
-        print()
-        print("=== After change to V75 ===")
-        print(v75)
-        print("Screenshot:", OUT_DIR / "test-title-v75.png")
-        print()
-        print("=== After change back to V85 ===")
-        print(back)
 
         ok = (
-            initial["headline"] == "VAI V85"
-            and initial["pageTitle"] == "VAI V85 — ATG UX v1.1 (Local UI)"
-            and initial["logoTitle"] == "VAI V85"
-            and initial["spelform"] == "V85"
-            and v75["headline"] == "VAI V75"
-            and v75["pageTitle"] == "VAI V75 — ATG UX v1.1 (Local UI)"
-            and v75["logoTitle"] == "VAI V75"
-            and v75["spelform"] == "V75"
-            and back["headline"] == "VAI V85"
-            and back["pageTitle"] == "VAI V85 — ATG UX v1.1 (Local UI)"
-            and back["spelform"] == "V85"
+            state["headline"] == "VAI V85"
+            and state["pageTitle"] == "VAI V85 — ATG UX v1.1 (Local UI)"
+            and state["logoTitle"] == "VAI V85"
+            and state["spelform"] == "V85"
+            and state["spelformOptions"] == ["V85"]
         )
-        print()
         print("VERIFY PASS:", ok)
         browser.close()
         return 0 if ok else 1

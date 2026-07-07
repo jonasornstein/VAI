@@ -77,7 +77,7 @@ python -m atg serve
 ## 6. Out of scope
 
 - Expert / quant modes
-- V75 schedule API (spelform selector enabled for title/ATG link only)
+- Other spelform (V75 discontinued at ATG; V86/V64 TBD)
 - Hosted deployment / auth
 - Automated bet placement
 

@@ -116,7 +116,7 @@ Exposed in API as `leg_distributions` on ATG race-card responses.
 
 ## 10. Out of scope
 
-- V75 / V86 schedule
+- V86 / V64 schedule (V75 discontinued at ATG)
 - Historical results ingestion
 - Odds archive to `inbox/odds/`
 - Hosted deployment

@@ -116,7 +116,7 @@ When `leg_distributions` available:
 | Reduced-stake systems | UC-14 §3a | α ∈ {0.30, 0.50, 0.70}; separate cost formula |
 | Field-size weighting | SL-003 | Still no |
 | Expert / Quant modes | UC-12, UC-13 | UX tabs disabled |
-| V75 generator | Phase 5 | Spelform selector enabled; schedule TBD |
+| Other games (V86, V64) | Phase 5 | V75 discontinued at ATG — not planned |
 
 ---
 
