@@ -2,11 +2,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.1 |
+| **Version** | 0.2 |
 | **Status** | DRAFT |
 | **Owner** | Jonte (M-004) |
 | **Use cases** | UC-09, UC-10, UC-11–13, UC-14 |
-| **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
+| **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` (v0.5) |
+| **v1 scope** | [scope-lock-v1-random.md](../../outbox/specs/scope-lock-v1-random.md) |
 
 End-to-end operator flow for race-day proposal generation.
 
@@ -16,71 +17,57 @@ End-to-end operator flow for race-day proposal generation.
 
 ```mermaid
 flowchart TD
-  load[UX load] --> defaultDate[F-027 Default DATUM]
-  defaultDate --> fetchSched[F-006 Fetch ATG schedule]
-  fetchSched --> dropdowns[F-028 Populate BANA and SPELFORM]
-  dropdowns --> pickDate[Operator selects DATUM]
-  pickDate --> fetchSched
-  dropdowns --> pickTrack[Operator selects BANA]
-  pickTrack --> fetchCard[F-007 Fetch race card]
-  fetchCard --> showLegs[Display 8 legs and horses]
+  load[UX load] --> card[Load race card YAML]
+  card --> showLegs[Display 8 legs and horses]
   showLegs --> pickHorses[Operator selects horses per leg]
   pickHorses --> stake[Operator enters SYSTEMKOSTNAD]
-  stake --> mode[Operator selects mode tab]
-  mode --> runModel[UC-11 or UC-12 or UC-13]
-  runModel --> slip[Betting slip plus probabilities]
+  stake --> mode[Mode: Random default]
+  mode --> runModel[UC-11 Random]
+  runModel --> slip[Betting slip plus cost]
   slip --> review[UC-20 Review]
 ```
 
+**v1:** race card from manual YAML; **v1.1 local UI** serves mockup + API ([local-ui-v1.1](../../pending/specs/local-ui-v1.1.md)). **Later:** UC-09 ATG auto-fetch for DATUM/BANA.
+
 ---
 
-## Step 1 — Race day selection (UC-09)
+## Step 1 — Race day selection
 
-When the operator opens the app:
+**v1 (manual):** operator picks date/track matching a YAML file in `inbox/race-cards/`.
 
-1. **DATUM** defaults to the **next relevant V85 round** on ATG:
-   - Today's V85 if the round is **not fully settled** (at least one leg lacks official result).
-   - Otherwise the **next future** V85 date listed on ATG.
-2. Changing **DATUM** triggers a fresh fetch; **BANA** and **SPELFORM** dropdowns repopulate from ATG data.
-3. **SPELFORM** defaults to **V85**; other games are future scope.
-4. **BANA** lists track(s) for the chosen date and game.
+**Future (UC-09):** DATUM defaults to next V85 per F-027; BANA/SPELFORM from ATG fetch.
 
 ---
 
 ## Step 2 — Race card and horse selection
 
-1. System **automatically** loads the race card (startlista) for the selected DATUM + BANA + SPELFORM.
+1. System loads race card for selected date + track.
 2. UX shows all 8 legs with eligible start numbers.
-3. Operator **marks which horses** to include in the pool for the active model (per leg). Unmarked horses are excluded from generation for that run.
-4. Operator may switch mode tab (Random / Expert / Quantitative); horse marks may be kept or reset *(TBD — default: keep marks)*.
+3. Operator **marks horses** in the candidate pool per leg (F-026). Unmarked horses are excluded.
+4. **Läge:** Random active by default; Expert and Kvantitativ disabled (*Kommer senare*).
 
 ---
 
 ## Step 3 — Stake budget and model run
 
-1. Operator enters **SYSTEMKOSTNAD** (target system budget in SEK).
-   - **Default: 500 SEK**
-   - This is the budget the model optimizes against (not the per-row ATG minimum alone).
-2. Operator triggers generation; selected mode (UC-11 / UC-12 / UC-13) runs on **operator-selected horse pools** within **SYSTEMKOSTNAD**.
-3. System outputs:
-   - **Betting slip** — final leg selections (spik/gardering) and row breakdown
-   - **Model probability** — hit probabilities per quantitative.md (all modes show summary where applicable)
-   - **Computed cost** — actual system cost (F-061); must be ≤ SYSTEMKOSTNAD unless operator overrides
+1. Operator enters **SYSTEMKOSTNAD** — default **500 SEK** (F-025).
+2. Operator triggers **Generera system**; UC-11 runs on operator pools within budget.
+3. Outputs: betting slip, computed cost (F-061), combination breakdown. Hit probabilities optional in random v1.
 
 ---
 
 ## UX field mapping
 
-| UX label (mockup) | Requirement | Default |
-|-------------------|-------------|---------|
-| DATUM | ISO date; drives fetch | Next V85 per F-027 |
-| BANA | Track dropdown from ATG | First available or last used |
+| UX label (mockup) | Requirement | Default (v1) |
+|-------------------|-------------|--------------|
+| DATUM | ISO date | From available YAML cards |
+| BANA | Track | From card `track` field |
 | SPELFORM | Game dropdown | V85 |
-| Läge | Mode tab: Random / Expert / Quantitative | Quantitative |
+| Läge | Random / Expert / Kvantitativ | **Random** |
 | Avdelningar | Leg grid; horse toggles | From race card |
 | SYSTEMKOSTNAD | Operator budget SEK | **500** |
-| Systemkostnad (computed) | ∏(horses)×0.50 SEK | After model run |
-| Träffsannolikhet | Model hit probs | After model run |
+| Systemkostnad (computed) | ∏(horses)×0.50 SEK | After UC-11 |
+| Träffsannolikhet | Model hit probs | N/A random v1 |
 
 ---
 
@@ -88,4 +75,5 @@ When the operator opens the app:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2 | 2026-07-07 | v1: manual YAML, Random default; ATG fetch deferred |
 | 0.1 | 2026-07-06 | Initial workflow per operator specification |

@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.5 |
+| **Version** | 0.6 |
 | **Status** | DRAFT |
-| **Last updated** | 2026-07-06 |
+| **Last updated** | 2026-07-07 |
 | **RUP role** | Replaces SRS introduction and overall description |
 | **Methodology** | IBM RUP + [AIRUP](./AIRUP.md) |
 | **Owner** | Jonte (M-004) |
@@ -38,10 +38,10 @@ The system is **decision support**, not an autopilot. Humans always place bets.
 ### 2.1 In scope
 
 - Documentation of trotting and ATG betting rules
-- Three proposal generation modes: random, expert, quantitative
+- Three proposal generation modes: **random (v1 shipped)**, expert and quantitative (deferred)
 - V85 as first supported game
 - Human-readable proposal output for manual ATG entry
-- **Automatic race card collection** from ATG website or API (read-only)
+- **Manual YAML race cards** in v1; automatic ATG collection planned v1.1+
 - Operator UX: DATUM → BANA / SPELFORM dropdowns; horse selection; SYSTEMKOSTNAD (default 500 SEK)
 - System cost and combination count calculation; model hit probabilities
 - AIRUP workflow for all artifacts
@@ -71,7 +71,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 | ID | Goal |
 |----|------|
 | G-001 | Generate V85 proposals Kricke/Jonte can enter without rework |
-| G-002 | Support random, expert, and quantitative generation modes |
+| G-002 | Support random, expert, and quantitative generation modes (v1: random only) |
 | G-003 | Maintain authoritative, versioned trotting/betting documentation |
 | G-004 | Compute system cost and combination count correctly |
 | G-005 | Leave a clear audit trail via AIRUP and [TRACE-LOG.md](./TRACE-LOG.md) |
@@ -94,10 +94,11 @@ Full roster: [ROSTER.md](./ROSTER.md).
 ## 6. Success criteria (v1)
 
 - [x] V85 doc approved by Nisse — [v85.md](./betting/v85.md) v1.0 APPROVED
-- [ ] At least one working generator per strategy mode
-- [ ] Sample proposals validated by Kricke or Jonte against ATG UI
-- [ ] Cost formula verified against ATG for 3+ example systems
-- [ ] Use-case specifications **reviewed** by operators (UC-10, UC-20, UC-22) — drafts complete
+- [x] Working **random** generator — [src/](../src/) per [random-v1.md](../outbox/specs/random-v1.md)
+- [x] Sample proposal validated by Jonte — [outbox/proposals/](../outbox/proposals/)
+- [x] Cost formula verified (13 tests + golden seed)
+- [ ] Expert / quantitative generators — deferred
+- [ ] Use-case specifications **reviewed** by operators (UC-10, UC-20) — drafts complete; first proposal reviewed ✓
 
 ---
 
@@ -109,8 +110,9 @@ Full roster: [ROSTER.md](./ROSTER.md).
 | **1 — V85 docs** | **I**→**R**→**P** rules | Nisse approves `docs/betting/v85.md` ✓ |
 | **2 — Quant specs** | **I**→**R**→**P** specs | Povl approves `docs/strategies/quantitative.md` ✓ |
 | **2b — Requirements** | **R** use cases | RUP trilogy; enter UC narratives *(current)* |
-| **3 — Generators** | **R** code via `pending/specs/` | Random → expert → quantitative in `src/` |
-| **4 — Race day** | **I** race cards → **P** proposals | Operators use `outbox/proposals/` |
+| **3 — Generators** | **R** code via `pending/specs/` | Random v1 ✓ in `src/`; expert/quant on hold |
+| **3b — Local UI** | **R**→**P** | Mockup wired to generator ([local-ui-v1.1](../pending/specs/local-ui-v1.1.md)) |
+| **4 — Race day** | **I** race cards → **P** proposals | Operators use `outbox/proposals/` ✓ (sample) |
 | **5 — More games** | AIRUP per game | V75, V86, etc. |
 
 ---
@@ -121,7 +123,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 |------|------------|
 | **Proposal** | A complete multi-leg horse selection with metadata and cost |
 | **Leg / avdelning** | One race within a pool (V85: 8 legs) |
-| **Race card** | Official start information for a race day (Swedish: *startlista*). For V85: which 8 races form the pool and which start numbers are valid in each leg. **Collected automatically** from ATG (API or website) per UC-09; cached in `inbox/race-cards/`. Not the betting slip, not SYSTEMKOSTNAD. |
+| **Race card** | Official start information for a race day (Swedish: *startlista*). For V85: which 8 races form the pool and which start numbers are valid in each leg. **v1:** manual YAML in `inbox/race-cards/`. **v1.1+:** ATG auto-fetch (UC-09). Not the betting slip, not SYSTEMKOSTNAD. |
 | **SYSTEMKOSTNAD** | Operator-entered target system budget (SEK). Default **500 SEK**. Model optimizes selections so computed cost ≤ budget. Distinct from per-row ATG radpris (0.50 SEK). |
 | **System** | Product of selections across legs; each combination is one row |
 | **Mode** | `random`, `expert`, or `quantitative` generation strategy |
@@ -145,6 +147,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.6 | 2026-07-07 | v1 random shipped; manual YAML primary; success criteria updated |
 | 0.5 | 2026-07-06 | ATG auto-fetch scope; SYSTEMKOSTNAD; NG-004 narrowed |
 | 0.4 | 2026-07-06 | Glossary: Race card definition |
 | 0.3 | 2026-07-06 | RUP Vision structure; scope/glossary from SRS §1; G-007 |

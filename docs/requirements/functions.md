@@ -143,9 +143,10 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation t
 
 | Priority | Functions |
 |----------|-----------|
-| **Must (v1)** | F-006–009, F-025–028, F-001–005, F-020–026, F-030–032, F-050–053, F-060–062, F-070–073, F-080 |
-| **Should (v1)** | F-040–043, F-090, F-071, F-008 scrape fallback |
-| **Could (v1.1+)** | F-054, F-092, reduced-stake cost variants |
+| **Shipped (v1)** | F-001–005, F-020–026, F-030–032, F-060–062, F-070–073, F-080 |
+| **Deferred (v1.1+)** | F-006–009 (ATG fetch), F-025–028 (live UX dropdowns), F-040–043 (expert), F-050–054 (quant) |
+| **Should (v1.1)** | F-071, F-090, local UI API (see [local-ui-v1.1](../../pending/specs/local-ui-v1.1.md)) |
+| **Could (v1.2+)** | F-054, F-092, reduced-stake cost variants |
 
 ---
 
@@ -153,5 +154,6 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation t
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3 | 2026-07-07 | v1 shipped set vs deferred; scope-lock alignment |
 | 0.2 | 2026-07-06 | ATG fetch F-006–009; UX F-025–028; SYSTEMKOSTNAD default 500 |
 | 0.1 | 2026-07-06 | Initial catalog; 30 functions across 10 domains |

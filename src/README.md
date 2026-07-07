@@ -1,6 +1,8 @@
 # Source code
 
-**v1 status:** Random mode vertical slice implemented per [random-v1.md](../pending/specs/random-v1.md).
+**v1 status:** Random mode vertical slice per [random-v1.md](../outbox/specs/random-v1.md).
+
+**v1.1:** Local UI — `python -m atg serve` → http://127.0.0.1:8765/
 
 ## Layout
 

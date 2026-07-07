@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>V85 Proposal — ATG UX Mockup v0.5</title>
+  <title>V85 Proposal — ATG UX v1.1 (Local UI)</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -509,7 +509,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">UX Mockup v0.5 · Random (standard) · Expert/Kvant avvaktar · SYSTEMKOSTNAD 500 SEK · Klicka hästar för att växla</div>
+  <div class="mockup-banner">v1.1 Local UI · Random · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -549,26 +549,18 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v0.5</span>
+        <span class="game-header__pill">v1.1</span>
       </div>
     </header>
 
     <div class="meta-bar">
       <div class="meta-item">
         <label for="datum">Datum</label>
-        <select class="meta-select" id="datum">
-          <option selected>2026-07-05 (lördag)</option>
-          <option>2026-07-12 (lördag)</option>
-          <option>2026-07-19 (lördag)</option>
-        </select>
+        <select class="meta-select" id="datum"></select>
       </div>
       <div class="meta-item">
         <label for="bana">Bana</label>
-        <select class="meta-select" id="bana">
-          <option selected>Halmstad</option>
-          <option>Jägersro</option>
-          <option>Örebro</option>
-        </select>
+        <select class="meta-select" id="bana"></select>
       </div>
       <div class="meta-item">
         <label for="spelform">Spelform</label>
@@ -579,7 +571,7 @@
       </div>
       <div class="meta-item">
         <label>Källa</label>
-        <span class="fetch-badge">ATG</span>
+        <span class="fetch-badge" id="source-badge">YAML</span>
       </div>
       <div class="meta-item">
         <label>Status</label>
@@ -596,116 +588,12 @@
     <div class="content">
       <section class="legs-panel">
         <h2 class="section-title">Välj hästar för modellen</h2>
-        <p class="section-hint">Klicka för att inkludera/exkludera hästar i kandidatpoolen. <strong>Blå markering</strong> = med i modellen. Startlista från ATG.</p>
-        <div class="legs-grid">
-          <div class="leg-card">
-            <div class="leg-col">1</div>
-            <div class="leg-body">
-              <div class="race-info">V85-1 · 15:00</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="1">3</button>
-                <button type="button" class="horse" data-leg="1">7</button>
-                <button type="button" class="horse pool-selected" data-leg="1">12</button>
-                <button type="button" class="horse" data-leg="1">1</button>
-                <button type="button" class="horse scratched" data-leg="1">5</button>
-              </div>
-              <div class="reserves">Reserver: 7, 12</div>
-            </div>
-          </div>
-          <div class="leg-card">
-            <div class="leg-col">2</div>
-            <div class="leg-body">
-              <div class="race-info">V85-2 · 15:20</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="2">4</button>
-                <button type="button" class="horse" data-leg="2">2</button>
-                <button type="button" class="horse pool-selected" data-leg="2">9</button>
-                <button type="button" class="horse pool-selected" data-leg="2">11</button>
-                <button type="button" class="horse" data-leg="2">6</button>
-              </div>
-            </div>
-          </div>
-          <div class="leg-card">
-            <div class="leg-col">3</div>
-            <div class="leg-body">
-              <div class="race-info">V85-3 · 15:40</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="3">1</button>
-                <button type="button" class="horse" data-leg="3">8</button>
-                <button type="button" class="horse" data-leg="3">10</button>
-              </div>
-            </div>
-          </div>
-          <div class="leg-card">
-            <div class="leg-col">4</div>
-            <div class="leg-body">
-              <div class="race-info">V85-4 · 16:00</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="4">2</button>
-                <button type="button" class="horse pool-selected" data-leg="4">6</button>
-                <button type="button" class="horse" data-leg="4">4</button>
-              </div>
-            </div>
-          </div>
-          <div class="leg-card">
-            <div class="leg-col">5</div>
-            <div class="leg-body">
-              <div class="race-info">V85-5 · 16:20</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="5">8</button>
-                <button type="button" class="horse" data-leg="5">3</button>
-                <button type="button" class="horse" data-leg="5">11</button>
-              </div>
-            </div>
-          </div>
-          <div class="leg-card">
-            <div class="leg-col">6</div>
-            <div class="leg-body">
-              <div class="race-info">V85-6 · 16:40</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="6">3</button>
-                <button type="button" class="horse pool-selected" data-leg="6">5</button>
-                <button type="button" class="horse pool-selected" data-leg="6">10</button>
-                <button type="button" class="horse pool-selected" data-leg="6">13</button>
-                <button type="button" class="horse" data-leg="6">1</button>
-              </div>
-            </div>
-          </div>
-          <div class="leg-card">
-            <div class="leg-col">7</div>
-            <div class="leg-body">
-              <div class="race-info">V85-7 · 17:00</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="7">2</button>
-                <button type="button" class="horse" data-leg="7">5</button>
-              </div>
-            </div>
-          </div>
-          <div class="leg-card">
-            <div class="leg-col">8</div>
-            <div class="leg-body">
-              <div class="race-info">V85-8 · 17:20</div>
-              <div class="horses">
-                <button type="button" class="horse pool-selected" data-leg="8">1</button>
-                <button type="button" class="horse pool-selected" data-leg="8">4</button>
-                <button type="button" class="horse" data-leg="8">7</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <p class="section-hint">Klicka för att inkludera/exkludera hästar i kandidatpoolen. <strong>Blå markering</strong> = med i modellen. Startlista från YAML (<code>inbox/race-cards/</code>).</p>
+        <div class="legs-grid" id="legs-grid"></div>
 
         <div class="slip-preview">
-          <h3>Genererat spel (exempel · seed 42)</h3>
-          <div class="slip-grid">
-            <div class="slip-leg wide"><span>1</span><span class="num">2·3·4·8·11</span></div>
-            <div class="slip-leg"><span>2</span><span class="num">1</span></div>
-            <div class="slip-leg wide"><span>3</span><span class="num">2·6·7·10</span></div>
-            <div class="slip-leg wide"><span>4</span><span class="num">1·2·4·5·9</span></div>
-            <div class="slip-leg wide"><span>5</span><span class="num">3·6·8·11·12</span></div>
-            <div class="slip-leg wide"><span>6</span><span class="num">2·5</span></div>
-            <div class="slip-leg"><span>7</span><span class="num">7</span></div>
-            <div class="slip-leg"><span>8</span><span class="num">4</span></div>
-          </div>
+          <h3 id="slip-title">Genererat spel</h3>
+          <div class="slip-grid" id="slip-grid"></div>
         </div>
       </section>
 
@@ -713,24 +601,26 @@
         <div class="summary-card">
           <h3>Systemkostnad (budget)</h3>
           <div class="stake-input-wrap">
-            <input class="stake-input" type="number" value="500" min="1" step="50" aria-label="Systemkostnad i SEK" />
+            <input class="stake-input" id="stake-input" type="number" value="500" min="1" step="50" aria-label="Systemkostnad i SEK" />
             <span class="stake-suffix">SEK</span>
           </div>
           <p class="stake-hint">Standardvärde 500 SEK. Slumpmässigt urval inom budget (greedy shrink).</p>
         </div>
         <div class="summary-card">
           <h3>Beräknad kostnad</h3>
-          <div class="cost-big">500,00 <span>SEK</span><span class="cost-ok">≤ budget</span></div>
-          <div class="stat-row"><span>Rader</span><strong>1 000</strong></div>
-          <div class="stat-row"><span>Radpris</span><strong>0,50 SEK</strong></div>
-          <div class="stat-row"><span>Beräkning</span><strong>5×1×4×5×5×2×1×1</strong></div>
-          <div class="stat-row"><span>Shrink-steg</span><strong>8</strong></div>
+          <div class="cost-big" id="cost-big">— <span>SEK</span></div>
+          <div id="stat-rows">
+            <div class="stat-row"><span>Rader</span><strong id="stat-rows-count">—</strong></div>
+            <div class="stat-row"><span>Radpris</span><strong>0,50 SEK</strong></div>
+            <div class="stat-row"><span>Beräkning</span><strong id="stat-breakdown">—</strong></div>
+            <div class="stat-row"><span>Shrink-steg</span><strong id="stat-shrink">—</strong></div>
+          </div>
         </div>
         <div class="summary-card">
           <h3>Träffsannolikhet (modell)</h3>
           <p class="stake-hint" style="margin-top:0">Ej tillgänglig i Random v1 (valfritt senare med odds).</p>
         </div>
-        <button class="button button--blue btn-generate" type="button">Generera system</button>
+        <button class="button button--blue btn-generate" id="btn-generate" type="button">Generera system</button>
         <div class="summary-card">
           <h3>Innan spel på atg.se</h3>
           <ul class="checklist">
@@ -748,17 +638,21 @@
 
     <div class="rationale">
       <h2>Rationale — Random</h2>
-      <p>Slumpmässigt urval ur operatörens kandidatpool per avdelning. Uniform fördelning; max antal hästar = poolstorlek. Om beräknad kostnad överstiger SYSTEMKOSTNAD 500 SEK minskas gardering (greedy shrink, max 10 steg). Seed 42 för reproducerbart exempel. Expert och Kvantitativ kommer senare.</p>
+      <p id="rationale-text">Slumpmässigt urval ur operatörens kandidatpool per avdelning. Kör <code>python -m atg serve</code> och klicka Generera system. Expert och Kvantitativ kommer senare.</p>
     </div>
   </div>
 
-  <p class="footer-note">ATG Trotting Betting Systems · Mockup v0.5 · Random standard · Logo: travhäst + V85</p>
+  <p class="footer-note">ATG Trotting Betting Systems · v1.1 Local UI · Random · Logo: travhäst + V85</p>
 
   <script>
     (function () {
+      var API = "";
       var storageKey = "atg-mockup-theme";
       var root = document.documentElement;
       var themeBtns = document.querySelectorAll("[data-theme-set]");
+      var raceCards = [];
+      var currentCard = null;
+      var lastSeed = null;
 
       function applyTheme(theme) {
         root.setAttribute("data-theme", theme);
@@ -775,18 +669,180 @@
       try { saved = localStorage.getItem(storageKey); } catch (e) {}
       var initial = params.get("theme") === "dark" ? "dark" : params.get("theme") === "light" ? "light" : saved;
       if (initial === "dark" || initial === "light") applyTheme(initial);
-
       themeBtns.forEach(function (btn) {
         btn.addEventListener("click", function () {
           applyTheme(btn.getAttribute("data-theme-set"));
         });
       });
 
-      document.querySelectorAll(".horse:not(.scratched)").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          btn.classList.toggle("pool-selected");
+      function setApiStatus(ok, msg) {
+        var el = document.getElementById("api-status");
+        if (el) el.textContent = ok ? "● online" : "○ " + msg;
+      }
+
+      function fmtSek(n) {
+        return n.toFixed(2).replace(".", ",");
+      }
+
+      function fmtNum(n) {
+        return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+      }
+
+      function collectPools() {
+        var pools = {};
+        document.querySelectorAll(".horse.pool-selected").forEach(function (btn) {
+          var leg = btn.getAttribute("data-leg");
+          var num = parseInt(btn.textContent, 10);
+          if (!pools[leg]) pools[leg] = [];
+          pools[leg].push(num);
         });
-      });
+        for (var i = 1; i <= 8; i++) {
+          if (!pools[String(i)] || !pools[String(i)].length) {
+            throw new Error("Minst en häst måste vara vald i avdelning " + i);
+          }
+        }
+        return pools;
+      }
+
+      function renderLegs(card) {
+        var grid = document.getElementById("legs-grid");
+        grid.innerHTML = "";
+        card.legs.forEach(function (leg) {
+          var scratches = new Set(leg.scratches || []);
+          var cardEl = document.createElement("div");
+          cardEl.className = "leg-card";
+          var horsesHtml = leg.horses.map(function (h) {
+            var cls = "horse pool-selected";
+            if (scratches.has(h)) cls = "horse scratched";
+            return '<button type="button" class="' + cls + '" data-leg="' + leg.leg + '">' + h + "</button>";
+          }).join("");
+          var scratchList = (leg.scratches || []).concat();
+          var reserveHtml = (leg.reserves && leg.reserves.length)
+            ? '<div class="reserves">Reserver: ' + leg.reserves.join(", ") + "</div>" : "";
+          var scratchHtml = scratchList.length
+            ? "" : "";
+          cardEl.innerHTML =
+            '<div class="leg-col">' + leg.leg + '</div><div class="leg-body">' +
+            '<div class="race-info">' + leg.race_label + (leg.start_time ? " · " + leg.start_time : "") + "</div>" +
+            '<div class="horses">' + horsesHtml + "</div>" + reserveHtml + "</div>";
+          grid.appendChild(cardEl);
+        });
+        grid.querySelectorAll(".horse:not(.scratched)").forEach(function (btn) {
+          btn.addEventListener("click", function () { btn.classList.toggle("pool-selected"); });
+        });
+      }
+
+      function renderSlip(selections, seed) {
+        var grid = document.getElementById("slip-grid");
+        var title = document.getElementById("slip-title");
+        grid.innerHTML = "";
+        title.textContent = seed != null ? "Genererat spel (seed " + seed + ")" : "Genererat spel";
+        for (var i = 1; i <= 8; i++) {
+          var horses = selections[String(i)] || selections[i] || [];
+          var text = horses.join("·");
+          var wide = horses.length > 1 ? " wide" : "";
+          var leg = document.createElement("div");
+          leg.className = "slip-leg" + wide;
+          leg.innerHTML = "<span>" + i + '</span><span class="num">' + text + "</span>";
+          grid.appendChild(leg);
+        }
+      }
+
+      function updateCost(data, budget) {
+        var ok = data.cost_sek <= budget + 0.001;
+        document.getElementById("cost-big").innerHTML =
+          fmtSek(data.cost_sek) + ' <span>SEK</span>' + (ok ? '<span class="cost-ok">≤ budget</span>' : "");
+        document.getElementById("stat-rows-count").textContent = fmtNum(data.combinations);
+        document.getElementById("stat-breakdown").textContent = data.cost_breakdown;
+        document.getElementById("stat-shrink").textContent = String(data.shrink_steps_used);
+        document.getElementById("rationale-text").textContent =
+          "Random ur operatörens pool. Greedy shrink: " + data.shrink_steps_used +
+          " steg. " + (data.seed != null ? "Seed " + data.seed + "." : "");
+      }
+
+      function populateDropdowns(cards) {
+        var datum = document.getElementById("datum");
+        var dates = [];
+        cards.forEach(function (c) {
+          if (dates.indexOf(c.date) === -1) dates.push(c.date);
+        });
+        datum.innerHTML = dates.map(function (d) {
+          return '<option value="' + d + '">' + d + "</option>";
+        }).join("");
+        datum.addEventListener("change", syncBana);
+        syncBana();
+      }
+
+      function syncBana() {
+        var date = document.getElementById("datum").value;
+        var tracks = raceCards.filter(function (c) { return c.date === date; });
+        var bana = document.getElementById("bana");
+        bana.innerHTML = tracks.map(function (c) {
+          return '<option value="' + c.id + '">' + c.track + "</option>";
+        }).join("");
+        loadSelectedCard();
+      }
+
+      function loadSelectedCard() {
+        var id = document.getElementById("bana").value;
+        if (!id) return;
+        fetch(API + "/api/v1/race-cards/" + encodeURIComponent(id))
+          .then(function (r) { return r.json(); })
+          .then(function (card) {
+            currentCard = card;
+            document.getElementById("source-badge").textContent = (card.source || "yaml").toUpperCase();
+            renderLegs(card);
+          })
+          .catch(function (e) { setApiStatus(false, "card load"); console.error(e); });
+      }
+
+      function generate() {
+        if (!currentCard) return;
+        var budget = parseFloat(document.getElementById("stake-input").value, 10);
+        var pools;
+        try { pools = collectPools(); } catch (e) { alert(e.message); return; }
+        document.getElementById("btn-generate").disabled = true;
+        fetch(API + "/api/v1/generate/random", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            race_card_id: currentCard.id,
+            pools: pools,
+            budget: budget,
+            seed: lastSeed
+          })
+        })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            document.getElementById("btn-generate").disabled = false;
+            if (!res.ok) {
+              alert((res.j.error && res.j.error.message) || "Generering misslyckades");
+              return;
+            }
+            lastSeed = res.j.seed;
+            renderSlip(res.j.selections, res.j.seed);
+            updateCost(res.j, budget);
+          })
+          .catch(function (e) {
+            document.getElementById("btn-generate").disabled = false;
+            alert("API fel — kör python -m atg serve");
+            console.error(e);
+          });
+      }
+
+      document.getElementById("bana").addEventListener("change", loadSelectedCard);
+      document.getElementById("btn-generate").addEventListener("click", generate);
+
+      fetch(API + "/api/v1/race-cards")
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          raceCards = data.race_cards || [];
+          setApiStatus(true, "");
+          populateDropdowns(raceCards);
+        })
+        .catch(function () {
+          setApiStatus(false, "offline — kör python -m atg serve");
+        });
     })();
   </script>
 </body>

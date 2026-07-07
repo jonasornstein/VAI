@@ -4,53 +4,46 @@
 |-------|-------|
 | **Mode** | `random` |
 | **Owner** | Povl |
-| **Status** | DRAFT |
-| **Last updated** | 2026-07-06 |
+| **Status** | APPROVED |
+| **Version** | 0.2 |
+| **Last updated** | 2026-07-07 |
+| **Spec** | [outbox/specs/random-v1.md](../../outbox/specs/random-v1.md) |
 
 ---
 
 ## 1. Purpose
 
-Generate betting systems by **random selection** of horses per leg, optionally within constraints. Useful for baseline comparison, exploration, or low-bias coverage.
+Generate betting systems by **random selection** of horses per leg from the **operator pool**, capped by **SYSTEMKOSTNAD**. Useful for baseline comparison, exploration, or low-bias coverage.
 
 ## 2. Inputs
 
 | Input | Required | Description |
 |-------|----------|-------------|
 | Race card | Yes | Per leg: eligible start numbers |
-| `max_cost_sek` | No | Cap total system cost |
-| `max_horses_per_leg` | No | Upper bound on gardering width |
-| `min_horses_per_leg` | No | Default 1 |
-| `seed` | No | RNG seed for reproducibility |
+| Operator pools | Yes | Marked horses per leg (F-026); ⊆ race card |
+| `stake_budget_sek` | Yes | SYSTEMKOSTNAD; default **500 SEK** |
+| `max_horses_per_leg` | No | Default: **\|operator pool\|** per leg |
+| `min_horses_per_leg` | No | Default **1** |
+| `seed` | No | RNG seed for reproducibility (F-032) |
 
-## 3. Algorithm (draft)
+## 3. Algorithm (v1)
 
-```
-for each leg in 1..8:
-    k = random integer in [min_horses_per_leg, max_horses_per_leg]
-        capped by |race_card[leg]| and budget feasibility
-    select k distinct horses uniformly from race_card[leg]
-compute combinations and cost
-if cost > max_cost_sek: retry or reduce (TBD — Povl)
-```
+1. For each leg 1..8: draw `k` uniformly from `[1, |pool|]`; select `k` horses uniformly from operator pool.
+2. Compute cost: ∏(horses per leg) × 0.50 SEK.
+3. If cost > SYSTEMKOSTNAD: **greedy shrink** — remove one random horse from widest leg (tie → lowest leg #); max **10** steps.
+4. No weighting by field size.
+
+Full pseudocode: [random-v1.md](../../outbox/specs/random-v1.md) §5–6.
 
 ## 4. Outputs
 
-Standard proposal format plus:
+Standard proposal format plus manifest (`mode`, `seed`, `constraints`, `shrink_steps_used`).
 
-```yaml
-mode: random
-seed: <int or null>
-constraints:
-  max_cost_sek: <float>
-  max_horses_per_leg: <int>
-```
+## 5. Resolved requirements (v1)
 
-## 5. Open requirements (Povl)
-
-- [ ] Default `max_horses_per_leg` for V85
-- [ ] Budget retry policy when over cap
-- [ ] Whether to weight by field size
+- [x] Default `max_horses_per_leg` = pool size per leg
+- [x] Budget policy: greedy shrink, max 10 steps
+- [x] No field-size weighting
 
 ---
 
@@ -58,4 +51,5 @@ constraints:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2 | 2026-07-07 | APPROVED v1 — per [random-v1.md](../../outbox/specs/random-v1.md) |
 | 0.1 | 2026-07-06 | Initial draft |

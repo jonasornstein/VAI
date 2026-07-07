@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-07 | P | Jonte | **v1 close-out** — specs + canonical docs; random.md v0.2 APPROVED | [outbox/specs/](../../outbox/specs/) |
+| 2026-07-07 | P | Assistant | **v1.1 local UI** — `atg serve` API + mockup wiring | [local-ui-v1.1.md](../../outbox/specs/local-ui-v1.1.md) |
 | 2026-07-07 | P | Jonte | **UX mockup v0.5** published — Random default; Expert/Kvant disabled | [outbox/mockups/](../../outbox/mockups/) |
 | 2026-07-07 | P | Jonte | **First random v1 proposal APPROVED** — Halmstad 2026-07-05 → `outbox/proposals/` | [proposal.md](../../outbox/proposals/v85/2026-07-05-halmstad/proposal.md) |
 | 2026-07-07 | R | Assistant | **Operator review** sample proposal Halmstad 2026-07-05 — READY FOR OPERATOR | [REVIEW_proposal_2026-07-05-halmstad.md](../../pending/reviews/REVIEW_proposal_2026-07-05-halmstad.md) |
@@ -75,16 +77,11 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | ID | Item | Owner |
 |----|------|-------|
-| **SL-*** | **v1 scope lock** — approve `pending/specs/scope-lock-v1-random.md` | Jonte |
-| — | Step 2: `pending/specs/random-v1.md` (close Povl open items in `random.md`) | Povl |
-| — | Step 3–4: `src/atg/` random vertical slice + sample YAML + golden test | Dev |
-| — | Step 5: Mockup — Random default; Expert/Quant disabled (*Kommer senare*) | Jonte |
+| — | Real race day: fresh YAML + operator pools → proposal | Kricke / Jonte |
+| — | ATG auto-fetch spec (`pending/specs/atg-data-source.md`) | Povl |
+| — | Expert / Quant generators — **on hold** until Jonte directs | Povl |
 | OI-001 | Ingest S-009b Swedish *Spelregler Häst* when ATG updates PDF | Nisse |
 | OI-004 | Spelstopp after Sept 2026 schedule change — TBD | Nisse |
-| — | Commit remaining project scaffold (`.grok/`, `AGENTS.md`, `src/`, etc.) | Jonte |
-| — | ATG auto-fetch spec (`pending/specs/atg-data-source.md`) — **deferred post-v1** | Povl |
-| — | Expert / Quant generators — **on hold** until Jonte directs | Povl |
-| — | First race-day proposal via `/generate-proposal` or `/v85-system` | Kricke / Jonte |
 
 ### Notes
 

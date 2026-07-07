@@ -2,14 +2,14 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.1 |
+| **Version** | 0.3 |
 | **Status** | DRAFT |
 | **Owner** | Povl (format), Nisse (scratches/reserves) |
 | **Glossary** | [VISION.md §8 — Race card](../VISION.md#8-glossary) |
 
 Canonical file location: `inbox/race-cards/<YYYY-MM-DD>-<track>.yaml`
 
-**Primary ingestion:** automatic via **F-007** `fetch_race_card_from_atg` (UC-09). Manual YAML entry is fallback only.
+**v1 primary ingestion:** **manual YAML** (operator or agent). **v1.1+:** automatic via F-007 `fetch_race_card_from_atg` (UC-09).
 
 ---
 
@@ -44,7 +44,7 @@ Canonical file location: `inbox/race-cards/<YYYY-MM-DD>-<track>.yaml`
 game: v85
 date: 2026-07-05
 track: Halmstad
-source: atg-api
+source: manual
 fetched_at: 2026-07-05T10:00:00+02:00
 settled: false
 legs:
@@ -78,5 +78,6 @@ legs:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3 | 2026-07-07 | v1 primary ingestion = manual YAML; ATG fetch v1.1+ |
 | 0.2 | 2026-07-06 | Primary ingestion via ATG auto-fetch; source enum |
 | 0.1 | 2026-07-06 | Initial YAML schema for v1 |

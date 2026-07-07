@@ -36,12 +36,25 @@ def main(argv: list[str] | None = None) -> int:
     random_parser.add_argument("--seed", type=int, default=None, help="RNG seed for reproducibility")
     random_parser.add_argument("--out", type=Path, required=True, help="Output proposal markdown path")
 
+    serve_parser = subparsers.add_parser("serve", help="Run local UI server (mockup + API)")
+    serve_parser.add_argument("--host", default="127.0.0.1", help="Bind host")
+    serve_parser.add_argument("--port", type=int, default=8765, help="Bind port")
+
     args = parser.parse_args(argv)
 
     if args.command == "random":
         return _run_random(args)
+    if args.command == "serve":
+        return _run_serve(args)
 
     return 1
+
+
+def _run_serve(args: argparse.Namespace) -> int:
+    from atg.server import serve
+
+    serve(host=args.host, port=args.port)
+    return 0
 
 
 def _run_random(args: argparse.Namespace) -> int:
