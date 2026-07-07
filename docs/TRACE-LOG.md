@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-07 | P | Jonte | **End of session** — v1.1 Hari shipped; RUP trilogy APPROVED; Phase 2b complete; race day Årjäng 2026-07-11 next | See [§ End of day — 2026-07-07](#end-of-day--2026-07-07) |
 | 2026-07-07 | P | Jonte, Povl, Nisse | **supplementary-specification APPROVED** — FURPS+ v1.0; v1.1 NFR alignments | [supplementary-specification.md](./requirements/supplementary-specification.md), [REVIEW_supplementary-specification.md](../../outbox/reviews/REVIEW_supplementary-specification.md) |
 | 2026-07-07 | P | Povl, Jonte | **functions.md APPROVED** — v1.0 F-* catalog; shipped vs deferred; module map | [functions.md](./requirements/functions.md), [REVIEW_functions.md](../../outbox/reviews/REVIEW_functions.md) |
 | 2026-07-07 | P | Jonte, Povl, Nisse | **All use cases APPROVED** — 13 UCs v1.0; Phase 2b complete; UC-12/13 spec-only | [use-cases/](./requirements/use-cases/), [REVIEW_use-cases_v1.0.md](../../outbox/reviews/REVIEW_use-cases_v1.0.md) |
@@ -69,6 +70,49 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 ## When not to log
 
 - Routine agent edits, typo fixes, or exploratory drafts still in `pending/`
+
+---
+
+## End of day — 2026-07-07
+
+**Session owner:** Jonte  
+**Git remote:** `origin` → `https://github.com/jonasornstein/ATG.git` (`master` synced)
+
+### Completed
+
+| Phase | Deliverable | Status |
+|-------|-------------|--------|
+| Ship | Random v1.1 + local UI (`python -m atg serve`) — exact budget, ATG fetch, nearest stake, F-052 basic, F-071 checklist | Done |
+| Review + Publish | `random-v1.1.md`, `atg-data-source.md`, `local-ui-v1.1.md` | APPROVED |
+| Review + Publish | UC-11, ux-workflow, race-card-schema v1.0 | APPROVED |
+| Review + Publish | All 13 remaining use cases v1.0 — Phase 2b complete | `b571037` |
+| Review + Publish | `functions.md` v1.0, `supplementary-specification.md` v1.0 — **RUP trilogy complete** | `9d76d89`, `b2670cc` |
+| Proposal | V85 Årjäng 2026-07-11 — Hari seed 42, 500 SEK, 1 000 rader | [outbox/proposals/v85/2026-07-11-arjang/](../../outbox/proposals/v85/2026-07-11-arjang/) |
+| Tooling | Try-out scripts (UI screenshot, hit tooltip, live V85 API) | `268de32` |
+| Docs | `functions.md` v0.4 refresh; VISION Phase 3b link fix; scope-lock + random-v1.1 promotion checklists ✓ | Done |
+
+### Published / approved artifacts (today)
+
+- **Specs:** `outbox/specs/random-v1.1.md`, `atg-data-source.md`, `local-ui-v1.1.md`
+- **Requirements:** all `docs/requirements/use-cases/UC-*.md`, `use-case-model.md` v0.4, `functions.md` v1.0, `supplementary-specification.md` v1.0, `ux-workflow.md`, `race-card-schema.md`
+- **Reviews:** `outbox/reviews/REVIEW_*` (UC-11, ux-workflow, race-card-schema, use-cases batch, functions, supplementary)
+- **Proposal:** `outbox/proposals/v85/2026-07-11-arjang/`
+
+### Open for next session
+
+| ID | Item | Owner |
+|----|------|-------|
+| — | **Race day** — re-fetch Årjäng 2026-07-11; scratches/reserves; UC-22 ATG entry | Kricke / Jonte |
+| — | **v1.2** — reduced-stake systems (UC-14 §3a); ATG disk cache | Povl |
+| — | Expert / Quant modes — UX tabs disabled; UC-12/13 spec-only | Nisse / Povl |
+| — | Housekeeping — archive duplicate `pending/specs/` and `pending/mockups/` | Assistant |
+| OI-004 | Spelstopp after Sept 2026 schedule change — TBD | Nisse |
+
+### Notes
+
+- Hari (random) v1.1 is the only active mode; Expert/Kvant show *Kommer senare*.
+- Local UI: http://127.0.0.1:8765/ after `python -m atg serve`.
+- No automated bet placement — proposals are operator-transcribed artifacts only.
 
 ---
 
