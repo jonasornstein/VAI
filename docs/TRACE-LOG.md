@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-07 | U | Assistant | **functions.md refreshed** — v0.4 shipped vs deferred; v1.1 ATG fetch, F-052 basic, module map | [functions.md](./requirements/functions.md) |
 | 2026-07-07 | P | Povl, Nisse | **race-card-schema APPROVED** — v1.0; ATG primary ingestion, validation rules, source enum | [race-card-schema.md](./requirements/race-card-schema.md), [REVIEW_race-card-schema.md](../../outbox/reviews/REVIEW_race-card-schema.md) |
 | 2026-07-07 | P | Jonte | **ux-workflow APPROVED** — operator UX workflow v1.0; Hari v1.1 flow, ATG fetch, nearest stake | [ux-workflow.md](./requirements/ux-workflow.md), [REVIEW_ux-workflow.md](../../outbox/reviews/REVIEW_ux-workflow.md) |
 | 2026-07-07 | P | Povl, Jonte | **UC-11 APPROVED** — Random mode (Hari) use case v1.0; exact-budget fill, frozen legs, nearest stake | [UC-11-random-mode.md](./requirements/use-cases/UC-11-random-mode.md), [REVIEW_UC-11_random-mode.md](../../outbox/reviews/REVIEW_UC-11_random-mode.md) |

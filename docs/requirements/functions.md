@@ -2,12 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.2 |
+| **Version** | 0.4 |
 | **Status** | DRAFT |
-| **Last updated** | 2026-07-06 |
+| **Last updated** | 2026-07-07 |
 | **Owner** | Jonte (M-004) |
+| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md) |
 
-Concrete system functions referenced by use-case steps (`F-*`). Implementation targets: `src/atg/` per [src/README.md](../../src/README.md).
+Concrete system functions referenced by use-case steps (`F-*`). Implementation: `src/atg/` per [src/README.md](../../src/README.md).
 
 ---
 
@@ -20,10 +21,10 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation t
 | F-003 | `store_request` | Save operator or task brief | Text/markdown file | Path under `inbox/requests/` | UC-01 |
 | F-004 | `parse_race_card` | Parse race card file into leg model | File path | `RaceCard` object | UC-01, UC-10 |
 | F-005 | `validate_race_card` | Check 8 legs, unique horse numbers per leg | `RaceCard` | Pass or error list | UC-01, UC-10 |
-| F-006 | `fetch_atg_schedule` | Fetch V85 dates, tracks, game forms from ATG | Date, game | Schedule list | UC-09 |
-| F-007 | `fetch_race_card_from_atg` | Download startlista for date/track/game | Identifiers | `RaceCard` | UC-01, UC-09 |
+| F-006 | `fetch_atg_schedule` | Fetch V85 schedule from ATG (`schedule.py`) | — | `V85Schedule` | UC-09 |
+| F-007 | `fetch_race_card_from_atg` | Build `RaceCard` from ATG game JSON (`atg_race_card.py`) | `game_id` | `RaceCard` | UC-01, UC-09 |
 | F-008 | `scrape_atg_race_card` | Website fallback when API unavailable | URL context | `RaceCard` | UC-01, UC-09 |
-| F-009 | `fetch_atg_odds` | Download odds/probabilities from ATG | Identifiers | Odds map | UC-01, UC-13 |
+| F-009 | `fetch_atg_odds` | Odds/probability archive; **partial:** V85 `betDistribution` for F-052 basic | `game_id` | Odds or leg distributions | UC-01, UC-11, UC-13 |
 
 ---
 
@@ -67,7 +68,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation t
 | ID | Name | Description | Inputs | Outputs | Use cases |
 |----|------|-------------|--------|---------|-----------|
 | F-030 | `random_select_horses` | Uniform random subset per leg | `RaceCard`, leg config | Leg → horse[] | UC-11 |
-| F-031 | `apply_random_constraints` | Enforce min/max horses, max cost | Selection, constraints | Adjusted selection or retry | UC-11 |
+| F-031 | `apply_random_constraints` | Exact-budget leg counts; frozen legs; nearest stake on failure | Pools, budget, `frozen_legs` | Selection or `BUDGET_NOT_MET` | UC-11 |
 | F-032 | `set_rng_seed` | Set or record RNG seed for reproducibility | Integer or null | Seeded RNG state | UC-11 |
 
 ---
@@ -89,7 +90,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation t
 |----|------|-------------|--------|---------|-----------|
 | F-050 | `load_odds_input` | Load probabilities or odds per horse | File path | Odds map | UC-13 |
 | F-051 | `compute_leg_probabilities` | Derive \(p_i = P(\text{winner} \in W_i)\) | Odds, candidate set | Per-leg probabilities | UC-13 |
-| F-052 | `compute_hit_probabilities` | P(exactly k), P(≥k) per quantitative.md | Leg probs, selections | Hit prob table | UC-13 |
+| F-052 | `compute_hit_probabilities` | P(exactly k), P(≥k); **basic** (Hari): ATG bet-% proxy, independent legs | Leg probs or distributions, selections | Hit prob table | UC-11 (basic), UC-13 (full) |
 | F-053 | `optimize_under_budget` | Maximize objective (e.g. P(≥7)) subject to cost cap | Budget, odds, `RaceCard` | Leg selections | UC-13 |
 | F-054 | `run_monte_carlo` | Optional simulation of leg outcomes | Model params, N iterations | Simulated hit rates | UC-13 (Could) |
 
@@ -139,14 +140,32 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation t
 
 ---
 
-## 12. v1 implementation priority
+## 12. Implementation priority
 
-| Priority | Functions |
-|----------|-----------|
-| **Shipped (v1)** | F-001–005, F-020–026, F-030–032, F-060–062, F-070–073, F-080 |
-| **Deferred (v1.1+)** | F-006–009 (ATG fetch), F-025–028 (live UX dropdowns), F-040–043 (expert), F-050–054 (quant) |
-| **Should (v1.1)** | F-071, F-090, local UI API (see [local-ui-v1.1](../../pending/specs/local-ui-v1.1.md)) |
-| **Could (v1.2+)** | F-054, F-092, reduced-stake cost variants |
+| Priority | Functions | Notes |
+|----------|-----------|-------|
+| **Shipped (v1.0 — CLI)** | F-001, F-004–005, F-020–021, F-023–026, F-030–032, F-060–062 | Manual YAML race cards; `python -m atg random` |
+| **Shipped (v1.1 — local UI + ATG)** | F-006–007, F-025–028, F-052 (basic), F-071, F-091 | `python -m atg serve`; see [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
+| **Partial** | F-009 | V85 `betDistribution` only; no `inbox/odds/` archive |
+| **UX / mockup only** | F-070, F-090, F-092 | Print slip (not PDF export); theme toggle in mockup variants |
+| **Agent / manual (AIRUP)** | F-002–003, F-010–014, F-072–073, F-080–081 | Skills and operator workflow; not automated in `src/` |
+| **Deferred** | F-008, F-040–043, F-050–051, F-053–054 | Scrape fallback; expert; full quant model |
+| **Could (v1.2+)** | Reduced-stake cost variants (UC-14 §3a), F-054, F-090 (PDF) | α ∈ {0.30, 0.50, 0.70} |
+
+### Module map (shipped)
+
+| Module | Functions |
+|--------|-----------|
+| `io/race_card.py` | F-004, F-005 |
+| `io/race_card_json.py` | F-020 (YAML id lookup) |
+| `io/pools.py` | F-026 |
+| `io/proposal.py` | F-023, F-071 (markdown checklist) |
+| `schedule.py` | F-006, F-027, F-028 |
+| `atg_race_card.py` | F-007, F-009 (partial) |
+| `strategies/random.py` | F-030–032, F-031 |
+| `cost.py` | F-060–062 |
+| `hit_summary.py` | F-052 (basic) |
+| `server.py` | Local UI API routes |
 
 ---
 
@@ -154,6 +173,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation t
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.4 | 2026-07-07 | v1.1 shipped set: ATG fetch, schedule UX, F-052 basic, F-071; module map |
 | 0.3 | 2026-07-07 | v1 shipped set vs deferred; scope-lock alignment |
 | 0.2 | 2026-07-06 | ATG fetch F-006–009; UX F-025–028; SYSTEMKOSTNAD default 500 |
 | 0.1 | 2026-07-06 | Initial catalog; 30 functions across 10 domains |
