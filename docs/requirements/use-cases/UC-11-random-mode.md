@@ -3,9 +3,15 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-11 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Povl (algorithm), Jonte (operator) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator |
 | **Preconditions** | UC-10 in progress; race card loaded; SYSTEMKOSTNAD from F-025 |
+| **Implements** | FR-020–022 |
+| **Spec** | [random-v1.1.md](../../../outbox/specs/random-v1.1.md) |
 
 ## Brief description
 
@@ -26,6 +32,7 @@ From **operator-marked horse pools** (optional per leg), randomly build a bettin
 | Step | Condition | Action |
 |------|-----------|--------|
 | 3a | No exact count vector exists | Abort `BUDGET_NOT_MET`; offer `suggested_stake_sek` (nearest valid) |
+| 3b | Reduced-stake (α) requested | Deferred v1.2 — see UC-14 §3a |
 | 2a | Frozen leg with no marks | Abort `FROZEN_EMPTY_LEG` |
 | 1a | Operator pool is single horse (frozen or all marked) | Leg count fixed to that set |
 
@@ -38,3 +45,11 @@ F-026, F-030, F-031 (exact-budget constraint), F-032, F-052 (basic), F-060, F-06
 - [random.md](../../strategies/random.md), [random-v1.1.md](../../../outbox/specs/random-v1.1.md)
 - [ux-workflow.md](../ux-workflow.md)
 - [SUP-R-002](../supplementary-specification.md#3-reliability)
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — v1.1 exact-budget Hari; aligns with shipped generator and local UI |
