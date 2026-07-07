@@ -3,7 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-21 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Jonte |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Agent |
 | **Preconditions** | Proposal status = `APPROVED` |
 
@@ -29,3 +33,11 @@ Publish approved proposal to `outbox/proposals/` for race-day use.
 ## Functions invoked
 
 F-080, F-081, F-014
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — AIRUP publish gate; exemplified by outbox proposals |

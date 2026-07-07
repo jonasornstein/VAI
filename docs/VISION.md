@@ -98,7 +98,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 - [x] Sample proposal validated by Jonte — [outbox/proposals/](../outbox/proposals/)
 - [x] Cost formula verified (13 tests + golden seed)
 - [ ] Expert / quantitative generators — deferred
-- [ ] Use-case specifications **reviewed** by operators (UC-10, UC-20) — drafts complete; first proposal reviewed ✓
+- [x] Use-case specifications **reviewed** — all UCs APPROVED v1.0 (2026-07-07); first proposal reviewed ✓
 
 ---
 
@@ -109,7 +109,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 | **0 — Scaffold** | **P** methodology | AIRUP, inbox/pending/outbox, skills |
 | **1 — V85 docs** | **I**→**R**→**P** rules | Nisse approves `docs/betting/v85.md` ✓ |
 | **2 — Quant specs** | **I**→**R**→**P** specs | Povl approves `docs/strategies/quantitative.md` ✓ |
-| **2b — Requirements** | **R** use cases | RUP trilogy; enter UC narratives *(current)* |
+| **2b — Requirements** | **R**→**P** use cases | RUP trilogy; all UC narratives APPROVED v1.0 ✓ |
 | **3 — Generators** | **R** code via `pending/specs/` | Random v1 ✓ in `src/`; expert/quant on hold |
 | **3b — Local UI** | **R**→**P** | Mockup wired to generator ([local-ui-v1.1](../outbox/specs/local-ui-v1.1.md)) ✓ |
 | **4 — Race day** | **I** race cards → **P** proposals | Operators use `outbox/proposals/` ✓ (sample) |
@@ -147,6 +147,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.7 | 2026-07-07 | Phase 2b complete — all use cases APPROVED v1.0 |
 | 0.6 | 2026-07-07 | v1 random shipped; manual YAML primary; success criteria updated |
 | 0.5 | 2026-07-06 | ATG auto-fetch scope; SYSTEMKOSTNAD; NG-004 narrowed |
 | 0.4 | 2026-07-06 | Glossary: Race card definition |

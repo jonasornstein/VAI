@@ -3,8 +3,13 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-14 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Povl (math) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Agent (included by UC-10) |
+| **Implements** | FR-013–014 |
 | **Preconditions** | Leg selections defined (horse count per leg) |
 
 ## Brief description
@@ -25,7 +30,7 @@ Calculate combination count and total SEK cost; produce operator-visible breakdo
 | Step | Condition | Action |
 |------|-----------|--------|
 | 1a | Any \(n_i = 0\) | Error — invalid system; UC-10 abort |
-| 3a | Reduced stake requested | \(C_\alpha = N \times 0.50 \times \alpha\) — v1.1; document only in v1 |
+| 3a | Reduced stake requested | \(C_\alpha = N \times 0.50 \times \alpha\) — deferred v1.2 (UC-14 §3a) |
 | 3b | N > 5000 systems limit | Warn per [quantitative.md](../../strategies/quantitative.md) §2.3 |
 
 ## Functions invoked
@@ -36,3 +41,11 @@ F-060, F-061, F-062
 
 - [v85.md](../../betting/v85.md) §2.1
 - [SUP-R-003](../supplementary-specification.md#3-reliability)
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — V85 cost formula shipped; reduced-stake deferred v1.2 |

@@ -3,7 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-22 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Jonte (operator) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator |
 | **Preconditions** | Published proposal in `outbox/proposals/` |
 
@@ -36,3 +40,12 @@ F-071, F-091 (human browser action only)
 
 - [SUP-I-001](../supplementary-specification.md#7-implementation-constraints)
 - Acceptance criterion SRS §4 item 4
+- v1.1: **ÖPPNA ATG/V85** button in UI opens atg.se; entry remains manual
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — manual ATG entry; no automation (NG-004) |

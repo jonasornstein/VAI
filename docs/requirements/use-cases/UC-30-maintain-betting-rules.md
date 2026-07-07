@@ -3,8 +3,13 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-30 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Nisse |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Trotting expert |
+| **Implements** | FR-001, FR-050–051 |
 | **Preconditions** | Research sources in `inbox/research/` |
 
 ## Brief description
@@ -36,3 +41,11 @@ F-100, F-101, F-081, F-014
 
 - [SUP-C-001](../supplementary-specification.md#9-regulatory-and-compliance), [SUP-C-004](../supplementary-specification.md#9-regulatory-and-compliance)
 - Completed example: [v85.md](../../betting/v85.md) v1.0
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — exemplified by v85.md v1.0 promotion workflow |

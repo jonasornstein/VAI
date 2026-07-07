@@ -3,7 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-09 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Jonte (operator), Nisse (ATG read-only) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator |
 | **Preconditions** | Network available; ATG website or API reachable for read-only race data |
 
@@ -55,7 +59,15 @@ F-006, F-007, F-008, F-027, F-028, F-001, F-005
 - [SUP-U-006](../supplementary-specification.md#2-usability) — UX workflow
 - [SUP-I-005](../supplementary-specification.md#7-implementation-constraints) — read-only ATG access; no bet placement
 
-## Open items
+## Notes
 
-- Official ATG API endpoint vs HTML scrape — `pending/specs/atg-data-source.md`
-- Legal/ToS review for automated fetch — Jonte / Nisse
+- ATG data source: [atg-data-source.md](../../../outbox/specs/atg-data-source.md) APPROVED — API primary, HTML scrape fallback (F-008).
+- Legal/ToS review for automated fetch remains operator responsibility before production use.
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — v1.1 ATG schedule + race card fetch; matches local UI |

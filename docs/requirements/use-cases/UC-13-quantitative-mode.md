@@ -3,8 +3,14 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-13 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Povl (math), Jonte (operator) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Quant analyst |
+| **Implements** | FR-040–043 |
+| **Implementation** | Deferred — UX tab disabled (*Kommer senare*) |
 | **Preconditions** | UC-10 in progress; operator pools set; SYSTEMKOSTNAD from F-025; odds from ATG or inbox |
 
 ## Brief description
@@ -37,3 +43,11 @@ F-009, F-026, F-050, F-051, F-052, F-053, F-054 (optional), F-060, F-061
 ## Special requirements
 
 - [quantitative.md](../../strategies/quantitative.md) v0.3, [ux-workflow.md](../ux-workflow.md)
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — requirements spec; generator not yet implemented |

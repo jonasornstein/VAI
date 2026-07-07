@@ -3,7 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-02 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Jonte |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Agent |
 | **Preconditions** | Task received; AIRUP methodology active |
 
@@ -40,3 +44,11 @@ F-010, F-011, F-012, F-013, F-014, F-073
 
 - [AIRUP.md](../../AIRUP.md) v1.1
 - [SUP-F-006](../supplementary-specification.md#1-functionality-cross-cutting), [SUP-F-007](../supplementary-specification.md#1-functionality-cross-cutting)
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — canonical AIRUP workflow narrative |

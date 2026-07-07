@@ -3,8 +3,13 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-10 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Jonte (operator) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator |
+| **Implements** | FR-010–016 |
 | **Preconditions** | UC-09 complete; race card loaded; operator horse pools selected; SYSTEMKOSTNAD entered |
 
 ## Brief description
@@ -19,13 +24,13 @@ Run selected mode on operator-marked horses within budget; produce betting slip,
 4. Operator selects mode tab: **F-022** `select_game_and_mode`.
 5. **F-020** `load_race_card` for session context.
 6. **F-021** `validate_horse_selection` — pools ⊆ race card horses.
-7. **Mode branch** (each mode uses operator pools as candidate universe):
-   - 7a. `random` → UC-11
-   - 7b. `expert` → UC-12
-   - 7c. `quantitative` → UC-13
+7. **Mode branch** (v1.1: Hari only active; Expert/Kvant tabs disabled):
+   - 7a. `random` (Hari) → UC-11
+   - 7b. `expert` → UC-12 *(deferred — tab disabled)*
+   - 7c. `quantitative` → UC-13 *(deferred — tab disabled)*
 8. Mode returns final `leg → horse[]` selections (betting slip).
-9. UC-14: **F-060**–**F-062** — computed cost vs SYSTEMKOSTNAD displayed.
-10. Model attaches hit probabilities (**F-052** for quant; summary for other modes where applicable).
+9. UC-14: **F-060**–**F-062** — computed cost; Hari targets exact SYSTEMKOSTNAD match.
+10. **F-052** basic hit summary when ATG leg distributions available (Hari); full F-052 with UC-13 when quant ships.
 11. **F-023** / **F-024** write draft; status `AWAITING_OPERATOR`.
 
 ## Proposal output format
@@ -36,10 +41,10 @@ Includes: mode, DATUM, BANA, SYSTEMKOSTNAD (budget), computed cost, combinations
 
 | Step | Condition | Action |
 |------|-----------|--------|
-| 3a | SYSTEMKOSTNAD &lt; min possible cost | Warn; model may return single-row minimum |
-| 6a | No horses marked in a leg | Require at least one per leg or abort |
-| 9a | Computed cost &gt; SYSTEMKOSTNAD | Model narrows selections (UC-11 F-031, UC-13 F-053) or warn |
-| 7c | Odds unavailable | Degrade to expert/random or abort |
+| 3a | No exact budget achievable | UC-11 `BUDGET_NOT_MET`; offer nearest `suggested_stake_sek` |
+| 6a | No horses marked in a leg | Allowed — Hari fills leg randomly (v1.1) |
+| 9a | Frozen leg with no marks | Abort `FROZEN_EMPTY_LEG` (UC-11) |
+| 7b–7c | Expert or quant selected | Tab disabled in v1.1 UX; UC-12/13 not invoked |
 
 ## Functions invoked
 
@@ -50,3 +55,11 @@ F-020, F-021, F-022, F-023, F-024, F-025, F-026, F-052, F-060, F-061, F-062 (+ m
 - [ux-workflow.md](../ux-workflow.md)
 - [SUP-U-006](../supplementary-specification.md#2-usability), [SUP-U-007](../supplementary-specification.md#2-usability)
 - UX mockup: `outbox/mockups/v85-proposal-ux-mockup-atg.html`
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — v1.1 Hari flow; exact budget; empty-leg fill; deferred modes noted |

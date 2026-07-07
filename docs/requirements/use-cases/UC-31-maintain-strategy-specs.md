@@ -3,8 +3,13 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-31 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Povl |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Quant analyst |
+| **Implements** | FR-002, FR-031, FR-042 |
 | **Preconditions** | Strategy mode scope defined (random / expert / quantitative) |
 
 ## Brief description
@@ -35,4 +40,12 @@ F-102, F-103, F-081, F-012, F-014
 ## Special requirements
 
 - Quant gate in [AIRUP.md](../../AIRUP.md)
-- Approved: [quantitative.md](../../strategies/quantitative.md) v0.3
+- Approved: [quantitative.md](../../strategies/quantitative.md) v0.3, [random.md](../../strategies/random.md) v0.3
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — exemplified by random and quantitative strategy promotions |

@@ -3,7 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-01 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Jonte (operator), Nisse (ATG sources) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Agent, System |
 | **Preconditions** | Raw material available, or UC-09 fetch triggered |
 
@@ -40,3 +44,11 @@ F-001, F-002, F-003, F-004, F-005, F-007, F-008, F-009
 
 - [SUP-F-008](../supplementary-specification.md#1-functionality-cross-cutting)
 - Glossary: [VISION.md §8 — Race card](../../VISION.md#8-glossary)
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — ATG auto-fetch primary; manual YAML fallback |

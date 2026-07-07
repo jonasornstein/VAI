@@ -3,8 +3,14 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-12 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Nisse (patterns), Jonte (operator) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Trotting expert |
+| **Implements** | FR-030–032 |
+| **Implementation** | Deferred — UX tab disabled (*Kommer senare*) |
 | **Preconditions** | UC-10 in progress; operator horse pools set; SYSTEMKOSTNAD from F-025 |
 
 ## Brief description
@@ -39,3 +45,11 @@ F-026, F-040, F-041, F-042, F-043, F-060, F-061
 ## Special requirements
 
 - [expert.md](../../strategies/expert.md), [ux-workflow.md](../ux-workflow.md)
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — requirements spec; generator not yet implemented |

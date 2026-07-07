@@ -3,7 +3,11 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-20 |
-| **Status** | DRAFT |
+| **Status** | APPROVED |
+| **Version** | 1.0 |
+| **Reviewer** | Jonte (operator) |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Trotting expert, Quant analyst |
 | **Preconditions** | Draft in `pending/proposals/` with `AWAITING_OPERATOR` or expert review |
 
@@ -41,3 +45,12 @@ F-070, F-071, F-072, F-073
 
 - [SUP-U-001](../supplementary-specification.md#2-usability) through [SUP-U-005](../supplementary-specification.md#2-usability)
 - Operator gate: Kricke or Jonte for race-day **P**
+- v1.1: **Innan spel** checklist wired in local UI (F-071 auto-updates from slip + race card)
+
+---
+
+## Change log
+
+| Version | Date | Change |
+|---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — operator checklist shipped in mockup and local UI |

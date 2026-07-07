@@ -2,9 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.3 |
-| **Status** | DRAFT — ATG auto-fetch and UX workflow added |
-| **Last updated** | 2026-07-06 |
+| **Version** | 0.4 |
+| **Status** | APPROVED |
+| **Reviewer** | Jonte |
+| **Approved** | 2026-07-07 |
+| **Last updated** | 2026-07-07 |
 | **Owner** | Jonte (M-004) |
 | **Supersedes** | SRS §3 (functional requirements) |
 
@@ -99,7 +101,7 @@ flowchart LR
 | UC-01 | Ingest inputs           | Operator / Agent / System  | Auto-collect or manual store race cards and odds            | [UC-01](./use-cases/UC-01-ingest-inputs.md)           | FR-001a, FR-011        |
 | UC-02 | Manage AIRUP artifacts  | Agent                      | Move drafts through inbox → pending → outbox; log decisions | [UC-02](./use-cases/UC-02-manage-airup-artifacts.md)  | FR-000, FR-001b–d      |
 | UC-10 | Generate proposal       | Operator                   | Horse pools + SYSTEMKOSTNAD → betting slip + probabilities | [UC-10](./use-cases/UC-10-generate-proposal.md)       | FR-010–016             |
-| UC-11 | Random mode             | Operator / Agent           | Select horses per leg using configurable random policy      | [UC-11](./use-cases/UC-11-random-mode.md)             | FR-020–022             |
+| UC-11 | Random mode (Hari)      | Operator / Agent           | Exact-budget random fill from operator pools                | [UC-11](./use-cases/UC-11-random-mode.md)             | FR-020–022             |
 | UC-12 | Expert mode             | Operator / Trotting expert | Apply spik/gardering templates from expert rules            | [UC-12](./use-cases/UC-12-expert-mode.md)             | FR-030–032             |
 | UC-13 | Quantitative mode       | Operator / Quant analyst   | Use odds/probabilities and optional simulation              | [UC-13](./use-cases/UC-13-quantitative-mode.md)       | FR-040–043             |
 | UC-14 | Compute system cost     | Agent                      | Calculate combinations and SEK cost                         | [UC-14](./use-cases/UC-14-compute-system-cost.md)     | FR-013–014             |
@@ -181,6 +183,7 @@ Full specifications: [functions.md](./functions.md). Race card schema: [race-car
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.4 | 2026-07-07 | All use cases APPROVED v1.0; v1.1 Hari flow reflected |
 | 0.3 | 2026-07-06 | UC-09 ATG auto-fetch; operator horse pools; SYSTEMKOSTNAD 500 SEK |
 | 0.2 | 2026-07-06 | Full UC narratives; functions catalog (F-001–F-103); race card schema |
 | 0.1 | 2026-07-06 | Initial model; migrated from SRS §3; spec narratives skeleton |

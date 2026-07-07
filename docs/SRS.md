@@ -75,7 +75,7 @@ Package overview and AIRUP workflow: [requirements/README.md](./requirements/REA
 2. Nisse signs off on `docs/betting/v85.md`. ✓
 3. Povl signs off on quantitative requirements. ✓ — [quantitative.md](./strategies/quantitative.md) v0.3
 4. Kricke or Jonte confirms one real Saturday proposal is enterable at ATG. *(UC-22)*
-5. Core use-case specifications completed beyond DRAFT skeleton. *(Phase 2b)*
+5. Core use-case specifications completed beyond DRAFT skeleton. ✓ — all UCs APPROVED v1.0 (2026-07-07)
 
 ---
 
