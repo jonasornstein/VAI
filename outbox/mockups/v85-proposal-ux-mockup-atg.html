@@ -2,8 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>V85 Proposal — ATG UX Mockup</title>
-  <!-- ATG production stylesheet (buttons, game-type tokens, typography utilities) -->
+  <title>V85 Proposal — ATG UX Mockup v0.4</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,7 +15,6 @@
       font-style: normal;
     }
 
-    /* V85 tokens extracted from ATG frame-main.css */
     :root,
     [data-theme="light"] {
       --v85-gradient: linear-gradient(180deg, #006db6 0%, #004f9f 100%);
@@ -32,8 +30,8 @@
       --atg-muted-bg: #eaeff5;
       --atg-horse-bg: linear-gradient(180deg, #fff 0%, #dbe4ef 100%);
       --atg-horse-border: #bacbdf;
-      --atg-logo-bg: #ffffff;
-      --atg-logo-text: #004f9f;
+      --atg-horse-pool: #e8f4fc;
+      --atg-horse-pool-border: #006db6;
       --atg-banner-bg: #fff8e6;
       --atg-banner-border: #f39332;
       --atg-approved-bg: #e8f5ee;
@@ -42,8 +40,6 @@
       --atg-step-done-border: #a7d4b8;
       --atg-step-current-bg: linear-gradient(180deg, #fff 0%, #dbe4ef 100%);
       --atg-shadow: 0 2px 8px rgba(0, 79, 159, 0.08);
-      --atg-green: linear-gradient(180deg, #22ac07 0%, #218f0b 100%);
-      --atg-blue-btn: linear-gradient(180deg, #006db6 0%, #004f9f 100%);
     }
 
     [data-theme="dark"] {
@@ -60,8 +56,8 @@
       --atg-muted-bg: #243447;
       --atg-horse-bg: linear-gradient(180deg, #2a3f55 0%, #1e3448 100%);
       --atg-horse-border: #3a556f;
-      --atg-logo-bg: #15374e;
-      --atg-logo-text: #79bae5;
+      --atg-horse-pool: #1e3a52;
+      --atg-horse-pool-border: #79bae5;
       --atg-banner-bg: #2a2418;
       --atg-banner-border: #b36d1a;
       --atg-approved-bg: #1a3d22;
@@ -104,14 +100,13 @@
       box-shadow: var(--atg-shadow);
     }
 
-    /* V85 game header — mirrors .active-game-type-v85 .game-header */
     .game-header {
       background: var(--v85-gradient);
       color: #fff;
       display: flex;
       justify-content: space-between;
       align-items: stretch;
-      min-height: 72px;
+      min-height: 76px;
       border-bottom: 2px solid var(--v85-dark);
     }
     .game-header__brand {
@@ -121,30 +116,24 @@
       padding: 12px 20px;
     }
     .game-header__logo {
-      width: 52px;
-      height: 52px;
-      background: var(--atg-logo-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: ATGRubrik, sans-serif;
-      font-size: 22px;
-      color: var(--atg-logo-text);
-      text-transform: uppercase;
-      letter-spacing: -0.02em;
-      border: 1px solid var(--atg-border);
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      transition: transform 0.15s ease;
     }
+    .game-header__logo:hover { transform: rotate(-3deg) scale(1.04); }
+    .game-header__logo svg { display: block; width: 100%; height: 100%; }
     .game-header__title .ATGheadline {
       color: #fff;
       font-size: 28px;
       padding: 0;
       text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
     }
-    .game-header__sub {
-      font-size: 13px;
-      opacity: 0.92;
-      margin-top: 2px;
-    }
+    .game-header__sub { font-size: 13px; opacity: 0.92; margin-top: 2px; }
     .game-header__meta {
       display: flex;
       align-items: center;
@@ -160,34 +149,16 @@
       padding: 6px 12px;
     }
 
-    /* Theme toggle — ATG segmented control */
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      margin-right: 4px;
-    }
+    .theme-toggle { display: flex; align-items: center; gap: 0; margin-right: 4px; }
     .theme-toggle__label {
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      opacity: 0.85;
-      margin-right: 8px;
-      white-space: nowrap;
+      font-size: 10px; font-weight: 900; text-transform: uppercase;
+      letter-spacing: 0.05em; opacity: 0.85; margin-right: 8px;
     }
     .theme-toggle__btn {
       font-family: Roboto, sans-serif;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      text-align: center;
-      font-weight: 900;
-      cursor: pointer;
-      text-transform: uppercase;
-      user-select: none;
-      padding: 6px 12px;
-      font-size: 11px;
+      display: inline-flex; align-items: center; gap: 5px;
+      font-weight: 900; cursor: pointer; text-transform: uppercase;
+      padding: 6px 12px; font-size: 11px;
       border: 1px solid rgba(255, 255, 255, 0.35);
       background: rgba(255, 255, 255, 0.1);
       color: rgba(255, 255, 255, 0.75);
@@ -200,25 +171,19 @@
       border-color: #fff;
       box-shadow: 0 0 0 1px #fff;
     }
-    [data-theme="dark"] .theme-toggle__btn.active {
-      color: #004f9f;
-    }
-    .theme-toggle__btn:not(.active):hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-    }
-    .theme-toggle__icon { font-size: 13px; line-height: 1; }
+    [data-theme="dark"] .theme-toggle__btn.active { color: #004f9f; }
+    .theme-toggle__btn:not(.active):hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
 
     .meta-bar {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: 1.1fr 1fr 0.9fr 0.8fr 0.9fr;
       gap: 1px;
       background: var(--atg-border);
       border-bottom: 1px solid var(--atg-border);
     }
     .meta-item {
       background: var(--atg-surface);
-      padding: 12px 16px;
+      padding: 10px 14px;
     }
     .meta-item label {
       display: block;
@@ -226,25 +191,34 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       color: var(--atg-text);
-      margin-bottom: 3px;
+      margin-bottom: 4px;
       font-weight: 700;
     }
-    .meta-item strong {
+    .meta-select {
+      width: 100%;
+      font-family: Roboto, sans-serif;
       font-size: 14px;
-      color: var(--v85-headline);
       font-weight: 700;
+      color: var(--v85-headline);
+      background: var(--atg-surface);
+      border: 1px solid var(--atg-border);
+      padding: 5px 8px;
+      border-radius: 0;
+      cursor: pointer;
     }
-    .status-approved {
-      display: inline-block;
+    .fetch-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       background: var(--atg-approved-bg);
       color: var(--atg-approved-text);
-      padding: 3px 8px;
+      padding: 4px 8px;
       font-size: 11px;
       font-weight: 900;
       text-transform: uppercase;
     }
+    .fetch-badge::before { content: "✓"; }
 
-    /* Mode tabs — ATG toggle button pattern */
     .mode-tabs {
       display: flex;
       gap: 0;
@@ -266,38 +240,32 @@
 
     .content {
       display: grid;
-      grid-template-columns: 1fr 300px;
-      min-height: 500px;
+      grid-template-columns: 1fr 310px;
+      min-height: 520px;
     }
 
-    .legs-panel {
-      padding: 20px;
-      background: var(--atg-surface);
-    }
+    .legs-panel { padding: 20px; background: var(--atg-surface); }
     .section-title {
       font-family: ATGRubrik, sans-serif;
       font-size: 18px;
       color: var(--v85-headline);
       text-transform: uppercase;
-      margin-bottom: 14px;
-      letter-spacing: 0.02em;
+      margin-bottom: 6px;
     }
-    .section-title span {
-      font-family: Roboto, sans-serif;
+    .section-hint {
       font-size: 12px;
-      font-weight: 400;
       color: var(--atg-text);
-      text-transform: none;
-      margin-left: 8px;
+      margin-bottom: 14px;
     }
+    .section-hint strong { color: var(--v85-headline); }
 
     .legs-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+      margin-bottom: 16px;
     }
 
-    /* Leg cards styled like ATG startlist division columns */
     .leg-card {
       border: 1px solid var(--atg-border);
       background: var(--atg-surface);
@@ -316,10 +284,7 @@
       text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
       border-bottom: 2px solid var(--v85-dark);
     }
-    .leg-body {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--atg-border);
-    }
+    .leg-body { padding: 10px 12px; border-bottom: 1px solid var(--atg-border); }
     .race-info {
       font-size: 11px;
       color: var(--atg-text);
@@ -327,34 +292,73 @@
       font-weight: 700;
       text-transform: uppercase;
     }
-    .horses {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
+    .horses { display: flex; flex-wrap: wrap; gap: 5px; }
     .horse {
-      min-width: 32px;
-      height: 32px;
+      min-width: 30px;
+      height: 30px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 14px;
+      font-size: 13px;
       border: 1px solid var(--atg-horse-border);
       background-image: var(--atg-horse-bg);
       color: var(--atg-link);
+      cursor: pointer;
+      padding: 0 4px;
+      transition: background 0.12s, transform 0.1s;
+      -webkit-appearance: none;
+      font-family: Roboto, sans-serif;
     }
-    .horse.spik {
-      background-image: var(--v85-gradient);
-      border-color: var(--v85-light);
-      color: #fff;
-      text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
+    .horse:hover { transform: scale(1.06); }
+    .horse.pool-selected {
+      background: var(--atg-horse-pool);
+      border-color: var(--atg-horse-pool-border);
+      color: var(--v85-headline);
+      box-shadow: inset 0 0 0 1px var(--atg-horse-pool-border);
     }
-    .reserves {
-      margin-top: 6px;
-      font-size: 11px;
+    .horse.scratched {
+      opacity: 0.35;
+      text-decoration: line-through;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .reserves { margin-top: 6px; font-size: 10px; color: var(--atg-text); }
+
+    .slip-preview {
+      border: 2px solid var(--v85-mid);
+      background: var(--atg-bg);
+      padding: 12px 14px;
+    }
+    .slip-preview h3 {
+      font-family: ATGRubrik, sans-serif;
+      font-size: 14px;
+      color: var(--v85-headline);
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+    .slip-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+    }
+    .slip-leg {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
       color: var(--atg-text);
     }
+    .slip-leg .num {
+      display: block;
+      margin-top: 4px;
+      background: var(--v85-gradient);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      padding: 6px 2px;
+      text-shadow: 1px 1px rgba(0,0,0,0.2);
+    }
+    .slip-leg.wide .num { font-size: 11px; line-height: 1.2; padding: 4px 2px; }
 
     .sidebar {
       background: var(--atg-bg);
@@ -377,17 +381,39 @@
       margin: 0 0 10px;
       font-weight: 900;
     }
-    .cost-big {
+    .stake-input-wrap { display: flex; align-items: baseline; gap: 8px; }
+    .stake-input {
       font-family: ATGRubrik, sans-serif;
       font-size: 34px;
+      font-weight: 900;
+      color: var(--v85-headline);
+      border: 2px solid var(--v85-light);
+      background: var(--atg-surface);
+      width: 100%;
+      padding: 6px 10px;
+      text-align: right;
+    }
+    .stake-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(0, 109, 182, 0.3); }
+    .stake-suffix { font-size: 14px; font-weight: 700; color: var(--atg-text); white-space: nowrap; }
+    .stake-hint { font-size: 10px; color: var(--atg-text); margin-top: 6px; }
+
+    .cost-big {
+      font-family: ATGRubrik, sans-serif;
+      font-size: 28px;
       color: var(--v85-headline);
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
-    .cost-big span {
-      font-family: Roboto, sans-serif;
-      font-size: 14px;
-      font-weight: 700;
+    .cost-big span { font-family: Roboto, sans-serif; font-size: 14px; font-weight: 700; }
+    .cost-ok {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--atg-approved-text);
+      background: var(--atg-approved-bg);
+      padding: 2px 6px;
+      margin-left: 6px;
+      vertical-align: middle;
     }
     .stat-row {
       display: flex;
@@ -413,31 +439,19 @@
       background: var(--atg-muted-bg);
       border: 1px solid var(--atg-border);
     }
-    .bar-fill {
-      height: 100%;
-      background: var(--v85-gradient);
-    }
+    .bar-fill { height: 100%; background: var(--v85-gradient); }
 
-    .checklist {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      font-size: 12px;
-    }
+    .checklist { list-style: none; margin: 0; padding: 0; font-size: 12px; }
     .checklist li {
       padding: 7px 0 7px 22px;
       position: relative;
       border-bottom: 1px solid var(--atg-border);
     }
-    .checklist li::before {
-      content: "☐";
-      position: absolute;
-      left: 0;
-      color: var(--atg-text);
-    }
+    .checklist li::before { content: "☐"; position: absolute; left: 0; color: var(--atg-text); }
     .checklist li.done::before { content: "☑"; color: var(--atg-approved-text); }
 
     .sidebar .button { width: 100%; margin-bottom: 6px; }
+    .btn-generate { font-size: 14px !important; padding: 14px !important; }
     .sidebar-note {
       font-size: 10px;
       color: var(--atg-text);
@@ -458,55 +472,7 @@
       text-transform: uppercase;
       margin: 0 0 6px;
     }
-    .rationale p {
-      margin: 0;
-      font-size: 13px;
-      color: var(--atg-text);
-      max-width: 860px;
-    }
-
-    .airup-strip {
-      max-width: 1180px;
-      margin: 16px auto 0;
-      background: var(--atg-surface);
-      border: 1px solid var(--atg-border);
-      padding: 16px 20px;
-    }
-    .airup-strip h2 {
-      font-family: ATGRubrik, sans-serif;
-      font-size: 16px;
-      color: var(--v85-headline);
-      text-transform: uppercase;
-      margin: 0 0 12px;
-    }
-    .pipeline {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-    .step {
-      flex: 1;
-      text-align: center;
-      padding: 10px 6px;
-      font-size: 11px;
-      font-weight: 900;
-      text-transform: uppercase;
-      border: 1px solid var(--atg-border);
-      color: var(--atg-text);
-      background: var(--atg-bg);
-    }
-    .step.done {
-      background: var(--atg-step-done-bg);
-      border-color: var(--atg-step-done-border);
-      color: var(--atg-approved-text);
-    }
-    .step.current {
-      background-image: var(--atg-step-current-bg);
-      border-color: var(--v85-mid);
-      color: var(--v85-headline);
-      box-shadow: 0 0 0 1px var(--v85-mid);
-    }
-    .arrow { color: var(--atg-text); font-size: 16px; }
+    .rationale p { margin: 0; font-size: 13px; color: var(--atg-text); max-width: 860px; }
 
     .footer-note {
       text-align: center;
@@ -524,38 +490,82 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">UX Mockup v0.3 · ATG.se färger &amp; typsnitt · Ljus/mörk växling · Ingen affärslogik</div>
+  <div class="mockup-banner">UX Mockup v0.4 · ATG-hämtning · Hästval · SYSTEMKOSTNAD 500 SEK · Klicka hästar för att växla</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
       <div class="game-header__brand">
-        <div class="game-header__logo">ATG</div>
+        <div class="game-header__logo" title="V85 Proposal">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <linearGradient id="logo-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#006db6"/><stop offset="100%" stop-color="#004f9f"/>
+              </linearGradient>
+              <linearGradient id="logo-mane" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#f39332"/><stop offset="100%" stop-color="#ee7202"/>
+              </linearGradient>
+            </defs>
+            <rect width="64" height="64" rx="10" fill="url(#logo-bg)"/>
+            <ellipse cx="32" cy="52" rx="22" ry="4" fill="rgba(0,0,0,0.15)"/>
+            <path d="M14 38h28l4 8H10z" fill="#fff" opacity="0.95"/>
+            <circle cx="18" cy="46" r="3.5" fill="#dce0e7" stroke="#00366c" stroke-width="1"/>
+            <circle cx="46" cy="46" r="3.5" fill="#dce0e7" stroke="#00366c" stroke-width="1"/>
+            <path d="M22 36c2-8 8-14 16-14 6 0 10 4 11 10l-3 2c-1-4-4-6-8-6-5 0-9 4-10 9l-6-1z" fill="#fff"/>
+            <path d="M38 18c4 0 8 3 9 8-2 1-4 1-6 0-1-3-2-5-3-6-1-1 0-2 0-2z" fill="#fff"/>
+            <path d="M44 24c2 2 2 5 0 7" fill="none" stroke="url(#logo-mane)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M26 36v6M30 36v7" stroke="#00366c" stroke-width="2" stroke-linecap="round"/>
+            <rect x="8" y="8" width="30" height="14" rx="3" fill="#22ac07"/>
+            <text x="23" y="18" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="9" font-weight="900" fill="#fff">V85</text>
+            <path d="M52 12l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z" fill="#79bae5"/>
+          </svg>
+        </div>
         <div class="game-header__title">
           <div class="ATGheadline">V85 Proposal</div>
-          <div class="game-header__sub">Beslutstöd för manuell inmatning på atg.se</div>
+          <div class="game-header__sub">Hämtar startlista från ATG · du väljer hästar · modellen bygger spelet</div>
         </div>
       </div>
       <div class="game-header__meta">
         <div class="theme-toggle" role="group" aria-label="Tema">
           <span class="theme-toggle__label">Tema</span>
-          <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true">
-            <span class="theme-toggle__icon" aria-hidden="true">☀</span> Ljus
-          </button>
-          <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false">
-            <span class="theme-toggle__icon" aria-hidden="true">☽</span> Mörk
-          </button>
+          <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
+          <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">Mockup v0.3</span>
-        <span class="game-header__pill">2026-07-06</span>
+        <span class="game-header__pill">v0.4</span>
       </div>
     </header>
 
     <div class="meta-bar">
-      <div class="meta-item"><label>Bana</label><strong>Halmstad</strong></div>
-      <div class="meta-item"><label>Datum</label><strong>2026-07-05</strong></div>
-      <div class="meta-item"><label>Spelform</label><strong>V85</strong></div>
-      <div class="meta-item"><label>Läge</label><strong>Quantitative</strong></div>
-      <div class="meta-item"><label>AIRUP</label><strong><span class="status-approved">Approved</span></strong></div>
+      <div class="meta-item">
+        <label for="datum">Datum</label>
+        <select class="meta-select" id="datum">
+          <option selected>2026-07-05 (lördag)</option>
+          <option>2026-07-12 (lördag)</option>
+          <option>2026-07-19 (lördag)</option>
+        </select>
+      </div>
+      <div class="meta-item">
+        <label for="bana">Bana</label>
+        <select class="meta-select" id="bana">
+          <option selected>Halmstad</option>
+          <option>Jägersro</option>
+          <option>Örebro</option>
+        </select>
+      </div>
+      <div class="meta-item">
+        <label for="spelform">Spelform</label>
+        <select class="meta-select" id="spelform">
+          <option selected>V85</option>
+          <option disabled>V75 (kommande)</option>
+        </select>
+      </div>
+      <div class="meta-item">
+        <label>Källa</label>
+        <span class="fetch-badge">ATG</span>
+      </div>
+      <div class="meta-item">
+        <label>Status</label>
+        <span class="fetch-badge">Startlista laddad</span>
+      </div>
     </div>
 
     <div class="mode-tabs">
@@ -566,13 +576,20 @@
 
     <div class="content">
       <section class="legs-panel">
-        <h2 class="section-title">Avdelningar <span>8 rätt · välj vinnare per lopp</span></h2>
+        <h2 class="section-title">Välj hästar för modellen</h2>
+        <p class="section-hint">Klicka för att inkludera/exkludera hästar i kandidatpoolen. <strong>Blå markering</strong> = med i modellen. Startlista från ATG.</p>
         <div class="legs-grid">
           <div class="leg-card">
             <div class="leg-col">1</div>
             <div class="leg-body">
               <div class="race-info">V85-1 · 15:00</div>
-              <div class="horses"><span class="horse spik">3</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="1">3</button>
+                <button type="button" class="horse" data-leg="1">7</button>
+                <button type="button" class="horse pool-selected" data-leg="1">12</button>
+                <button type="button" class="horse" data-leg="1">1</button>
+                <button type="button" class="horse scratched" data-leg="1">5</button>
+              </div>
               <div class="reserves">Reserver: 7, 12</div>
             </div>
           </div>
@@ -580,58 +597,111 @@
             <div class="leg-col">2</div>
             <div class="leg-body">
               <div class="race-info">V85-2 · 15:20</div>
-              <div class="horses"><span class="horse">4</span><span class="horse">9</span><span class="horse">11</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="2">4</button>
+                <button type="button" class="horse" data-leg="2">2</button>
+                <button type="button" class="horse pool-selected" data-leg="2">9</button>
+                <button type="button" class="horse pool-selected" data-leg="2">11</button>
+                <button type="button" class="horse" data-leg="2">6</button>
+              </div>
             </div>
           </div>
           <div class="leg-card">
             <div class="leg-col">3</div>
             <div class="leg-body">
               <div class="race-info">V85-3 · 15:40</div>
-              <div class="horses"><span class="horse spik">1</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="3">1</button>
+                <button type="button" class="horse" data-leg="3">8</button>
+                <button type="button" class="horse" data-leg="3">10</button>
+              </div>
             </div>
           </div>
           <div class="leg-card">
             <div class="leg-col">4</div>
             <div class="leg-body">
               <div class="race-info">V85-4 · 16:00</div>
-              <div class="horses"><span class="horse">2</span><span class="horse">6</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="4">2</button>
+                <button type="button" class="horse pool-selected" data-leg="4">6</button>
+                <button type="button" class="horse" data-leg="4">4</button>
+              </div>
             </div>
           </div>
           <div class="leg-card">
             <div class="leg-col">5</div>
             <div class="leg-body">
               <div class="race-info">V85-5 · 16:20</div>
-              <div class="horses"><span class="horse spik">8</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="5">8</button>
+                <button type="button" class="horse" data-leg="5">3</button>
+                <button type="button" class="horse" data-leg="5">11</button>
+              </div>
             </div>
           </div>
           <div class="leg-card">
             <div class="leg-col">6</div>
             <div class="leg-body">
               <div class="race-info">V85-6 · 16:40</div>
-              <div class="horses"><span class="horse">3</span><span class="horse">5</span><span class="horse">10</span><span class="horse">13</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="6">3</button>
+                <button type="button" class="horse pool-selected" data-leg="6">5</button>
+                <button type="button" class="horse pool-selected" data-leg="6">10</button>
+                <button type="button" class="horse pool-selected" data-leg="6">13</button>
+                <button type="button" class="horse" data-leg="6">1</button>
+              </div>
             </div>
           </div>
           <div class="leg-card">
             <div class="leg-col">7</div>
             <div class="leg-body">
               <div class="race-info">V85-7 · 17:00</div>
-              <div class="horses"><span class="horse spik">2</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="7">2</button>
+                <button type="button" class="horse" data-leg="7">5</button>
+              </div>
             </div>
           </div>
           <div class="leg-card">
             <div class="leg-col">8</div>
             <div class="leg-body">
               <div class="race-info">V85-8 · 17:20</div>
-              <div class="horses"><span class="horse">1</span><span class="horse">4</span></div>
+              <div class="horses">
+                <button type="button" class="horse pool-selected" data-leg="8">1</button>
+                <button type="button" class="horse pool-selected" data-leg="8">4</button>
+                <button type="button" class="horse" data-leg="8">7</button>
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div class="slip-preview">
+          <h3>Genererat spel (exempel)</h3>
+          <div class="slip-grid">
+            <div class="slip-leg"><span>1</span><span class="num">3</span></div>
+            <div class="slip-leg wide"><span>2</span><span class="num">4·9·11</span></div>
+            <div class="slip-leg"><span>3</span><span class="num">1</span></div>
+            <div class="slip-leg wide"><span>4</span><span class="num">2·6</span></div>
+            <div class="slip-leg"><span>5</span><span class="num">8</span></div>
+            <div class="slip-leg wide"><span>6</span><span class="num">3·5·10·13</span></div>
+            <div class="slip-leg"><span>7</span><span class="num">2</span></div>
+            <div class="slip-leg wide"><span>8</span><span class="num">1·4</span></div>
           </div>
         </div>
       </section>
 
       <aside class="sidebar">
         <div class="summary-card">
-          <h3>Systemkostnad</h3>
-          <div class="cost-big">24,00 <span>SEK</span></div>
+          <h3>Systemkostnad (budget)</h3>
+          <div class="stake-input-wrap">
+            <input class="stake-input" type="number" value="500" min="1" step="50" aria-label="Systemkostnad i SEK" />
+            <span class="stake-suffix">SEK</span>
+          </div>
+          <p class="stake-hint">Standardvärde 500 SEK. Modellen optimerar inom denna budget.</p>
+        </div>
+        <div class="summary-card">
+          <h3>Beräknad kostnad</h3>
+          <div class="cost-big">24,00 <span>SEK</span><span class="cost-ok">≤ budget</span></div>
           <div class="stat-row"><span>Rader</span><strong>48</strong></div>
           <div class="stat-row"><span>Radpris</span><strong>0,50 SEK</strong></div>
           <div class="stat-row"><span>Beräkning</span><strong>1×3×1×2×1×4×1×2</strong></div>
@@ -644,11 +714,12 @@
             <div class="hit-row"><span>≥6 rätt</span><div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div><span>4,2%</span></div>
           </div>
         </div>
+        <button class="button button--blue btn-generate" type="button">Generera system</button>
         <div class="summary-card">
           <h3>Innan spel på atg.se</h3>
           <ul class="checklist">
-            <li class="done">8 avdelningar ifyllda</li>
-            <li class="done">Kostnad verifierad</li>
+            <li class="done">Hästar valda i alla avdelningar</li>
+            <li class="done">Beräknad kostnad ≤ budget</li>
             <li>Kontrollera strukna hästar</li>
             <li>Reserver aktiva</li>
           </ul>
@@ -661,36 +732,21 @@
 
     <div class="rationale">
       <h2>Rationale — Quantitative</h2>
-      <p>Maximerar P(≥7 rätt) inom budget 25 SEK. Oberoende ben antaget. Poolandelar enligt v85.md v1.0 (30/20/15/35 från 2026-07-02). Odds källa: ATG (exempeldata).</p>
+      <p>Maximerar P(≥7 rätt) inom SYSTEMKOSTNAD 500 SEK. Kandidatpool = operatörens valda hästar. Oberoende ben. Poolandelar v85.md v1.0. Odds: ATG (hämtad).</p>
     </div>
   </div>
 
-  <div class="airup-strip">
-    <h2>AIRUP — artefaktstatus</h2>
-    <div class="pipeline">
-      <div class="step done">A Analyze</div>
-      <span class="arrow">→</span>
-      <div class="step done">I Inbox</div>
-      <span class="arrow">→</span>
-      <div class="step done">R Review</div>
-      <span class="arrow">→</span>
-      <div class="step done">U Update</div>
-      <span class="arrow">→</span>
-      <div class="step current">P Publish → outbox</div>
-    </div>
-  </div>
-
-  <p class="footer-note">ATG Trotting Betting Systems · Mockup för Kricke/Jonte · Färger från atg.se frame-main.css</p>
+  <p class="footer-note">ATG Trotting Betting Systems · Mockup v0.4 · Logo: travhäst + V85</p>
 
   <script>
     (function () {
       var storageKey = "atg-mockup-theme";
       var root = document.documentElement;
-      var buttons = document.querySelectorAll("[data-theme-set]");
+      var themeBtns = document.querySelectorAll("[data-theme-set]");
 
       function applyTheme(theme) {
         root.setAttribute("data-theme", theme);
-        buttons.forEach(function (btn) {
+        themeBtns.forEach(function (btn) {
           var active = btn.getAttribute("data-theme-set") === theme;
           btn.classList.toggle("active", active);
           btn.setAttribute("aria-pressed", active ? "true" : "false");
@@ -699,17 +755,20 @@
       }
 
       var params = new URLSearchParams(window.location.search);
-      var queryTheme = params.get("theme");
       var saved = null;
       try { saved = localStorage.getItem(storageKey); } catch (e) {}
-      var initial = (queryTheme === "dark" || queryTheme === "light") ? queryTheme : saved;
-      if (initial === "dark" || initial === "light") {
-        applyTheme(initial);
-      }
+      var initial = params.get("theme") === "dark" ? "dark" : params.get("theme") === "light" ? "light" : saved;
+      if (initial === "dark" || initial === "light") applyTheme(initial);
 
-      buttons.forEach(function (btn) {
+      themeBtns.forEach(function (btn) {
         btn.addEventListener("click", function () {
           applyTheme(btn.getAttribute("data-theme-set"));
+        });
+      });
+
+      document.querySelectorAll(".horse:not(.scratched)").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          btn.classList.toggle("pool-selected");
         });
       });
     })();
