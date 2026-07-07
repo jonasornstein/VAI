@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>V85 Proposal — ATG UX v1.1 (Local UI)</title>
+  <title>VAI V85 — ATG UX v1.1 (Local UI)</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -291,6 +291,13 @@
       display: grid;
       grid-template-columns: 36px 1fr;
     }
+    .leg-card.leg-frozen {
+      border-color: #6b7c93;
+      box-shadow: inset 0 0 0 1px rgba(107, 124, 147, 0.35);
+    }
+    .leg-card.leg-frozen .leg-col {
+      background: linear-gradient(180deg, #6b7c93 0%, #4f5d70 100%);
+    }
     .leg-col {
       background: var(--v85-gradient);
       color: #fff;
@@ -336,6 +343,12 @@
       color: var(--v85-headline);
       box-shadow: inset 0 0 0 1px var(--atg-horse-pool-border);
     }
+    .horse.random-selected {
+      border: 2px solid #e85d04;
+      box-shadow: 0 0 0 1px #e85d04;
+      color: var(--v85-headline);
+      font-weight: 900;
+    }
     .horse.scratched {
       opacity: 0.35;
       text-decoration: line-through;
@@ -343,41 +356,157 @@
       pointer-events: none;
     }
     .reserves { margin-top: 6px; font-size: 10px; color: var(--atg-text); }
-
-    .slip-preview {
-      border: 2px solid var(--v85-mid);
-      background: var(--atg-bg);
-      padding: 12px 14px;
+    .legs-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 10px;
     }
-    .slip-preview h3 {
-      font-family: ATGRubrik, sans-serif;
-      font-size: 14px;
-      color: var(--v85-headline);
-      text-transform: uppercase;
-      margin: 0 0 10px;
-    }
-    .slip-grid {
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
+    .leg-actions {
+      display: flex;
+      justify-content: flex-end;
       gap: 6px;
+      margin-bottom: 6px;
     }
-    .slip-leg {
-      text-align: center;
+    .leg-clear-btn,
+    .leg-freeze-btn,
+    .btn-deselect-all {
+      font-family: Roboto, sans-serif;
       font-size: 10px;
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--atg-link);
+      background: var(--atg-surface);
+      border: 1px solid var(--atg-border);
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    .leg-clear-btn:hover,
+    .leg-freeze-btn:hover,
+    .btn-deselect-all:hover {
+      border-color: var(--atg-link);
+      background: var(--atg-muted-bg);
+    }
+    .selection-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+      font-size: 11px;
       color: var(--atg-text);
     }
-    .slip-leg .num {
-      display: block;
-      margin-top: 4px;
-      background: var(--v85-gradient);
-      color: #fff;
-      font-size: 14px;
-      font-weight: 900;
-      padding: 6px 2px;
-      text-shadow: 1px 1px rgba(0,0,0,0.2);
+    .selection-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
-    .slip-leg.wide .num { font-size: 11px; line-height: 1.2; padding: 4px 2px; }
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--atg-horse-border);
+      display: inline-block;
+    }
+    .legend-swatch.operator {
+      background: var(--atg-horse-pool);
+      border-color: var(--atg-horse-pool-border);
+    }
+    .legend-swatch.random {
+      border: 2px solid #e85d04;
+      box-shadow: 0 0 0 1px #e85d04;
+    }
+    .legend-swatch.frozen {
+      background: linear-gradient(180deg, #6b7c93 0%, #4f5d70 100%);
+      border-color: #4f5d70;
+    }
+    .leg-freeze-btn.active {
+      color: #fff;
+      background: #4f5d70;
+      border-color: #4f5d70;
+    }
+
+    .slip-preview {
+      border: 1px solid var(--atg-border);
+      background: var(--atg-bg);
+      padding: 0;
+      overflow: hidden;
+    }
+    .slip-preview h3 {
+      display: none;
+    }
+    .slip-table {
+      background: #fff;
+      border-top: 1px solid #e5e5e5;
+    }
+    .slip-row {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      border-bottom: 1px solid #ececec;
+      min-height: 44px;
+    }
+    .slip-row:last-child {
+      border-bottom: none;
+    }
+    .slip-row-leg {
+      background: #006bb3;
+      color: #fff;
+      font-family: ATGRubrik, sans-serif;
+      font-size: 20px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 1px 1px rgba(0, 0, 0, 0.15);
+    }
+    .slip-row-horses {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      font-size: 15px;
+      font-weight: 400;
+      color: #1a1a1a;
+      letter-spacing: 0.02em;
+      line-height: 1.35;
+      background: #fff;
+    }
+    .slip-footer {
+      background: #f2efe8;
+      border-top: 1px solid #e0ddd6;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: #1a1a1a;
+      min-height: 20px;
+    }
+    .slip-footer strong {
+      font-weight: 700;
+    }
+    .slip-footer:empty {
+      display: none;
+    }
+    .slip-print-meta {
+      display: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a1a1a;
+      padding: 10px 16px;
+      border-bottom: 1px solid #ececec;
+      background: #fff;
+    }
+    .slip-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .slip-actions .button {
+      font-size: 12px;
+      padding: 8px 14px;
+    }
+    .slip-actions .button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
 
     .sidebar {
       background: var(--atg-bg);
@@ -415,6 +544,18 @@
     .stake-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(0, 109, 182, 0.3); }
     .stake-suffix { font-size: 14px; font-weight: 700; color: var(--atg-text); white-space: nowrap; }
     .stake-hint { font-size: 10px; color: var(--atg-text); margin-top: 6px; }
+    .seed-input {
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--v85-headline);
+      border: 1px solid var(--atg-border);
+      background: var(--atg-surface);
+      width: 100%;
+      padding: 8px 10px;
+      margin-top: 4px;
+    }
+    .seed-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(0, 109, 182, 0.3); }
 
     .cost-big {
       font-family: ATGRubrik, sans-serif;
@@ -468,9 +609,17 @@
     }
     .checklist li::before { content: "☐"; position: absolute; left: 0; color: var(--atg-text); }
     .checklist li.done::before { content: "☑"; color: var(--atg-approved-text); }
+    .checklist li.warn::before { content: "!"; font-weight: 900; color: #c45c00; }
+    .checklist li.warn { color: #8a3b00; }
 
     .sidebar .button { width: 100%; margin-bottom: 6px; }
-    .btn-generate { font-size: 14px !important; padding: 14px !important; }
+    .sidebar .btn-action {
+      font-size: 14px !important;
+      padding: 14px !important;
+      min-height: 48px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
     .sidebar-note {
       font-size: 10px;
       color: var(--atg-text);
@@ -505,6 +654,43 @@
     @media print {
       body { padding: 0; background: #fff; }
       .mockup-banner { display: none; }
+      body.print-slip-only .mockup-banner,
+      body.print-slip-only .game-header,
+      body.print-slip-only .meta-bar,
+      body.print-slip-only .mode-tabs,
+      body.print-slip-only .section-title,
+      body.print-slip-only .section-hint,
+      body.print-slip-only .selection-legend,
+      body.print-slip-only .legs-toolbar,
+      body.print-slip-only .legs-grid,
+      body.print-slip-only .slip-actions,
+      body.print-slip-only .sidebar,
+      body.print-slip-only .rationale,
+      body.print-slip-only .footer-note {
+        display: none !important;
+      }
+      body.print-slip-only {
+        padding: 0;
+        background: #fff;
+      }
+      body.print-slip-only .app {
+        border: none;
+        box-shadow: none;
+        max-width: none;
+        margin: 0;
+      }
+      body.print-slip-only .content {
+        display: block;
+      }
+      body.print-slip-only .legs-panel {
+        padding: 0;
+      }
+      body.print-slip-only .slip-preview {
+        border: none;
+      }
+      body.print-slip-only .slip-print-meta {
+        display: block;
+      }
     }
   </style>
 </head>
@@ -514,7 +700,7 @@
   <div class="app active-game-type-v85">
     <header class="game-header">
       <div class="game-header__brand">
-        <div class="game-header__logo" title="V85 Proposal">
+        <div class="game-header__logo" id="app-logo" title="VAI V85">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
             <defs>
               <linearGradient id="logo-bg" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -534,12 +720,12 @@
             <path d="M44 24c2 2 2 5 0 7" fill="none" stroke="url(#logo-mane)" stroke-width="2.5" stroke-linecap="round"/>
             <path d="M26 36v6M30 36v7" stroke="#00366c" stroke-width="2" stroke-linecap="round"/>
             <rect x="8" y="8" width="30" height="14" rx="3" fill="#22ac07"/>
-            <text x="23" y="18" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="9" font-weight="900" fill="#fff">V85</text>
+            <text x="23" y="18" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="8" font-weight="900" fill="#fff">VAI</text>
             <path d="M52 12l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z" fill="#79bae5"/>
           </svg>
         </div>
         <div class="game-header__title">
-          <div class="ATGheadline">V85 Proposal</div>
+          <div class="ATGheadline" id="app-headline">VAI V85</div>
           <div class="game-header__sub">Hämtar startlista från ATG · du väljer hästar · modellen bygger spelet</div>
         </div>
       </div>
@@ -565,13 +751,13 @@
       <div class="meta-item">
         <label for="spelform">Spelform</label>
         <select class="meta-select" id="spelform">
-          <option selected>V85</option>
-          <option disabled>V75 (kommande)</option>
+          <option value="V85" selected>V85</option>
+          <option value="V75" disabled>V75 (kommande)</option>
         </select>
       </div>
       <div class="meta-item">
         <label>Källa</label>
-        <span class="fetch-badge" id="source-badge">YAML</span>
+        <span class="fetch-badge" id="source-badge">ATG</span>
       </div>
       <div class="meta-item">
         <label>Status</label>
@@ -580,7 +766,7 @@
     </div>
 
     <div class="mode-tabs" role="tablist" aria-label="Läge">
-      <button class="button button--toggle active" type="button" role="tab" aria-selected="true" data-mode="random">Random</button>
+      <button class="button button--toggle active" type="button" role="tab" aria-selected="true" data-mode="random">Hari</button>
       <button class="button button--toggle" type="button" role="tab" aria-selected="false" aria-disabled="true" disabled title="Kommer senare">Expert</button>
       <button class="button button--toggle" type="button" role="tab" aria-selected="false" aria-disabled="true" disabled title="Kommer senare">Kvantitativ</button>
     </div>
@@ -588,12 +774,25 @@
     <div class="content">
       <section class="legs-panel">
         <h2 class="section-title">Välj hästar för modellen</h2>
-        <p class="section-hint">Klicka för att inkludera/exkludera hästar i kandidatpoolen. <strong>Blå markering</strong> = med i modellen. Startlista från YAML (<code>inbox/race-cards/</code>).</p>
+        <p class="section-hint">Klicka för att markera hästar du vill låsa. Tomt val = slumpen väljer på öppna avdelningar. <strong>Frys avd.</strong> blockerar slumpen — markera minst en häst på frysta avdelningar.</p>
+        <div class="selection-legend" aria-label="Förklaring av markeringar">
+          <span><i class="legend-swatch operator" aria-hidden="true"></i> Operatörens val</span>
+          <span><i class="legend-swatch random" aria-hidden="true"></i> Slumpens hästar</span>
+          <span><i class="legend-swatch frozen" aria-hidden="true"></i> Fryst avdelning</span>
+        </div>
+        <div class="legs-toolbar">
+          <button class="btn-deselect-all" id="btn-deselect-all" type="button">Rensa alla avdelningar</button>
+        </div>
         <div class="legs-grid" id="legs-grid"></div>
 
-        <div class="slip-preview">
+        <div class="slip-preview" id="slip-preview">
+          <div class="slip-print-meta" id="slip-print-meta" aria-hidden="true"></div>
           <h3 id="slip-title">Genererat spel</h3>
-          <div class="slip-grid" id="slip-grid"></div>
+          <div class="slip-table" id="slip-grid" aria-label="Genererat spel rader"></div>
+          <div class="slip-footer" id="slip-footer"></div>
+        </div>
+        <div class="slip-actions" aria-label="Spelkvitto">
+          <button class="button" id="btn-print-slip" type="button" disabled>Skriv ut spelkvitto</button>
         </div>
       </section>
 
@@ -604,7 +803,16 @@
             <input class="stake-input" id="stake-input" type="number" value="500" min="1" step="50" aria-label="Systemkostnad i SEK" />
             <span class="stake-suffix">SEK</span>
           </div>
-          <p class="stake-hint">Standardvärde 500 SEK. Slumpmässigt urval inom budget (greedy shrink).</p>
+          <p class="stake-hint">Standardvärde 500 SEK. Markera valfria hästar — slumpen fyller på till exakt budget.</p>
+        </div>
+        <div class="summary-card">
+          <h3>Seed (valfritt)</h3>
+          <input class="seed-input" id="seed-input" type="number" step="1" placeholder="t.ex. 42" aria-label="RNG seed för reproducerbart system" aria-describedby="seed-help" />
+          <p class="stake-hint" id="seed-help">
+            Styr slumpens tillägg efter att du markerat hästar. Påverkar inte vilka hästar du klickar i rutnätet.
+            Lämna tom för ett nytt slumpmässigt system varje gång du klickar <strong>Generera system</strong>.
+            Samma seed + samma markerade hästar + samma budget = samma <strong>Genererat spel</strong> (t.ex. <code>42</code> vid test).
+          </p>
         </div>
         <div class="summary-card">
           <h3>Beräknad kostnad</h3>
@@ -613,47 +821,50 @@
             <div class="stat-row"><span>Rader</span><strong id="stat-rows-count">—</strong></div>
             <div class="stat-row"><span>Radpris</span><strong>0,50 SEK</strong></div>
             <div class="stat-row"><span>Beräkning</span><strong id="stat-breakdown">—</strong></div>
-            <div class="stat-row"><span>Shrink-steg</span><strong id="stat-shrink">—</strong></div>
+            <div class="stat-row"><span>Antal hästar tillagda</span><strong id="stat-shrink">—</strong></div>
           </div>
         </div>
         <div class="summary-card">
           <h3>Träffsannolikhet (modell)</h3>
           <p class="stake-hint" style="margin-top:0">Ej tillgänglig i Random v1 (valfritt senare med odds).</p>
         </div>
-        <button class="button button--blue btn-generate" id="btn-generate" type="button">Generera system</button>
+        <button class="button button--blue btn-action btn-generate" id="btn-generate" type="button">Generera system</button>
         <div class="summary-card">
           <h3>Innan spel på atg.se</h3>
-          <ul class="checklist">
-            <li class="done">Hästar valda i alla avdelningar</li>
-            <li class="done">Beräknad kostnad ≤ budget</li>
-            <li>Kontrollera strukna hästar</li>
-            <li>Reserver aktiva</li>
+          <ul class="checklist" id="operator-checklist">
+            <li id="check-legs">Hästar valda i alla avdelningar</li>
+            <li id="check-cost">Beräknad kostnad ≤ budget</li>
+            <li id="check-scratches">Kontrollera strukna hästar</li>
+            <li id="check-reserves">Reserver aktiva</li>
           </ul>
         </div>
-        <button class="button" type="button">Exportera förslag (PDF)</button>
-        <button class="button button--blue" type="button">Öppna atg.se/v85 ↗</button>
+        <button class="button button--blue btn-action" id="btn-open-atg" type="button">Öppna ATG/V85</button>
         <p class="sidebar-note">Placerar inte spel automatiskt</p>
       </aside>
     </div>
 
     <div class="rationale">
       <h2>Rationale — Random</h2>
-      <p id="rationale-text">Slumpmässigt urval ur operatörens kandidatpool per avdelning. Kör <code>python -m atg serve</code> och klicka Generera system. Expert och Kvantitativ kommer senare.</p>
+      <p id="rationale-text">Slumpmässigt urval ur operatörens kandidatpool per avdelning.</p>
     </div>
   </div>
 
-  <p class="footer-note">ATG Trotting Betting Systems · v1.1 Local UI · Random · Logo: travhäst + V85</p>
+  <p class="footer-note">ATG Trotting Betting Systems · v1.1 Local UI · Random · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
       var API = "";
+      var ATG_V85_URL = "https://www.atg.se/v85";
       var storageKey = "atg-mockup-theme";
       var root = document.documentElement;
       var themeBtns = document.querySelectorAll("[data-theme-set]");
-      var raceCards = [];
+      var schedule = null;
       var currentCard = null;
-      var lastSeed = null;
-
+      var datumListenerBound = false;
+      var frozenLegs = {};
+      var slipReady = false;
+      var RATIONALE_DEFAULT =
+        "Slumpmässigt urval ur operatörens kandidatpool per avdelning.";
       function applyTheme(theme) {
         root.setAttribute("data-theme", theme);
         themeBtns.forEach(function (btn) {
@@ -688,64 +899,327 @@
         return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
       }
 
+      function readSeed() {
+        var raw = document.getElementById("seed-input").value.trim();
+        if (!raw) return null;
+        var n = parseInt(raw, 10);
+        if (isNaN(n)) {
+          alert("Ogiltigt seed — ange ett heltal");
+          return undefined;
+        }
+        return n;
+      }
+
+      function findHorseBtn(leg, num) {
+        var buttons = document.querySelectorAll('.horse[data-leg="' + leg + '"]:not(.scratched)');
+        for (var i = 0; i < buttons.length; i++) {
+          if (parseInt(buttons[i].textContent, 10) === num) return buttons[i];
+        }
+        return null;
+      }
+
+      function clearHorseSelection(btn) {
+        btn.classList.remove("pool-selected", "random-selected");
+      }
+
+      function deselectLeg(leg) {
+        document.querySelectorAll('.horse[data-leg="' + leg + '"]').forEach(clearHorseSelection);
+      }
+
+      function deselectAllLegs() {
+        document.querySelectorAll(".horse").forEach(clearHorseSelection);
+      }
+
+      function collectFrozenLegs() {
+        return Object.keys(frozenLegs).filter(function (leg) {
+          return frozenLegs[leg];
+        }).map(function (leg) { return parseInt(leg, 10); });
+      }
+
+      function updateLegFreezeUi(leg) {
+        var legKey = String(leg);
+        var card = document.querySelector('.leg-card[data-leg="' + legKey + '"]');
+        var btn = document.querySelector('.leg-freeze-btn[data-leg="' + legKey + '"]');
+        var frozen = !!frozenLegs[legKey];
+        if (card) card.classList.toggle("leg-frozen", frozen);
+        if (btn) {
+          btn.classList.toggle("active", frozen);
+          btn.setAttribute("aria-pressed", frozen ? "true" : "false");
+          btn.textContent = frozen ? "Frigör avd. " + legKey : "Frys avd. " + legKey;
+        }
+      }
+
+      function toggleFreezeLeg(leg) {
+        var legKey = String(leg);
+        frozenLegs[legKey] = !frozenLegs[legKey];
+        updateLegFreezeUi(legKey);
+      }
+
       function collectPools() {
         var pools = {};
+        for (var i = 1; i <= 8; i++) pools[String(i)] = [];
         document.querySelectorAll(".horse.pool-selected").forEach(function (btn) {
           var leg = btn.getAttribute("data-leg");
           var num = parseInt(btn.textContent, 10);
-          if (!pools[leg]) pools[leg] = [];
           pools[leg].push(num);
         });
-        for (var i = 1; i <= 8; i++) {
-          if (!pools[String(i)] || !pools[String(i)].length) {
-            throw new Error("Minst en häst måste vara vald i avdelning " + i);
-          }
-        }
         return pools;
       }
 
+      function applyGeneratedSelections(operatorPools, selections) {
+        deselectAllLegs();
+        for (var leg = 1; leg <= 8; leg++) {
+          var legKey = String(leg);
+          var operatorSet = new Set(operatorPools[legKey] || []);
+          var finalHorses = selections[legKey] || selections[leg] || [];
+          finalHorses.forEach(function (num) {
+            var btn = findHorseBtn(leg, num);
+            if (!btn) return;
+            if (operatorSet.has(num)) {
+              btn.classList.add("pool-selected");
+            } else {
+              btn.classList.add("random-selected");
+            }
+          });
+        }
+      }
+
       function renderLegs(card) {
+        resetOperatorChecklist();
+        document.getElementById("rationale-text").textContent = RATIONALE_DEFAULT;
         var grid = document.getElementById("legs-grid");
         grid.innerHTML = "";
         card.legs.forEach(function (leg) {
           var scratches = new Set(leg.scratches || []);
           var cardEl = document.createElement("div");
           cardEl.className = "leg-card";
+          cardEl.setAttribute("data-leg", String(leg.leg));
           var horsesHtml = leg.horses.map(function (h) {
-            var cls = "horse pool-selected";
+            var cls = "horse";
             if (scratches.has(h)) cls = "horse scratched";
             return '<button type="button" class="' + cls + '" data-leg="' + leg.leg + '">' + h + "</button>";
           }).join("");
-          var scratchList = (leg.scratches || []).concat();
           var reserveHtml = (leg.reserves && leg.reserves.length)
             ? '<div class="reserves">Reserver: ' + leg.reserves.join(", ") + "</div>" : "";
-          var scratchHtml = scratchList.length
-            ? "" : "";
           cardEl.innerHTML =
             '<div class="leg-col">' + leg.leg + '</div><div class="leg-body">' +
             '<div class="race-info">' + leg.race_label + (leg.start_time ? " · " + leg.start_time : "") + "</div>" +
+            '<div class="leg-actions">' +
+            '<button type="button" class="leg-clear-btn" data-leg="' + leg.leg + '">Rensa avd. ' + leg.leg + "</button>" +
+            '<button type="button" class="leg-freeze-btn" data-leg="' + leg.leg + '" aria-pressed="false">Frys avd. ' + leg.leg + "</button>" +
+            "</div>" +
             '<div class="horses">' + horsesHtml + "</div>" + reserveHtml + "</div>";
           grid.appendChild(cardEl);
         });
         grid.querySelectorAll(".horse:not(.scratched)").forEach(function (btn) {
-          btn.addEventListener("click", function () { btn.classList.toggle("pool-selected"); });
+          btn.addEventListener("click", function () {
+            btn.classList.remove("random-selected");
+            btn.classList.toggle("pool-selected");
+          });
         });
+        grid.querySelectorAll(".leg-clear-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            deselectLeg(btn.getAttribute("data-leg"));
+          });
+        });
+        grid.querySelectorAll(".leg-freeze-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            toggleFreezeLeg(btn.getAttribute("data-leg"));
+          });
+        });
+        for (var legNum = 1; legNum <= 8; legNum++) {
+          updateLegFreezeUi(legNum);
+        }
+      }
+
+      function hasSlip() {
+        return slipReady && document.querySelectorAll(".slip-row").length > 0;
+      }
+
+      function selectedGameType() {
+        var sel = document.getElementById("spelform");
+        return sel && sel.value ? sel.value : "V85";
+      }
+
+      function updateAppTitle() {
+        var game = selectedGameType();
+        var title = "VAI " + game;
+        var headline = document.getElementById("app-headline");
+        if (headline) headline.textContent = title;
+        document.title = title + " — ATG UX v1.1 (Local UI)";
+        var logo = document.getElementById("app-logo");
+        if (logo) logo.setAttribute("title", title);
+      }
+
+      function getSlipMeta() {
+        var date = document.getElementById("datum").value || "";
+        var track = "";
+        var banaSel = document.getElementById("bana");
+        if (banaSel && banaSel.selectedOptions.length) {
+          track = banaSel.selectedOptions[0].textContent.trim();
+        }
+        return { date: date, track: track, game: selectedGameType(), mode: "Hari" };
+      }
+
+      function updateSlipPrintMeta() {
+        var meta = getSlipMeta();
+        var el = document.getElementById("slip-print-meta");
+        if (!el) return;
+        el.textContent = meta.game + " · " + meta.track + " · " + meta.date + " · " + meta.mode;
+      }
+
+      function updateSlipActions() {
+        var ready = hasSlip();
+        var printBtn = document.getElementById("btn-print-slip");
+        if (printBtn) printBtn.disabled = !ready;
+      }
+
+      function setChecklistItem(id, state, hint) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove("done", "warn");
+        if (state === "done") el.classList.add("done");
+        if (state === "warn") el.classList.add("warn");
+        if (hint) el.title = hint;
+        else el.removeAttribute("title");
+      }
+
+      function resetOperatorChecklist() {
+        ["check-legs", "check-cost", "check-scratches", "check-reserves"].forEach(function (id) {
+          setChecklistItem(id, "pending", null);
+        });
+      }
+
+      function horsesForLeg(selections, leg) {
+        return selections[String(leg)] || selections[leg] || [];
+      }
+
+      function evaluateOperatorChecks(selections, costSek, budget) {
+        var legsOk = true;
+        var leg;
+        for (leg = 1; leg <= 8; leg++) {
+          if (!horsesForLeg(selections, leg).length) legsOk = false;
+        }
+        var costOk = costSek <= budget + 0.001;
+        var scratchOk = true;
+        var reservesOk = true;
+        var scratchHint = null;
+        var reservesHint = null;
+        var hasScratchesOnCard = false;
+        if (currentCard && currentCard.legs) {
+          currentCard.legs.forEach(function (legData) {
+            var legNum = legData.leg;
+            var selected = horsesForLeg(selections, legNum);
+            var scratches = legData.scratches || [];
+            var reserves = legData.reserves || [];
+            if (scratches.length) hasScratchesOnCard = true;
+            scratches.forEach(function (horse) {
+              if (selected.indexOf(horse) !== -1) {
+                scratchOk = false;
+                scratchHint = "Avd. " + legNum + ": struken häst " + horse + " finns i systemet";
+              }
+            });
+            if (scratches.length && !reserves.length) {
+              reservesOk = false;
+              reservesHint = "Avd. " + legNum + ": strukna hästar utan reserver på startlistan";
+            }
+          });
+        }
+        if (scratchOk && hasScratchesOnCard) {
+          scratchHint = "Inga strukna hästar i systemet — verifiera mot ATG före spel";
+        }
+        if (reservesOk && hasScratchesOnCard) {
+          reservesHint = "Reserver finns på startlistan — kontrollera att de är aktiva på ATG";
+        }
+        return {
+          legsOk: legsOk,
+          costOk: costOk,
+          scratchOk: scratchOk,
+          reservesOk: reservesOk,
+          scratchHint: scratchHint,
+          reservesHint: reservesHint
+        };
+      }
+
+      function updateOperatorChecklist(selections, costSek, budget) {
+        if (!selections) {
+          resetOperatorChecklist();
+          return;
+        }
+        var checks = evaluateOperatorChecks(selections, costSek, budget);
+        setChecklistItem(
+          "check-legs",
+          checks.legsOk ? "done" : "warn",
+          checks.legsOk ? null : "Minst en avdelning saknar hästar i det genererade spelet"
+        );
+        setChecklistItem(
+          "check-cost",
+          checks.costOk ? "done" : "warn",
+          checks.costOk ? null : "Kostnaden överskrider systemkostnad (budget)"
+        );
+        setChecklistItem(
+          "check-scratches",
+          checks.scratchOk ? "done" : "warn",
+          checks.scratchOk ? checks.scratchHint : checks.scratchHint
+        );
+        setChecklistItem(
+          "check-reserves",
+          checks.reservesOk ? "done" : "warn",
+          checks.reservesOk ? checks.reservesHint : checks.reservesHint
+        );
+      }
+
+      function printSlip() {
+        if (!hasSlip()) {
+          alert("Generera system först");
+          return;
+        }
+        updateSlipPrintMeta();
+        document.body.classList.add("print-slip-only");
+        window.addEventListener(
+          "afterprint",
+          function () {
+            document.body.classList.remove("print-slip-only");
+          },
+          { once: true }
+        );
+        window.print();
+      }
+
+      function openAtg() {
+        window.open(ATG_V85_URL, "_blank", "noopener,noreferrer");
       }
 
       function renderSlip(selections, seed) {
         var grid = document.getElementById("slip-grid");
-        var title = document.getElementById("slip-title");
         grid.innerHTML = "";
-        title.textContent = seed != null ? "Genererat spel (seed " + seed + ")" : "Genererat spel";
         for (var i = 1; i <= 8; i++) {
           var horses = selections[String(i)] || selections[i] || [];
-          var text = horses.join("·");
-          var wide = horses.length > 1 ? " wide" : "";
-          var leg = document.createElement("div");
-          leg.className = "slip-leg" + wide;
-          leg.innerHTML = "<span>" + i + '</span><span class="num">' + text + "</span>";
-          grid.appendChild(leg);
+          var text = horses.join(" ");
+          var row = document.createElement("div");
+          row.className = "slip-row";
+          row.innerHTML =
+            '<div class="slip-row-leg">' + i + '</div>' +
+            '<div class="slip-row-horses">' + text + "</div>";
+          grid.appendChild(row);
         }
+        slipReady = true;
+        updateSlipPrintMeta();
+        updateSlipActions();
+      }
+
+      function updateSlipFooter(combinations, costSek) {
+        var footer = document.getElementById("slip-footer");
+        if (!footer) return;
+        if (!combinations) {
+          footer.innerHTML = "";
+          slipReady = false;
+          updateSlipActions();
+          resetOperatorChecklist();
+          return;
+        }
+        footer.innerHTML =
+          fmtNum(combinations) + ' rader x 0,50 kr = <strong>' + fmtSek(costSek) + " kr</strong>";
       }
 
       function updateCost(data, budget) {
@@ -755,30 +1229,40 @@
         document.getElementById("stat-rows-count").textContent = fmtNum(data.combinations);
         document.getElementById("stat-breakdown").textContent = data.cost_breakdown;
         document.getElementById("stat-shrink").textContent = String(data.shrink_steps_used);
+        updateSlipFooter(data.combinations, data.cost_sek);
+        updateOperatorChecklist(data.selections, data.cost_sek, budget);
         document.getElementById("rationale-text").textContent =
-          "Random ur operatörens pool. Greedy shrink: " + data.shrink_steps_used +
-          " steg. " + (data.seed != null ? "Seed " + data.seed + "." : "");
+          "Markerade hästar låses. Slumpen fyller på med " + data.shrink_steps_used +
+          " hästar till budget. " + (data.seed != null ? "Seed " + data.seed + "." : "");
       }
 
-      function populateDropdowns(cards) {
+      function populateDropdowns(data) {
+        schedule = data;
         var datum = document.getElementById("datum");
-        var dates = [];
-        cards.forEach(function (c) {
-          if (dates.indexOf(c.date) === -1) dates.push(c.date);
-        });
+        var dates = data.dates || [];
         datum.innerHTML = dates.map(function (d) {
-          return '<option value="' + d + '">' + d + "</option>";
+          var selected = d === data.default_date ? " selected" : "";
+          return '<option value="' + d + '"' + selected + ">" + d + "</option>";
         }).join("");
-        datum.addEventListener("change", syncBana);
+        if (!datumListenerBound) {
+          datum.addEventListener("change", syncBana);
+          datumListenerBound = true;
+        }
+        if (data.default_date && dates.indexOf(data.default_date) === -1) {
+          datum.value = dates[0] || "";
+        } else if (data.default_date) {
+          datum.value = data.default_date;
+        }
         syncBana();
       }
 
       function syncBana() {
+        if (!schedule) return;
         var date = document.getElementById("datum").value;
-        var tracks = raceCards.filter(function (c) { return c.date === date; });
+        var tracks = (schedule.rounds || []).filter(function (r) { return r.date === date; });
         var bana = document.getElementById("bana");
-        bana.innerHTML = tracks.map(function (c) {
-          return '<option value="' + c.id + '">' + c.track + "</option>";
+        bana.innerHTML = tracks.map(function (r) {
+          return '<option value="' + r.game_id + '">' + r.track + "</option>";
         }).join("");
         loadSelectedCard();
       }
@@ -799,18 +1283,29 @@
       function generate() {
         if (!currentCard) return;
         var budget = parseFloat(document.getElementById("stake-input").value, 10);
-        var pools;
-        try { pools = collectPools(); } catch (e) { alert(e.message); return; }
+        var seed = readSeed();
+        if (seed === undefined) return;
+        var operatorPools = collectPools();
+        var frozen = collectFrozenLegs();
+        for (var fi = 0; fi < frozen.length; fi++) {
+          var fleg = String(frozen[fi]);
+          if (!operatorPools[fleg] || !operatorPools[fleg].length) {
+            alert("Fryst avdelning " + fleg + " måste ha minst en markerad häst");
+            return;
+          }
+        }
         document.getElementById("btn-generate").disabled = true;
+        var payload = {
+          race_card_id: currentCard.id,
+          pools: operatorPools,
+          budget: budget,
+          frozen_legs: frozen
+        };
+        if (seed !== null) payload.seed = seed;
         fetch(API + "/api/v1/generate/random", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            race_card_id: currentCard.id,
-            pools: pools,
-            budget: budget,
-            seed: lastSeed
-          })
+          body: JSON.stringify(payload)
         })
           .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
           .then(function (res) {
@@ -819,7 +1314,7 @@
               alert((res.j.error && res.j.error.message) || "Generering misslyckades");
               return;
             }
-            lastSeed = res.j.seed;
+            applyGeneratedSelections(operatorPools, res.j.selections);
             renderSlip(res.j.selections, res.j.seed);
             updateCost(res.j, budget);
           })
@@ -832,13 +1327,25 @@
 
       document.getElementById("bana").addEventListener("change", loadSelectedCard);
       document.getElementById("btn-generate").addEventListener("click", generate);
+      document.getElementById("btn-deselect-all").addEventListener("click", deselectAllLegs);
+      document.getElementById("btn-print-slip").addEventListener("click", printSlip);
+      document.getElementById("btn-open-atg").addEventListener("click", openAtg);
+      document.getElementById("spelform").addEventListener("change", updateAppTitle);
+      updateAppTitle();
+      resetOperatorChecklist();
 
-      fetch(API + "/api/v1/race-cards")
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          raceCards = data.race_cards || [];
+      fetch(API + "/api/v1/schedule/v85")
+        .then(function (r) {
+          return r.json().then(function (j) { return { ok: r.ok, j: j }; });
+        })
+        .then(function (res) {
+          if (!res.ok) {
+            var msg = (res.j.error && res.j.error.message) || "ATG otillgänglig";
+            setApiStatus(false, msg);
+            return;
+          }
           setApiStatus(true, "");
-          populateDropdowns(raceCards);
+          populateDropdowns(res.j);
         })
         .catch(function () {
           setApiStatus(false, "offline — kör python -m atg serve");

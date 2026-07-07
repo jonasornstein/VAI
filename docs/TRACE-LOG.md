@@ -14,6 +14,13 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-07 | U | Jonte | **Hästar labels** — legend `Slumpens hästar`; stat `Antal hästar tillagda`; rationale uses `hästar till budget` (seed help unchanged) | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
+| 2026-07-07 | U | Jonte | **Rationale text** — default `Slumpmässigt urval ur operatörens kandidatpool per avdelning.`; after generate appends `Markerade hästar låses. Slumpen fyller på med x hästar till budget.` | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
+| 2026-07-07 | U | Jonte | **Hari mode + action buttons** — Random tab renamed `Hari`; `GENERERA SYSTEM` and `ÖPPNA ATG/V85` matched size via `.btn-action` | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
+| 2026-07-07 | U | Jonte | **Innan spel checklist wired** — `F-071` items update from generated system + race card (legs, cost, scratches, reserves) | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
+| 2026-07-07 | U | Jonte | **Dynamic title verified** — headline, page title, and logo tooltip update to `VAI` + spelform on change (e.g. V85 → V75) | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
+| 2026-07-07 | U | Jonte | **VAI branding** — logo badge `VAI`; headline `VAI` + spelform; PDF export button removed; print-only slip export | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
+| 2026-07-07 | P | Jonte | **Genererat spel betslip APPROVED** — layout matches `inbox/betslip.png`; 8-leg V85, footer `x` format, no title bar | [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html) |
 | 2026-07-07 | P | Jonte | **v1 close-out** — specs + canonical docs; random.md v0.2 APPROVED | [outbox/specs/](../../outbox/specs/) |
 | 2026-07-07 | P | Assistant | **v1.1 local UI** — `atg serve` API + mockup wiring | [local-ui-v1.1.md](../../outbox/specs/local-ui-v1.1.md) |
 | 2026-07-07 | P | Jonte | **UX mockup v0.5** published — Random default; Expert/Kvant disabled | [outbox/mockups/](../../outbox/mockups/) |
