@@ -2,8 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.4 |
-| **Status** | DRAFT |
+| **Version** | 1.0 |
+| **Status** | APPROVED |
+| **Reviewer** | Povl (math), Jonte (operator) |
+| **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
 | **Owner** | Jonte (M-004) |
 | **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md) |
@@ -123,7 +125,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 |----|------|-------------|--------|---------|-----------|
 | F-080 | `copy_to_outbox` | Publish proposal folder | Approved pending path | `outbox/proposals/...` | UC-21 |
 | F-081 | `write_review_record` | Save review packet to outbox/reviews | Review content | Review file | UC-21 |
-| F-090 | `export_pdf` | Generate PDF from proposal | Proposal path | PDF file | UC-23 |
+| F-090 | `export_pdf` | Generate PDF from proposal *(deferred v1.2; v1.1 uses browser print slip)* | Proposal path | PDF file | UC-23 |
 | F-091 | `open_atg_link` | Open atg.se/v85 (browser; no automation) | — | URL opened | UC-22, UC-23 |
 | F-092 | `toggle_display_theme` | Switch light/dark UI theme | Theme choice | UI state | UC-23 (mockup) |
 
@@ -173,6 +175,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.0 | 2026-07-07 | APPROVED — canonical F-* catalog; shipped vs deferred aligned with v1.1 |
 | 0.4 | 2026-07-07 | v1.1 shipped set: ATG fetch, schedule UX, F-052 basic, F-071; module map |
 | 0.3 | 2026-07-07 | v1 shipped set vs deferred; scope-lock alignment |
 | 0.2 | 2026-07-06 | ATG fetch F-006–009; UX F-025–028; SYSTEMKOSTNAD default 500 |
