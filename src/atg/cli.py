@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from atg.io.pools import load_operator_pools, pools_from_race_card
+from atg.io.pools import empty_operator_pools, load_operator_pools
 from atg.io.proposal import format_proposal_markdown
 from atg.io.race_card import load_race_card
 from atg.models.proposal import RandomError, RandomResult
@@ -25,7 +25,7 @@ def main(argv: list[str] | None = None) -> int:
         "--pools",
         type=Path,
         default=None,
-        help="Operator pools YAML (default: all race-card horses)",
+        help="Operator horse picks YAML (default: none marked — random fills all legs)",
     )
     random_parser.add_argument(
         "--budget",
@@ -62,7 +62,7 @@ def _run_random(args: argparse.Namespace) -> int:
     if args.pools is not None:
         operator_pools = load_operator_pools(args.pools)
     else:
-        operator_pools = pools_from_race_card(race_card)
+        operator_pools = empty_operator_pools()
 
     outcome = generate_random_v1(
         race_card,

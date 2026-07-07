@@ -12,11 +12,15 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+from atg.atg_fetch import AtgFetchError
+from atg.atg_race_card import fetch_race_card_from_atg, is_atg_game_id
 from atg.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
 from atg.models.proposal import RandomError, RandomResult
+from atg.schedule import fetch_atg_schedule, schedule_to_dict
 from atg.strategies.random import generate_random_v1
 
 CARD_ID_PATTERN = re.compile(r"^[a-zA-Z0-9._-]+$")
+ATG_GAME_ID_PATTERN = re.compile(r"^V85_\d{4}-\d{2}-\d{2}_\d+_\d+$")
 DEFAULT_PORT = 8765
 
 
@@ -40,6 +44,9 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/" or path == "/index.html":
             self._serve_file(self.mockup_dir / "v85-proposal-ux-mockup-atg.html")
+            return
+        if path == "/api/v1/schedule/v85":
+            self._handle_get_schedule_v85()
             return
         if path == "/api/v1/race-cards":
             self._send_json(HTTPStatus.OK, {"race_cards": list_race_card_ids(self.race_cards_dir)})
@@ -71,7 +78,41 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
         self._set_cors_headers()
         self.end_headers()
 
+    def _handle_get_schedule_v85(self) -> None:
+        try:
+            schedule = fetch_atg_schedule()
+        except AtgFetchError as exc:
+            self._send_json(
+                HTTPStatus.BAD_GATEWAY,
+                {"error": {"code": "ATG_UNAVAILABLE", "message": str(exc)}},
+            )
+            return
+        self._send_json(HTTPStatus.OK, schedule_to_dict(schedule))
+
     def _handle_get_race_card(self, card_id: str) -> None:
+        if is_atg_game_id(card_id):
+            if not ATG_GAME_ID_PATTERN.match(card_id):
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_ID", "message": card_id}})
+                return
+            try:
+                card = fetch_race_card_from_atg(card_id)
+            except AtgFetchError as exc:
+                self._send_json(
+                    HTTPStatus.BAD_GATEWAY,
+                    {"error": {"code": "ATG_UNAVAILABLE", "message": str(exc)}},
+                )
+                return
+            except ValueError as exc:
+                self._send_json(
+                    HTTPStatus.BAD_GATEWAY,
+                    {"error": {"code": "ATG_PARSE_ERROR", "message": str(exc)}},
+                )
+                return
+            payload = race_card_to_dict(card)
+            payload["id"] = card_id
+            self._send_json(HTTPStatus.OK, payload)
+            return
+
         if not CARD_ID_PATTERN.match(card_id):
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_ID", "message": card_id}})
             return
@@ -83,6 +124,11 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
         payload = race_card_to_dict(card)
         payload["id"] = card_id
         self._send_json(HTTPStatus.OK, payload)
+
+    def _load_race_card(self, card_id: str):
+        if is_atg_game_id(card_id):
+            return fetch_race_card_from_atg(card_id)
+        return load_race_card_by_id(self.race_cards_dir, card_id)
 
     def _handle_generate_random(self) -> None:
         try:
@@ -97,9 +143,21 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            card = load_race_card_by_id(self.race_cards_dir, card_id)
+            card = self._load_race_card(card_id)
         except FileNotFoundError:
             self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": card_id}})
+            return
+        except AtgFetchError as exc:
+            self._send_json(
+                HTTPStatus.BAD_GATEWAY,
+                {"error": {"code": "ATG_UNAVAILABLE", "message": str(exc)}},
+            )
+            return
+        except ValueError as exc:
+            self._send_json(
+                HTTPStatus.BAD_GATEWAY,
+                {"error": {"code": "ATG_PARSE_ERROR", "message": str(exc)}},
+            )
             return
 
         pools_raw = body.get("pools")
@@ -127,7 +185,25 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_SEED", "message": "seed"}})
                 return
 
-        outcome = generate_random_v1(card, pools, budget, seed=seed)
+        frozen_legs = frozenset()
+        frozen_raw = body.get("frozen_legs")
+        if frozen_raw is not None:
+            if not isinstance(frozen_raw, list):
+                self._send_json(
+                    HTTPStatus.BAD_REQUEST,
+                    {"error": {"code": "INVALID_FROZEN_LEGS", "message": "frozen_legs must be a list"}},
+                )
+                return
+            try:
+                frozen_legs = frozenset(int(leg) for leg in frozen_raw)
+            except (TypeError, ValueError):
+                self._send_json(
+                    HTTPStatus.BAD_REQUEST,
+                    {"error": {"code": "INVALID_FROZEN_LEGS", "message": "frozen_legs format"}},
+                )
+                return
+
+        outcome = generate_random_v1(card, pools, budget, seed=seed, frozen_legs=frozen_legs)
         if isinstance(outcome, RandomError):
             self._send_json(
                 HTTPStatus.BAD_REQUEST,
