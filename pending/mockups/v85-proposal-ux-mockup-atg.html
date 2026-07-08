@@ -312,11 +312,26 @@
     }
     .leg-body { padding: 10px 12px; border-bottom: 1px solid var(--atg-border); }
     .race-info {
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .race-info-primary {
       font-size: 11px;
       color: var(--atg-text);
-      margin-bottom: 8px;
       font-weight: 700;
       text-transform: uppercase;
+    }
+    .race-info-secondary,
+    .race-info-class {
+      font-size: 10px;
+      color: var(--atg-text);
+      font-weight: 500;
+      text-transform: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0.92;
+      margin-top: 2px;
     }
     .horses { display: flex; flex-wrap: wrap; gap: 5px; }
     .horse {
@@ -1027,6 +1042,35 @@
         }
       }
 
+      function truncateText(text, maxLen) {
+        if (!text || text.length <= maxLen) return text;
+        return text.slice(0, maxLen - 1) + "…";
+      }
+
+      function startMethodLabel(method) {
+        if (method === "volt") return "Volt";
+        if (method === "auto") return "Autostart";
+        return method;
+      }
+
+      function buildRaceInfoHtml(leg) {
+        var info = leg.race_info || null;
+        var primary = [leg.race_label];
+        if (leg.start_time) primary.push(leg.start_time);
+        if (info && info.distance_m) primary.push(info.distance_m + " m");
+        if (info && info.start_method) primary.push(startMethodLabel(info.start_method));
+        var html = '<div class="race-info-primary">' + primary.join(" · ") + "</div>";
+        if (info && info.race_name) {
+          html += '<div class="race-info-secondary" title="' + info.race_name.replace(/"/g, "&quot;") + '">' +
+            truncateText(info.race_name, 72) + "</div>";
+        }
+        if (info && info.class_summary) {
+          html += '<div class="race-info-class" title="' + info.class_summary.replace(/"/g, "&quot;") + '">' +
+            truncateText(info.class_summary, 80) + "</div>";
+        }
+        return '<div class="race-info">' + html + "</div>";
+      }
+
       function renderLegs(card) {
         resetOperatorChecklist();
         document.getElementById("rationale-text").textContent = RATIONALE_DEFAULT;
@@ -1046,7 +1090,7 @@
             ? '<div class="reserves">Reserver: ' + leg.reserves.join(", ") + "</div>" : "";
           cardEl.innerHTML =
             '<div class="leg-col">' + leg.leg + '</div><div class="leg-body">' +
-            '<div class="race-info">' + leg.race_label + (leg.start_time ? " · " + leg.start_time : "") + "</div>" +
+            buildRaceInfoHtml(leg) +
             '<div class="leg-actions">' +
             '<button type="button" class="leg-clear-btn" data-leg="' + leg.leg + '">Rensa avd. ' + leg.leg + "</button>" +
             '<button type="button" class="leg-freeze-btn" data-leg="' + leg.leg + '" aria-pressed="false">Frys avd. ' + leg.leg + "</button>" +

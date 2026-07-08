@@ -4,6 +4,15 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
+class RaceInfo:
+    race_name: str | None = None
+    distance_m: int | None = None
+    start_method: str | None = None  # "volt" | "auto"
+    class_summary: str | None = None
+    status: str | None = None
+
+
+@dataclass(frozen=True)
 class Leg:
     leg: int
     race_label: str
@@ -11,6 +20,7 @@ class Leg:
     start_time: str | None = None
     scratches: tuple[int, ...] = ()
     reserves: tuple[int, ...] = ()
+    race_info: RaceInfo | None = None
 
 
 @dataclass(frozen=True)

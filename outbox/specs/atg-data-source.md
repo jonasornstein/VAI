@@ -66,7 +66,9 @@ From ATG game JSON:
 | `source` | `"atg"` |
 | `settled` | all races `status == results` |
 
-**Not mapped in v1.1:** driver, distance, form rows, official reserves (reserves `[]` unless manual YAML).
+**Mapped in v1.2 (race-info):** `legs[].race_info` via **F-029** — `name`, `distance`, `startMethod`, `terms[0]`, `status`.
+
+**Not mapped:** driver, per-horse form rows, official reserves (reserves `[]` unless manual YAML).
 
 ---
 

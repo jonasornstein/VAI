@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-08 | P | Nisse, Jonte | **UC-15 race info shipped** — F-029 leg headers; ATG metadata; scratches fix | [UC-15-race-info.md](./requirements/use-cases/UC-15-race-info.md), [race-info-v1.md](../../outbox/specs/race-info-v1.md) |
 | 2026-07-07 | P | Jonte | **End of session** — v1.1 Hari shipped; RUP trilogy APPROVED; Phase 2b complete; race day Årjäng 2026-07-11 next | See [§ End of day — 2026-07-07](#end-of-day--2026-07-07) |
 | 2026-07-07 | P | Jonte, Povl, Nisse | **supplementary-specification APPROVED** — FURPS+ v1.0; v1.1 NFR alignments | [supplementary-specification.md](./requirements/supplementary-specification.md), [REVIEW_supplementary-specification.md](../../outbox/reviews/REVIEW_supplementary-specification.md) |
 | 2026-07-07 | P | Povl, Jonte | **functions.md APPROVED** — v1.0 F-* catalog; shipped vs deferred; module map | [functions.md](./requirements/functions.md), [REVIEW_functions.md](../../outbox/reviews/REVIEW_functions.md) |

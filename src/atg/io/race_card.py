@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from atg.models.race_card import Leg, RaceCard
+from atg.models.race_card import Leg, RaceCard, RaceInfo
 
 
 class RaceCardValidationError(ValueError):
@@ -88,6 +88,46 @@ def _parse_leg(item: Any) -> Leg:
         start_time=start_time,
         scratches=scratches,
         reserves=reserves,
+        race_info=_parse_race_info(item.get("race_info"), leg_num),
+    )
+
+
+def _parse_race_info(value: Any, leg_num: int) -> RaceInfo | None:
+    if value is None:
+        return None
+    _require_mapping(value, f"leg {leg_num} race_info")
+
+    race_name = value.get("race_name")
+    if race_name is not None and (not isinstance(race_name, str) or not race_name.strip()):
+        raise RaceCardValidationError(f"Leg {leg_num}: race_info.race_name must be a non-empty string")
+
+    distance_m = value.get("distance_m")
+    if distance_m is not None and (not isinstance(distance_m, int) or distance_m <= 0):
+        raise RaceCardValidationError(f"Leg {leg_num}: race_info.distance_m must be a positive integer")
+
+    start_method = value.get("start_method")
+    if start_method is not None:
+        if not isinstance(start_method, str) or start_method.strip().lower() not in {"volt", "auto", "volte"}:
+            raise RaceCardValidationError(f"Leg {leg_num}: race_info.start_method must be volt or auto")
+        start_method = "volt" if start_method.strip().lower() in {"volt", "volte"} else "auto"
+
+    class_summary = value.get("class_summary")
+    if class_summary is not None and (not isinstance(class_summary, str) or not class_summary.strip()):
+        raise RaceCardValidationError(f"Leg {leg_num}: race_info.class_summary must be a non-empty string")
+
+    status = value.get("status")
+    if status is not None and (not isinstance(status, str) or not status.strip()):
+        raise RaceCardValidationError(f"Leg {leg_num}: race_info.status must be a non-empty string")
+
+    if not any([race_name, distance_m, start_method, class_summary, status]):
+        return None
+
+    return RaceInfo(
+        race_name=race_name.strip() if isinstance(race_name, str) else None,
+        distance_m=distance_m,
+        start_method=start_method,
+        class_summary=class_summary.strip() if isinstance(class_summary, str) else None,
+        status=status.strip() if isinstance(status, str) else None,
     )
 
 

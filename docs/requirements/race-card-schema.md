@@ -39,6 +39,19 @@ Canonical file location: `inbox/race-cards/<YYYY-MM-DD>-<track>.yaml`
 | `horses` | int[] | Yes | Eligible start numbers (non-scratched) |
 | `scratches` | int[] | No | Strukna hästar (excluded from `horses`) |
 | `reserves` | int[] | No | Reserve order if applicable |
+| `race_info` | object | No | Race-level metadata (UC-15); see below |
+
+#### `race_info` object (optional)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `race_name` | string | Full race title from ATG |
+| `distance_m` | int | Distance in metres |
+| `start_method` | enum | `volt` \| `auto` |
+| `class_summary` | string | First eligibility/terms line |
+| `status` | string | e.g. `upcoming`, `results` |
+
+ATG ingestion populates via **F-029**; manual YAML may omit.
 
 ---
 
@@ -82,6 +95,7 @@ legs:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.1 | 2026-07-08 | Optional `race_info` per leg (UC-15, F-029) |
 | 1.0 | 2026-07-07 | APPROVED — v1.1 ATG primary; `source: atg` aligned with implementation |
 | 0.3 | 2026-07-07 | v1 primary ingestion = manual YAML; ATG fetch v1.1+ |
 | 0.2 | 2026-07-06 | Primary ingestion via ATG auto-fetch; source enum |

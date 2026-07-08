@@ -111,5 +111,6 @@ def test_parse_atg_game_builds_eight_legs() -> None:
     assert card.track == "Årjäng"
     assert card.source == "atg"
     assert len(card.legs) == 8
-    assert card.legs[0].horses == (1, 2)
+    assert card.legs[0].horses == (1,)
     assert card.legs[0].scratches == (2,)
+    assert card.legs[0].race_info is not None

@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from atg.atg_fetch import fetch_v85_game
-from atg.models.race_card import Leg, RaceCard
+from atg.models.race_card import Leg, RaceCard, RaceInfo
 from atg.schedule import parse_date_from_game_id
 
 ATG_GAME_ID_RE = re.compile(r"^V85_\d{4}-\d{2}-\d{2}_\d+_\d+$")
@@ -21,6 +21,47 @@ def _format_start_time(value: str | None) -> str | None:
     if not value or len(value) < 16:
         return None
     return value[11:16]
+
+
+def _normalize_start_method(value: str | None) -> str | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    key = value.strip().lower()
+    if key == "volte":
+        return "volt"
+    if key == "auto":
+        return "auto"
+    return key
+
+
+def extract_race_info(race: dict[str, Any]) -> RaceInfo | None:
+    """F-029 — per-leg race metadata from ATG races[] object."""
+    race_name = race.get("name")
+    distance = race.get("distance")
+    terms = race.get("terms")
+    status = race.get("status")
+
+    class_summary: str | None = None
+    if isinstance(terms, list) and terms and isinstance(terms[0], str):
+        class_summary = terms[0].strip() or None
+
+    start_method = _normalize_start_method(
+        race.get("startMethod") if isinstance(race.get("startMethod"), str) else None
+    )
+    distance_m = distance if isinstance(distance, int) and distance > 0 else None
+    race_name_str = race_name.strip() if isinstance(race_name, str) and race_name.strip() else None
+    status_str = status if isinstance(status, str) and status.strip() else None
+
+    if not any([race_name_str, distance_m, start_method, class_summary, status_str]):
+        return None
+
+    return RaceInfo(
+        race_name=race_name_str,
+        distance_m=distance_m,
+        start_method=start_method,
+        class_summary=class_summary,
+        status=status_str,
+    )
 
 
 def _track_name(game: dict[str, Any], game_id: str) -> str:
@@ -75,9 +116,10 @@ def parse_atg_game(game_id: str, payload: dict[str, Any]) -> RaceCard:
             number = start.get("number")
             if not isinstance(number, int) or number <= 0:
                 continue
-            horses.append(number)
             if start.get("scratched"):
                 scratches.append(number)
+            else:
+                horses.append(number)
 
         if not horses:
             raise ValueError(f"Race {index} in {game_id} has no horse numbers")
@@ -96,6 +138,7 @@ def parse_atg_game(game_id: str, payload: dict[str, Any]) -> RaceCard:
                     race.get("scheduledStartTime") if isinstance(race.get("scheduledStartTime"), str) else race.get("startTime")
                 ),
                 scratches=tuple(scratches),
+                race_info=extract_race_info(race),
             )
         )
 

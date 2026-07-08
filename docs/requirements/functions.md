@@ -27,6 +27,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | F-007 | `fetch_race_card_from_atg` | Build `RaceCard` from ATG game JSON (`atg_race_card.py`) | `game_id` | `RaceCard` | UC-01, UC-09 |
 | F-008 | `scrape_atg_race_card` | Website fallback when API unavailable | URL context | `RaceCard` | UC-01, UC-09 |
 | F-009 | `fetch_atg_odds` | Odds/probability archive; **partial:** V85 `betDistribution` for F-052 basic | `game_id` | Odds or leg distributions | UC-01, UC-11, UC-13 |
+| F-029 | `extract_race_info` | Per-leg race metadata from ATG `races[]` or YAML | Race object | `RaceInfo` | UC-15 |
 
 ---
 
@@ -148,6 +149,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 |----------|-----------|-------|
 | **Shipped (v1.0 — CLI)** | F-001, F-004–005, F-020–021, F-023–026, F-030–032, F-060–062 | Manual YAML race cards; `python -m atg random` |
 | **Shipped (v1.1 — local UI + ATG)** | F-006–007, F-025–028, F-052 (basic), F-071, F-091 | `python -m atg serve`; see [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
+| **Shipped (v1.2 — race info)** | F-029 | Leg header metadata; [race-info-v1](../../outbox/specs/race-info-v1.md) |
 | **Partial** | F-009 | V85 `betDistribution` only; no `inbox/odds/` archive |
 | **UX / mockup only** | F-070, F-090, F-092 | Print slip (not PDF export); theme toggle in mockup variants |
 | **Agent / manual (AIRUP)** | F-002–003, F-010–014, F-072–073, F-080–081 | Skills and operator workflow; not automated in `src/` |
@@ -163,7 +165,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | `io/pools.py` | F-026 |
 | `io/proposal.py` | F-023, F-071 (markdown checklist) |
 | `schedule.py` | F-006, F-027, F-028 |
-| `atg_race_card.py` | F-007, F-009 (partial) |
+| `atg_race_card.py` | F-007, F-009 (partial), F-029 |
 | `strategies/random.py` | F-030–032, F-031 |
 | `cost.py` | F-060–062 |
 | `hit_summary.py` | F-052 (basic) |
@@ -175,6 +177,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.1 | 2026-07-08 | F-029 race info shipped (UC-15) |
 | 1.0 | 2026-07-07 | APPROVED — canonical F-* catalog; shipped vs deferred aligned with v1.1 |
 | 0.4 | 2026-07-07 | v1.1 shipped set: ATG fetch, schedule UX, F-052 basic, F-071; module map |
 | 0.3 | 2026-07-07 | v1 shipped set vs deferred; scope-lock alignment |

@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 from atg.io.race_card import load_race_card
-from atg.models.race_card import Leg, RaceCard
+from atg.models.race_card import Leg, RaceCard, RaceInfo
 
 
 def list_race_card_ids(race_cards_dir: Path) -> list[dict[str, str]]:
@@ -40,8 +39,30 @@ def race_card_to_dict(card: RaceCard) -> dict[str, Any]:
 
 
 def _leg_to_dict(leg: Leg) -> dict[str, Any]:
-    data = asdict(leg)
-    data["horses"] = list(leg.horses)
-    data["scratches"] = list(leg.scratches)
-    data["reserves"] = list(leg.reserves)
+    data: dict[str, Any] = {
+        "leg": leg.leg,
+        "race_label": leg.race_label,
+        "horses": list(leg.horses),
+        "scratches": list(leg.scratches),
+        "reserves": list(leg.reserves),
+    }
+    if leg.start_time is not None:
+        data["start_time"] = leg.start_time
+    if leg.race_info is not None:
+        data["race_info"] = _race_info_to_dict(leg.race_info)
     return data
+
+
+def _race_info_to_dict(info: RaceInfo) -> dict[str, Any]:
+    payload: dict[str, Any] = {}
+    if info.race_name is not None:
+        payload["race_name"] = info.race_name
+    if info.distance_m is not None:
+        payload["distance_m"] = info.distance_m
+    if info.start_method is not None:
+        payload["start_method"] = info.start_method
+    if info.class_summary is not None:
+        payload["class_summary"] = info.class_summary
+    if info.status is not None:
+        payload["status"] = info.status
+    return payload

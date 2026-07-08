@@ -105,6 +105,7 @@ flowchart LR
 | UC-12 | Expert mode             | Operator / Trotting expert | Apply spik/gardering templates from expert rules            | [UC-12](./use-cases/UC-12-expert-mode.md)             | FR-030–032             |
 | UC-13 | Quantitative mode       | Operator / Quant analyst   | Use odds/probabilities and optional simulation              | [UC-13](./use-cases/UC-13-quantitative-mode.md)       | FR-040–043             |
 | UC-14 | Compute system cost     | Agent                      | Calculate combinations and SEK cost                         | [UC-14](./use-cases/UC-14-compute-system-cost.md)     | FR-013–014             |
+| UC-15 | Display race info       | Operator                   | Race metadata in avdelning headers (ATG F-029)              | [UC-15](./use-cases/UC-15-race-info.md)               | —                      |
 | UC-20 | Review proposal         | Operator / experts         | AIRUP review until APPROVED                                 | [UC-20](./use-cases/UC-20-review-proposal.md)         | FR-001b–c              |
 | UC-21 | Publish proposal        | Agent                      | Copy approved proposal to `outbox/proposals/`               | [UC-21](./use-cases/UC-21-publish-proposal.md)        | FR-001c, FR-012        |
 | UC-22 | Enter at ATG            | Operator                   | Manually transcribe published proposal to atg.se            | [UC-22](./use-cases/UC-22-enter-at-atg.md)            | — (human)              |
@@ -156,7 +157,7 @@ Full specifications: [functions.md](./functions.md). Race card schema: [race-car
 
 | Domain | IDs | Use cases |
 |--------|-----|-----------|
-| ATG fetch | F-006 – F-009 | UC-01, UC-09 |
+| ATG fetch | F-006 – F-009, F-029 | UC-01, UC-09, UC-15 |
 | UX / schedule | F-025 – F-028 | UC-09, UC-10 |
 | Input / storage | F-001 – F-005 | UC-01 |
 | AIRUP workflow | F-010 – F-014 | UC-02, UC-20, UC-21 |
@@ -183,6 +184,7 @@ Full specifications: [functions.md](./functions.md). Race card schema: [race-car
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5 | 2026-07-08 | UC-15 race info in leg headers |
 | 0.4 | 2026-07-07 | All use cases APPROVED v1.0; v1.1 Hari flow reflected |
 | 0.3 | 2026-07-06 | UC-09 ATG auto-fetch; operator horse pools; SYSTEMKOSTNAD 500 SEK |
 | 0.2 | 2026-07-06 | Full UC narratives; functions catalog (F-001–F-103); race card schema |

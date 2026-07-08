@@ -29,3 +29,30 @@ def test_rejects_wrong_leg_count(tmp_path: Path) -> None:
     )
     with pytest.raises(RaceCardValidationError, match="exactly 8 legs"):
         load_race_card(bad)
+
+
+def test_load_race_info_from_yaml(tmp_path: Path) -> None:
+    legs_yaml = ""
+    for i in range(1, 9):
+        block = f"  - leg: {i}\n    race_label: V85-{i}\n    horses: [1]\n"
+        if i == 1:
+            block += (
+                "    race_info:\n"
+                "      race_name: Testlopp\n"
+                "      distance_m: 2140\n"
+                "      start_method: volt\n"
+                "      class_summary: 3-åriga ston\n"
+            )
+        legs_yaml += block
+    path = tmp_path / "with-info.yaml"
+    path.write_text(
+        "game: v85\ndate: 2026-01-01\ntrack: X\nsource: manual\n"
+        f"fetched_at: 2026-01-01T00:00:00Z\nsettled: false\nlegs:\n{legs_yaml}",
+        encoding="utf-8",
+    )
+    card = load_race_card(path)
+    info = card.leg_by_number(1).race_info
+    assert info is not None
+    assert info.race_name == "Testlopp"
+    assert info.distance_m == 2140
+    assert card.leg_by_number(2).race_info is None

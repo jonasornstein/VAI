@@ -45,7 +45,7 @@ flowchart TD
 ## Step 2 — Race card and horse selection
 
 1. System loads race card for selected date + track.
-2. UX shows all 8 legs with eligible start numbers (scratches disabled).
+2. UX shows all 8 legs with race info header (UC-15: name, distance, start method, class) and eligible start numbers (scratches disabled).
 3. Operator **may mark** horses to lock before generate (F-026). Empty leg = slumpen väljer.
 4. **Frys avd.** fixes leg to marked horses only.
 5. **Läge:** **Hari** active; Expert and Kvantitativ disabled (*Kommer senare*).
