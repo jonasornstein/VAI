@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | Jonte |
-| **Last updated** | 2026-07-07 |
+| **Last updated** | 2026-07-08 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. Jonte requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-08 | P | Jonte | **End of session** — UC-15 race info in leg headers; operator verified in local UI | See [§ End of day — 2026-07-08](#end-of-day--2026-07-08) |
 | 2026-07-08 | P | Nisse, Jonte | **UC-15 race info shipped** — F-029 leg headers; ATG metadata; scratches fix | [UC-15-race-info.md](./requirements/use-cases/UC-15-race-info.md), [race-info-v1.md](../../outbox/specs/race-info-v1.md) |
 | 2026-07-07 | P | Jonte | **End of session** — v1.1 Hari shipped; RUP trilogy APPROVED; Phase 2b complete; race day Årjäng 2026-07-11 next | See [§ End of day — 2026-07-07](#end-of-day--2026-07-07) |
 | 2026-07-07 | P | Jonte, Povl, Nisse | **supplementary-specification APPROVED** — FURPS+ v1.0; v1.1 NFR alignments | [supplementary-specification.md](./requirements/supplementary-specification.md), [REVIEW_supplementary-specification.md](../../outbox/reviews/REVIEW_supplementary-specification.md) |
@@ -71,6 +72,48 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 ## When not to log
 
 - Routine agent edits, typo fixes, or exploratory drafts still in `pending/`
+
+---
+
+## End of day — 2026-07-08
+
+**Session owner:** Jonte  
+**Git remote:** `origin` → `https://github.com/jonasornstein/ATG.git` (`master` synced)
+
+### Completed
+
+| Phase | Deliverable | Status |
+|-------|-------------|--------|
+| Plan | UC-15 Race-info — race-level metadata per avdelning (scope confirmed) | Done |
+| Ship | F-029 `extract_race_info` — name, distance, start method, class from ATG JSON | `319a12e` |
+| Ship | Multi-line leg headers in local UI (`.race-info-primary/secondary/class`) | Done |
+| Fix | Scratched horses excluded from `legs[].horses` (schema rule 5) | Done |
+| Review + Publish | UC-15 APPROVED, `race-info-v1.md`, race-card-schema v1.1 | Done |
+| Verify | Operator sign-off — race info headers look great in browser | Jonte ✓ |
+| Ops | ATG server restarted (`python -m atg serve` → :8765) | Done |
+
+### Published / approved artifacts (today)
+
+- **Spec:** `outbox/specs/race-info-v1.md`
+- **Use case:** `docs/requirements/use-cases/UC-15-race-info.md`
+- **Review:** `outbox/reviews/REVIEW_UC-15_race-info.md`
+- **Code:** `src/atg/atg_race_card.py`, `models/race_card.py`, mockup, 34 tests pass
+
+### Open for next session
+
+| ID | Item | Owner |
+|----|------|-------|
+| — | **Race day Saturday** — Årjäng 2026-07-11; re-fetch with race info; UC-22 ATG entry | Kricke / Jonte |
+| — | **v1.2** — reduced-stake (UC-14 §3a); ATG disk cache | Povl |
+| — | Per-horse info in leg grid (deferred from UC-15 v1) | Future |
+| — | Housekeeping — archive duplicate `pending/` copies | Assistant |
+| OI-004 | Spelstopp after Sept 2026 schedule change — TBD | Nisse |
+
+### Notes
+
+- Race info uses existing `games/{game_id}` fetch — no extra ATG call.
+- YAML inbox cards without `race_info` still show time-only headers.
+- Local UI: http://127.0.0.1:8765/
 
 ---
 
