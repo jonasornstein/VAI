@@ -30,6 +30,9 @@ def find_repo_root() -> Path:
     for parent in here.parents:
         if (parent / "pyproject.toml").is_file() and (parent / "inbox").is_dir():
             return parent
+    cwd = Path.cwd()
+    if (cwd / "pyproject.toml").is_file() and (cwd / "inbox").is_dir():
+        return cwd
     raise RuntimeError("Could not locate ATG repo root")
 
 
