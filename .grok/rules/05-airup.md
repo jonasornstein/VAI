@@ -27,7 +27,7 @@ docs/       → long-lived published baseline
 |---------------|----------|
 | Betting rules, trotting research | Nisse |
 | Quant specs, odds-based proposals | Povl |
-| V85 proposals for race day | Kricke / Jonte |
+| V85 proposals for race day | Kricke / ornstein |
 
 ## Skills
 

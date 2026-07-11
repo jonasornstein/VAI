@@ -5,7 +5,7 @@
 | **Version** | 0.1 |
 | **Status** | APPROVED |
 | **AIRUP phase** | R |
-| **Reviewer** | Jonte |
+| **Reviewer** | ornstein |
 | **Author** | Assistant |
 | **Last updated** | 2026-07-07 |
 | **Source request** | [inbox/requests/2026-07-07-v1-random-manual-yaml.md](../../inbox/requests/2026-07-07-v1-random-manual-yaml.md) |
@@ -36,7 +36,7 @@ This document **supersedes** conflicting v1 assumptions in [ux-workflow.md](../.
 - Correct **system cost** and **combination count** (ATG formula: ∏(horses per leg) × 0.50 SEK).
 - **Reproducible** runs when `seed` is set (F-032).
 - **Budget constraint:** computed cost ≤ SYSTEMKOSTNAD, with retry policy per UC-11 (max 10 retries, F-031).
-- Human-readable proposal format for Kricke/Jonte manual ATG entry ([AGENTS.md](../../AGENTS.md) proposal template).
+- Human-readable proposal format for Kricke/ornstein manual ATG entry ([AGENTS.md](../../AGENTS.md) proposal template).
 - Optional basic hit summary when odds are present (F-052 — best-effort in v1).
 
 ### 2.2 Data
@@ -114,8 +114,8 @@ Minimum vertical slice (CLI acceptable for v1):
 | SL-001 | Default `max_horses_per_leg` for V85 random | Povl | **Resolved** → [random-v1.md](./random-v1.md): `max = \|pool\|` per leg |
 | SL-002 | Budget retry policy when over SYSTEMKOSTNAD | Povl | **Resolved** → greedy shrink, max 10 steps |
 | SL-003 | Weight selection by field size? | Povl | **Resolved** → no weighting |
-| SL-004 | Mockup: disabled Expert/Quant copy | Jonte | *Kommer senare* + `aria-disabled` |
-| SL-005 | v1 interface: CLI only vs minimal local UI | Jonte | CLI first; mockup unchanged until UI sprint |
+| SL-004 | Mockup: disabled Expert/Quant copy | ornstein | *Kommer senare* + `aria-disabled` |
+| SL-005 | v1 interface: CLI only vs minimal local UI | ornstein | CLI first; mockup unchanged until UI sprint |
 
 ---
 
@@ -134,12 +134,12 @@ Minimum vertical slice (CLI acceptable for v1):
 
 ## 7. Success criteria (v1)
 
-- [x] Scope lock **APPROVED** by Jonte
+- [x] Scope lock **APPROVED** by ornstein
 - [x] Random generator produces valid 8-leg proposal from manual YAML
 - [x] Cost matches ATG formula for 3+ golden examples
 - [x] Fixed seed reproduces identical selections
 - [x] Budget cap enforced per UC-11
-- [x] Jonte confirms proposal transcribable to ATG UI
+- [x] ornstein confirms proposal transcribable to ATG UI
 
 ---
 
@@ -163,4 +163,4 @@ Copy approved scope lock to `outbox/specs/scope-lock-v1-random.md`.
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-07-07 | Initial scope lock — random-only, manual YAML (Jonte direction) |
+| 0.1 | 2026-07-07 | Initial scope lock — random-only, manual YAML (ornstein direction) |

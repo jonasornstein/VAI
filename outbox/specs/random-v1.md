@@ -6,7 +6,7 @@
 | **Status** | APPROVED |
 | **AIRUP phase** | R |
 | **Reviewer** | Povl |
-| **Author** | Assistant (Jonte decisions 2026-07-07) |
+| **Author** | Assistant (ornstein decisions 2026-07-07) |
 | **Last updated** | 2026-07-07 |
 | **Parent scope** | [scope-lock-v1-random.md](./scope-lock-v1-random.md) |
 | **Implements** | UC-11, F-030, F-031, F-032, F-060, F-061, F-062 |
@@ -346,4 +346,4 @@ Format: [AGENTS.md](../../AGENTS.md) proposal template → `pending/proposals/v8
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-07-07 | Initial spec — dynamic max per pool, greedy shrink, uniform draw (Jonte + Povl defaults) |
+| 0.1 | 2026-07-07 | Initial spec — dynamic max per pool, greedy shrink, uniform draw (ornstein + Povl defaults) |

@@ -5,7 +5,7 @@
 | Mode | random (Hari) |
 | AIRUP status | APPROVED |
 | Generated | 2026-07-07T10:37:58Z |
-| Approved | 2026-07-07 · Jonte |
+| Approved | 2026-07-07 · ornstein |
 | SYSTEMKOSTNAD | 500.00 SEK |
 | Total cost | 500.00 SEK |
 | Combinations | 1000 |

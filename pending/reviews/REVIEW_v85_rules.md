@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Artifact** | `pending/research/PENDING-RESEARCH_v85_rules.md` v0.5-draft |
-| **Reviewer** | Nisse (agent lens) + Povl (math) + Operator (Jonte) |
+| **Reviewer** | Nisse (agent lens) + Povl (math) + Operator (ornstein) |
 | **Review type** | Agent review — not substitute for human expert sign-off on S-009b |
 | **Date** | 2026-07-06 |
 | **Verdict** | **APPROVE** (with caveats) |
@@ -55,7 +55,7 @@
 
 ---
 
-## Operator — Kricke / Jonte
+## Operator — Kricke / ornstein
 
 - [x] §10 entry steps match atg.se workflow
 - [x] §11 proposal requirements — 8 legs, start numbers, cost, track/date, scratch reminder

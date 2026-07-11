@@ -4,10 +4,10 @@
 |-------|-------|
 | **Version** | 1.0 |
 | **Status** | APPROVED |
-| **Reviewer** | Povl (math), Jonte (operator) |
+| **Reviewer** | Povl (math), ornstein (operator) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
-| **Owner** | Jonte (M-004) |
+| **Owner** | ornstein (M-004) |
 | **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md) |
 
 Concrete system functions referenced by use-case steps (`F-*`). Implementation: `src/atg/` per [src/README.md](../../src/README.md).

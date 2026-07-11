@@ -1,6 +1,6 @@
 # Outbox (AIRUP — **P**)
 
-Approved artifacts only. Kricke and Jonte use **`outbox/proposals/`** on race day.
+Approved artifacts only. Kricke and ornstein use **`outbox/proposals/`** on race day.
 
 | Subfolder | Contents |
 |-----------|----------|

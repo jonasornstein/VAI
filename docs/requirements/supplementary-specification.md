@@ -4,10 +4,10 @@
 |-------|-------|
 | **Version** | 1.0 |
 | **Status** | APPROVED |
-| **Reviewer** | Jonte (operator), Povl (constraints), Nisse (compliance) |
+| **Reviewer** | ornstein (operator), Povl (constraints), Nisse (compliance) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
-| **Owner** | Jonte (M-004) |
+| **Owner** | ornstein (M-004) |
 | **Specs** | [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md), [ux-workflow](./ux-workflow.md) |
 | **Supersedes** | SRS §4–§5, §7 (non-functional and cross-cutting) |
 
@@ -39,9 +39,9 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 
 | ID | Requirement | Priority | Owner |
 |----|-------------|----------|-------|
-| SUP-U-001 | Operator SHALL read a proposal in under 2 minutes | Must | Kricke/Jonte |
-| SUP-U-002 | Leg-by-leg horse numbers SHALL be unambiguous for ATG entry | Must | Kricke/Jonte |
-| SUP-U-003 | Total cost and row count SHALL be visible before publish | Must | Kricke/Jonte |
+| SUP-U-001 | Operator SHALL read a proposal in under 2 minutes | Must | Kricke/ornstein |
+| SUP-U-002 | Leg-by-leg horse numbers SHALL be unambiguous for ATG entry | Must | Kricke/ornstein |
+| SUP-U-003 | Total cost and row count SHALL be visible before publish | Must | Kricke/ornstein |
 | SUP-U-004 | Proposal UI SHALL support light and dark display modes | Should | Mockup variants; theme toggle F-092 |
 | SUP-U-005 | Pre-entry checklist SHALL remind operator of scratches and reserves | Should | F-071 wired in local UI v1.1 |
 | SUP-U-006 | On DATUM change, BANA and SPELFORM dropdowns SHALL repopulate from ATG schedule | Must | UC-09 |
@@ -133,8 +133,8 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 | ID | Requirement | Authority | Notes |
 |----|-------------|-----------|-------|
 | SUP-C-001 | Betting rules in `docs/betting/` SHALL align with official ATG regulations | Nisse | Flag discrepancies for reconciliation |
-| SUP-C-002 | Tool is decision support only; operators place bets under ATG T&C | Jonte | Not a gambling operator |
-| SUP-C-003 | ATG data fetch (race card, odds) SHALL comply with ATG ToS; document source in manifest | Povl / Jonte | [atg-data-source.md](../../outbox/specs/atg-data-source.md) APPROVED |
+| SUP-C-002 | Tool is decision support only; operators place bets under ATG T&C | ornstein | Not a gambling operator |
+| SUP-C-003 | ATG data fetch (race card, odds) SHALL comply with ATG ToS; document source in manifest | Povl / ornstein | [atg-data-source.md](../../outbox/specs/atg-data-source.md) APPROVED |
 | SUP-C-004 | V85 pool percentages SHALL follow effective date rules (e.g. 2026-07-02 change) | Nisse | [v85.md](../betting/v85.md) v1.0 |
 
 ---
@@ -143,7 +143,7 @@ Requirements that do not fit a single use-case narrative. Organized with the **F
 
 | Item | Waiting on | Linked UC/SUP |
 |------|------------|---------------|
-| Legal review of ATG read access | Jonte / Nisse | SUP-C-003 |
+| Legal review of ATG read access | ornstein / Nisse | SUP-C-003 |
 | Expert template catalog | Nisse | UC-12 |
 | Monte Carlo iteration defaults | Povl | UC-13, SUP-P-002 |
 | Disk cache / stale-while-revalidate | v1.2 | SUP-R-001, atg-data-source |

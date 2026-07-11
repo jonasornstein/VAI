@@ -28,7 +28,7 @@ Expert systems often:
 |-------|----------|-------------|
 | Race card | Yes | Eligible horses per leg |
 | Expert template ID | No | Named pattern from catalog |
-| Manual picks | No | Override per leg (Kricke/Jonte) |
+| Manual picks | No | Override per leg (Kricke/ornstein) |
 | `target_cost_sek` | No | Budget guidance |
 
 ## 4. Template catalog (TBD — Nisse)

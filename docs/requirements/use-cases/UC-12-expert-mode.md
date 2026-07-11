@@ -5,7 +5,7 @@
 | **ID** | UC-12 |
 | **Status** | APPROVED |
 | **Version** | 1.0 |
-| **Reviewer** | Nisse (patterns), Jonte (operator) |
+| **Reviewer** | Nisse (patterns), ornstein (operator) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Trotting expert |

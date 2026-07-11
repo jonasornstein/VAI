@@ -6,7 +6,7 @@
 | **Status** | APPROVED (project standard) |
 | **Last updated** | 2026-07-06 |
 | **Requirements model** | IBM RUP — see [requirements/README.md](./requirements/README.md) |
-| **Owner** | Jonte |
+| **Owner** | ornstein |
 
 **AIRUP** is the mandatory workflow for all ATG project work — documentation, research, proposals, and implementation. Every artifact moves through five phases in order. Do not skip phases.
 
@@ -36,7 +36,7 @@ Analyze → Inbox → Review ⇄ Update → Publish
 Before creating or changing anything:
 
 1. What **game** (default V85), **date**, **track**, and **mode** (random / expert / quantitative)?
-2. Who **reviews**? Nisse (rules), Povl (math), Kricke/Jonte (usability)
+2. Who **reviews**? Nisse (rules), Povl (math), Kricke/ornstein (usability)
 3. What already exists in `docs/`, `outbox/`, or `inbox/` for this topic?
 4. Is this new work, a revision, or a race-day run?
 
@@ -61,9 +61,9 @@ Draft artifacts go to `pending/` with status **AWAITING_REVIEW**.
 
 | Subfolder | Contents | Default reviewer |
 |-----------|----------|------------------|
-| `pending/proposals/` | Draft betting systems | Kricke / Jonte |
+| `pending/proposals/` | Draft betting systems | Kricke / ornstein |
 | `pending/research/` | Draft rules / trotting docs | Nisse |
-| `pending/requirements/` | Draft use cases, vision, supplementary spec (RUP) | Jonte / per UC |
+| `pending/requirements/` | Draft use cases, vision, supplementary spec (RUP) | ornstein / per UC |
 | `pending/specs/` | Draft implementation / quant specs | Povl |
 | `pending/reviews/` | Review packets (like Titan INBOX-REVIEW) | Per packet |
 
@@ -87,8 +87,8 @@ On approval:
 1. Copy (or move) artifact to `outbox/` with publish timestamp
 2. Write review record to `outbox/reviews/` if applicable
 3. **Promote** stable rules to `docs/` when research is finalized (Nisse for betting, Povl for strategies)
-4. **Promote** approved RUP requirements to `docs/requirements/`, `docs/VISION.md` (Jonte / per-UC reviewers)
-5. Operators (Kricke/Jonte) use **`outbox/proposals/`** on race day
+4. **Promote** approved RUP requirements to `docs/requirements/`, `docs/VISION.md` (ornstein / per-UC reviewers)
+5. Operators (Kricke/ornstein) use **`outbox/proposals/`** on race day
 
 **Never** place unreviewed drafts in `outbox/`.
 
@@ -100,7 +100,7 @@ On approval:
 |------|-------------------|
 | **Nisse** | Reviews `pending/research/`; approves betting rule changes before **P** → `docs/betting/` |
 | **Povl** | Reviews `pending/specs/` and quantitative proposals; approves math |
-| **Kricke / Jonte** | Review `pending/proposals/`; accept before **P** |
+| **Kricke / ornstein** | Review `pending/proposals/`; accept before **P** |
 | **Agents** | Execute A→I→R; facilitate U; **P** only after explicit or documented approval |
 
 ---
@@ -124,7 +124,7 @@ On approval:
 | **Review gate** | No move to `outbox/` while status ≠ `APPROVED` |
 | **Rules gate** | No `docs/betting/*.md` promotion without Nisse |
 | **Quant gate** | No quantitative proposal **P** without Povl review if odds/model used |
-| **Operator gate** | V85 proposals for race day require Kricke or Jonte **P** approval |
+| **Operator gate** | V85 proposals for race day require Kricke or ornstein **P** approval |
 | **Requirements gate** | New `UC-*` / `SUP-*` IDs promoted from `pending/requirements/` only when APPROVED |
 
 ---
@@ -142,9 +142,9 @@ Index / traceability ─ docs/SRS.md
 
 | RUP artifact | AIRUP path | Reviewer |
 |--------------|------------|----------|
-| Vision | `pending/requirements/` → `docs/VISION.md` | Jonte |
+| Vision | `pending/requirements/` → `docs/VISION.md` | ornstein |
 | Use-case spec | `pending/requirements/use-cases/` → `docs/requirements/use-cases/` | Per actor (operator / Nisse / Povl) |
-| Supplementary | `pending/requirements/` → `docs/requirements/supplementary-specification.md` | Jonte + domain expert as needed |
+| Supplementary | `pending/requirements/` → `docs/requirements/supplementary-specification.md` | ornstein + domain expert as needed |
 | Implementation | `pending/specs/` → `src/` | Povl |
 
 Use cases replace monolithic `FR-*` statements. Cross-cutting quality attributes live in the supplementary spec (`SUP-*`).

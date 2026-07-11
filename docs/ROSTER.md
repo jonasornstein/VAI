@@ -17,7 +17,7 @@ This roster tracks **who** is involved and **what** they own.
 | M-001 | **Nisse** | Trotting domain expert, rules researcher, documentation (betting) | Active | 40+ years: owner, trainer, gambler in Swedish trotting |
 | M-002 | **Povl** | Bookmaker, quant analyst, strategy requirements | Active | 50+ years: odds, system math, trotting gambling |
 | M-003 | **Kricke** | Operator / gambler | Active | Enters systems manually at ATG |
-| M-004 | **Jonte** | Operator / gambler, project owner | Active | Enters systems manually at ATG; drives priorities |
+| M-004 | **ornstein** | Operator / gambler, project owner | Active | Enters systems manually at ATG; drives priorities |
 | M-005 | Assistant | Implementation, scaffolding, documentation drafting | Active | Does not approve rules or place bets |
 
 ---
@@ -26,10 +26,10 @@ This roster tracks **who** is involved and **what** they own.
 
 | Role | Description | Assignee |
 |------|-------------|----------|
-| **Product owner** | Vision, priorities, acceptance | Jonte (M-004) |
+| **Product owner** | Vision, priorities, acceptance | ornstein (M-004) |
 | **Trotting authority** | ATG rules, race logic, trotting docs | Nisse (M-001) |
 | **Quant authority** | Odds math, model requirements, expert-system constraints | Povl (M-002) |
-| **Operators** | Use proposals on race day; feedback on usability | Kricke (M-003), Jonte (M-004) |
+| **Operators** | Use proposals on race day; feedback on usability | Kricke (M-003), ornstein (M-004) |
 | **Developer** | Code, tests, tooling | M-005 (interim) |
 
 ---
@@ -38,17 +38,17 @@ This roster tracks **who** is involved and **what** they own.
 
 | Area | Primary | Backup |
 |------|---------|--------|
-| `docs/betting/` | Nisse | Jonte |
-| `docs/strategies/expert.md` | Nisse + Povl | Jonte |
+| `docs/betting/` | Nisse | ornstein |
+| `docs/strategies/expert.md` | Nisse + Povl | ornstein |
 | `docs/strategies/quantitative.md` | Povl | Nisse |
 | `docs/strategies/random.md` | Povl (constraints) | M-005 |
-| `docs/SRS.md` | Jonte | Povl |
-| `docs/VISION.md` | Jonte | Nisse |
+| `docs/SRS.md` | ornstein | Povl |
+| `docs/VISION.md` | ornstein | Nisse |
 | `src/` generators | M-005 | Povl (quant review) |
-| `inbox/`, `pending/`, `outbox/` (AIRUP) | Jonte | M-005 |
-| `outbox/proposals/` acceptance | Kricke, Jonte | M-005 |
-| `docs/AIRUP.md` methodology | Jonte | M-005 |
-| `.grok/rules/`, `.grok/skills/` | M-005 | Jonte |
+| `inbox/`, `pending/`, `outbox/` (AIRUP) | ornstein | M-005 |
+| `outbox/proposals/` acceptance | Kricke, ornstein | M-005 |
+| `docs/AIRUP.md` methodology | ornstein | M-005 |
+| `.grok/rules/`, `.grok/skills/` | M-005 | ornstein |
 
 ---
 
@@ -58,9 +58,9 @@ This roster tracks **who** is involved and **what** they own.
 |----------|-------------|
 | ATG rule interpretation | Nisse |
 | Mathematical model assumptions | Povl |
-| Feature priority | Jonte |
-| Proposal format acceptance | Kricke, Jonte |
-| Release / phase complete | Jonte against SRS success criteria |
+| Feature priority | ornstein |
+| Proposal format acceptance | Kricke, ornstein |
+| Release / phase complete | ornstein against SRS success criteria |
 
 ---
 
@@ -70,7 +70,7 @@ This roster tracks **who** is involved and **what** they own.
 |-------------------|----------|---------------|
 | `pending/research/` | Nisse | `outbox/research/` + `docs/betting/` |
 | `pending/specs/` | Povl | `outbox/` + `docs/strategies/` |
-| `pending/proposals/` | Kricke / Jonte | `outbox/proposals/` |
+| `pending/proposals/` | Kricke / ornstein | `outbox/proposals/` |
 
 ---
 
@@ -78,11 +78,11 @@ This roster tracks **who** is involved and **what** they own.
 
 | Document | Owner |
 |----------|-------|
-| [AIRUP.md](./AIRUP.md) | Jonte |
-| [TRACE-LOG.md](./TRACE-LOG.md) | Jonte |
-| [VISION.md](./VISION.md) | Jonte |
-| [SRS.md](./SRS.md) | Jonte |
-| [ROSTER.md](./ROSTER.md) | Jonte |
+| [AIRUP.md](./AIRUP.md) | ornstein |
+| [TRACE-LOG.md](./TRACE-LOG.md) | ornstein |
+| [VISION.md](./VISION.md) | ornstein |
+| [SRS.md](./SRS.md) | ornstein |
+| [ROSTER.md](./ROSTER.md) | ornstein |
 | [betting/v85.md](./betting/v85.md) | Nisse |
 | [betting/trotting-fundamentals.md](./betting/trotting-fundamentals.md) | Nisse |
 | [strategies/*.md](./strategies/) | Povl (quant), Nisse (expert) |

@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Artifact** | `docs/requirements/supplementary-specification.md` |
-| **Reviewer** | Jonte (operator), Povl (constraints), Nisse (compliance) |
+| **Reviewer** | ornstein (operator), Povl (constraints), Nisse (compliance) |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
 

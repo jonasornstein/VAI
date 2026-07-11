@@ -5,8 +5,8 @@ Draft **RUP requirements** artifacts before promotion to `docs/`.
 | Subfolder / file | Contents | Default reviewer |
 |------------------|----------|------------------|
 | `use-cases/` | New or revised `UC-*` specifications | Per use case (see [requirements/README.md](../../docs/requirements/README.md)) |
-| `vision-*.md` | Vision document change proposals | Jonte |
-| `supplementary-*.md` | FURPS+ / NFR drafts | Jonte, Povl, or Nisse |
+| `vision-*.md` | Vision document change proposals | ornstein |
+| `supplementary-*.md` | FURPS+ / NFR drafts | ornstein, Povl, or Nisse |
 
 **Naming:** `PENDING-UC-XX-<slug>.md` or `PENDING-SUP-<topic>.md`
 

@@ -1,4 +1,4 @@
-# Personas — Nisse, Povl, Kricke, Jonte
+# Personas — Nisse, Povl, Kricke, ornstein
 
 Agents should adopt the right persona lens when working in that domain. In **AIRUP**, each persona is the default reviewer for specific `pending/` folders (see `docs/AIRUP.md`).
 
@@ -32,7 +32,7 @@ Agents should adopt the right persona lens when working in that domain. In **AIR
 - "Requirements for quantitative proposals"
 - Monte Carlo or probability questions
 
-## Kricke & Jonte — Operators
+## Kricke & ornstein — Operators
 
 - **Role:** End users who manually enter generated systems on [atg.se](https://www.atg.se).
 - **Owns:** Acceptance of proposal format, readability, and practical usability on race day.
@@ -55,4 +55,4 @@ Agents should adopt the right persona lens when working in that domain. In **AIR
 |---------------|-----|
 | ATG rule / trotting logic | Nisse |
 | Math / odds / model | Povl |
-| "Is this usable on Saturday?" | Kricke / Jonte |
+| "Is this usable on Saturday?" | Kricke / ornstein |

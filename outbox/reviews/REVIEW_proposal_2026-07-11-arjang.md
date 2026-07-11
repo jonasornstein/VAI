@@ -5,7 +5,7 @@
 | **Artifact** | `outbox/proposals/v85/2026-07-11-arjang/proposal.md` |
 | **Race card** | `inbox/race-cards/2026-07-11-arjang.yaml` (ATG `V85_2026-07-11_31_5`) |
 | **Mode** | Hari / random (seed 42) |
-| **Reviewer** | Jonte (operator) |
+| **Reviewer** | ornstein (operator) |
 | **Review type** | UC-20 / F-071 operator checklist |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
@@ -18,7 +18,7 @@
 - [x] Kostnad verifierad mot ATG-formel (1 000 × 0,50 = 500 SEK)
 - [x] Inga ogiltiga hästnummer
 - [x] Inga strukna hästar valda (re-check race day)
-- [x] ATG UI transcribability confirmed by Jonte
+- [x] ATG UI transcribability confirmed by ornstein
 - [ ] Scratch/reserve status still current on race day (operator re-check before play)
 
 ---

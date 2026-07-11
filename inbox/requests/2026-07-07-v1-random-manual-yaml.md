@@ -3,13 +3,13 @@
 | Field | Value |
 |-------|-------|
 | **Date** | 2026-07-07 |
-| **Requester** | Jonte |
+| **Requester** | ornstein |
 | **AIRUP phase** | I |
 
 ## Direction
 
 1. **Focus implementation on Random mode only** for v1. Random shall be the **default selected mode** in UX.
-2. **Expert and Quantitative modes** remain visible in UX but **implementation is on hold** until Jonte says otherwise.
+2. **Expert and Quantitative modes** remain visible in UX but **implementation is on hold** until ornstein says otherwise.
 3. **Race card input for v1:** manual YAML (not ATG auto-fetch first).
 4. **Next action:** Step 1 — scope-lock document + TRACE-LOG entry.
 

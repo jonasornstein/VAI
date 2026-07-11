@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Artifact** | `docs/requirements/use-cases/UC-11-random-mode.md` |
-| **Reviewer** | Povl (algorithm), Jonte (operator) |
+| **Reviewer** | Povl (algorithm), ornstein (operator) |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
 

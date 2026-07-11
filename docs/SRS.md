@@ -6,7 +6,7 @@
 | **Status** | DRAFT |
 | **Last updated** | 2026-07-06 |
 | **Model** | IBM RUP — monolithic SRS split into three artifacts |
-| **Owner** | Jonte (M-004) |
+| **Owner** | ornstein (M-004) |
 
 The traditional SRS is **decomposed** per IBM RUP. This file is the **index and traceability hub** — not the primary home for new requirements.
 
@@ -28,9 +28,9 @@ Package overview and AIRUP workflow: [requirements/README.md](./requirements/REA
 
 | Type | Draft in | Publish to | Reviewer |
 |------|----------|------------|----------|
-| Vision / scope change | `pending/requirements/` | `docs/VISION.md` | Jonte |
+| Vision / scope change | `pending/requirements/` | `docs/VISION.md` | ornstein |
 | New use case or function | `pending/requirements/use-cases/` | `docs/requirements/use-cases/` | Per UC (see README) |
-| NFR, interface, constraint | `pending/requirements/` | `docs/requirements/supplementary-specification.md` | Jonte / Povl / Nisse |
+| NFR, interface, constraint | `pending/requirements/` | `docs/requirements/supplementary-specification.md` | ornstein / Povl / Nisse |
 | Implementation detail | `pending/specs/` | `src/` (after review) | Povl |
 
 **Do not** add new `FR-*` or `NFR-*` rows here. Use `UC-*` and `SUP-*` IDs in the RUP artifacts.
@@ -41,21 +41,21 @@ Package overview and AIRUP workflow: [requirements/README.md](./requirements/REA
 
 ### 3.1 Functional requirements (legacy FR → UC)
 
-| Legacy ID | Summary | Use case |
-|-----------|---------|----------|
-| FR-000 | AIRUP workflow mandatory | UC-02 |
-| FR-001a | Raw inputs in `inbox/` | UC-01 |
-| FR-001b | Drafts in `pending/` with status | UC-02, UC-20 |
-| FR-001c | Only APPROVED → `outbox/` | UC-21 |
-| FR-001d | Log in TRACE-LOG | UC-02 |
-| FR-001 | Maintain `docs/betting/v85.md` | UC-30 |
-| FR-002 | Maintain `docs/strategies/` | UC-31 |
-| FR-003 | Version major docs | SUP-S-004 |
-| FR-010–016 | Proposal generation common | UC-10, UC-14 |
-| FR-020–022 | Random mode | UC-11 |
-| FR-030–032 | Expert mode | UC-12 |
-| FR-040–043 | Quantitative mode | UC-13 |
-| FR-050–051 | V85-specific legs / consolation | UC-30, SUP-F-003, SUP-F-005 |
+| Legacy ID  | Summary                          | Use case                    |
+| ---------- | -------------------------------- | --------------------------- |
+| FR-000     | AIRUP workflow mandatory         | UC-02                       |
+| FR-001a    | Raw inputs in `inbox/`           | UC-01                       |
+| FR-001b    | Drafts in `pending/` with status | UC-02, UC-20                |
+| FR-001c    | Only APPROVED → `outbox/`        | UC-21                       |
+| FR-001d    | Log in TRACE-LOG                 | UC-02                       |
+| FR-001     | Maintain `docs/betting/v85.md`   | UC-30                       |
+| FR-002     | Maintain `docs/strategies/`      | UC-31                       |
+| FR-003     | Version major docs               | SUP-S-004                   |
+| FR-010–016 | Proposal generation common       | UC-10, UC-14                |
+| FR-020–022 | Random mode                      | UC-11                       |
+| FR-030–032 | Expert mode                      | UC-12                       |
+| FR-040–043 | Quantitative mode                | UC-13                       |
+| FR-050–051 | V85-specific legs / consolation  | UC-30, SUP-F-003, SUP-F-005 |
 
 ### 3.2 Non-functional requirements (legacy NFR → SUP)
 
@@ -74,7 +74,7 @@ Package overview and AIRUP workflow: [requirements/README.md](./requirements/REA
 1. Three modes each produce a valid V85 proposal for a sample race card. *(UC-10, UC-11–13)*
 2. Nisse signs off on `docs/betting/v85.md`. ✓
 3. Povl signs off on quantitative requirements. ✓ — [quantitative.md](./strategies/quantitative.md) v0.3
-4. Kricke or Jonte confirms one real Saturday proposal is enterable at ATG. *(UC-22)*
+4. Kricke or ornstein confirms one real Saturday proposal is enterable at ATG. *(UC-22)*
 5. Core use-case specifications completed beyond DRAFT skeleton. ✓ — all UCs APPROVED v1.0 (2026-07-07)
 
 ---

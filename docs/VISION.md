@@ -7,7 +7,7 @@
 | **Last updated** | 2026-07-07 |
 | **RUP role** | Replaces SRS introduction and overall description |
 | **Methodology** | IBM RUP + [AIRUP](./AIRUP.md) |
-| **Owner** | Jonte (M-004) |
+| **Owner** | ornstein (M-004) |
 
 ---
 
@@ -15,7 +15,7 @@
 
 ### 1.1 Problem statement
 
-Kricke and Jonte play multi-leg trotting pools at ATG — especially **V85** on Saturdays. Building a **system** (selecting multiple horses across 8 legs) is time-consuming and error-prone. They want **assisted generation** of system proposals they can review and manually enter at [atg.se](https://www.atg.se).
+Kricke and ornstein play multi-leg trotting pools at ATG — especially **V85** on Saturdays. Building a **system** (selecting multiple horses across 8 legs) is time-consuming and error-prone. They want **assisted generation** of system proposals they can review and manually enter at [atg.se](https://www.atg.se).
 
 ### 1.2 Product vision
 
@@ -29,7 +29,7 @@ The system is **decision support**, not an autopilot. Humans always place bets.
 
 ### 1.3 Elevator statement
 
-*For Kricke and Jonte who need fast, correct V85 systems on race day, ATG Proposal Toolkit is a local decision-support generator that produces reviewable, cost-verified proposals — unlike manual spreadsheet work or opaque tip services, it documents every assumption through AIRUP and expert-reviewed rules.*
+*For Kricke and ornstein who need fast, correct V85 systems on race day, ATG Proposal Toolkit is a local decision-support generator that produces reviewable, cost-verified proposals — unlike manual spreadsheet work or opaque tip services, it documents every assumption through AIRUP and expert-reviewed rules.*
 
 ---
 
@@ -59,7 +59,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 
 | Stakeholder | Interest |
 |-------------|----------|
-| **Kricke / Jonte** | Usable proposals on Saturdays; manual ATG entry |
+| **Kricke / ornstein** | Usable proposals on Saturdays; manual ATG entry |
 | **Nisse** | Correct trotting and ATG rules |
 | **Povl** | Sound quant requirements and cost math |
 | **Agents / developers** | Clear use cases and traceable specs |
@@ -70,7 +70,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 
 | ID | Goal |
 |----|------|
-| G-001 | Generate V85 proposals Kricke/Jonte can enter without rework |
+| G-001 | Generate V85 proposals Kricke/ornstein can enter without rework |
 | G-002 | Support random, expert, and quantitative generation modes (v1: random only) |
 | G-003 | Maintain authoritative, versioned trotting/betting documentation |
 | G-004 | Compute system cost and combination count correctly |
@@ -95,7 +95,7 @@ Full roster: [ROSTER.md](./ROSTER.md).
 
 - [x] V85 doc approved by Nisse — [v85.md](./betting/v85.md) v1.0 APPROVED
 - [x] Working **random** generator — [src/](../src/) per [random-v1.md](../outbox/specs/random-v1.md)
-- [x] Sample proposal validated by Jonte — [outbox/proposals/](../outbox/proposals/)
+- [x] Sample proposal validated by ornstein — [outbox/proposals/](../outbox/proposals/)
 - [x] Cost formula verified (13 tests + golden seed)
 - [ ] Expert / quantitative generators — deferred
 - [x] Use-case specifications **reviewed** — all UCs APPROVED v1.0 (2026-07-07); first proposal reviewed ✓

@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 1.0 |
 | **Status** | APPROVED |
-| **Reviewer** | Nisse, Jonte |
+| **Reviewer** | Nisse, ornstein |
 | **Approved** | 2026-07-08 |
 | **AIRUP phase** | P |
 | **Last updated** | 2026-07-08 |

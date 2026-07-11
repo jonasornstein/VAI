@@ -5,7 +5,7 @@
 | **ID** | UC-01 |
 | **Status** | APPROVED |
 | **Version** | 1.0 |
-| **Reviewer** | Jonte (operator), Nisse (ATG sources) |
+| **Reviewer** | ornstein (operator), Nisse (ATG sources) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Agent, System |

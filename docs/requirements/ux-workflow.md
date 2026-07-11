@@ -4,10 +4,10 @@
 |-------|-------|
 | **Version** | 1.0 |
 | **Status** | APPROVED |
-| **Reviewer** | Jonte (operator) |
+| **Reviewer** | ornstein (operator) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
-| **Owner** | Jonte (M-004) |
+| **Owner** | ornstein (M-004) |
 | **Use cases** | UC-09, UC-10, UC-11–13, UC-14 |
 | **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` (v1.1) |
 | **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md) |

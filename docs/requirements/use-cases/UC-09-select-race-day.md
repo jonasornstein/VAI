@@ -5,7 +5,7 @@
 | **ID** | UC-09 |
 | **Status** | APPROVED |
 | **Version** | 1.0 |
-| **Reviewer** | Jonte (operator), Nisse (ATG read-only) |
+| **Reviewer** | ornstein (operator), Nisse (ATG read-only) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator |

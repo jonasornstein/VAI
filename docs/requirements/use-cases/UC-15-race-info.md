@@ -5,7 +5,7 @@
 | **ID** | UC-15 |
 | **Status** | APPROVED |
 | **Version** | 1.0 |
-| **Reviewer** | Nisse (terminology), Jonte (operator) |
+| **Reviewer** | Nisse (terminology), ornstein (operator) |
 | **Approved** | 2026-07-08 |
 | **Last updated** | 2026-07-08 |
 | **Primary actor** | Operator |

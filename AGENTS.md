@@ -1,6 +1,6 @@
 # ATG Trotting Betting Systems — Agent Instructions
 
-You are working on **ATG**, a project that generates **betting system proposals** for Swedish trotting (trav) at [ATG](https://www.atg.se). Proposals are **manually entered** on the ATG website by gamblers **Kricke** or **Jonte** — this project does not automate placement of bets.
+You are working on **ATG**, a project that generates **betting system proposals** for Swedish trotting (trav) at [ATG](https://www.atg.se). Proposals are **manually entered** on the ATG website by gamblers **Kricke** or **ornstein** — this project does not automate placement of bets.
 
 ## Methodology: AIRUP (mandatory)
 
@@ -30,9 +30,9 @@ Full spec: [docs/AIRUP.md](docs/AIRUP.md). Rule summary: [.grok/rules/05-airup.m
 |---------|--------|-------------------|
 | **Nisse** | Trotting rules, ATG mechanics | `pending/research/`, betting docs |
 | **Povl** | Odds, quant models, system math | `pending/specs/`, quantitative proposals |
-| **Kricke / Jonte** | Manual ATG entry | `pending/proposals/` |
+| **Kricke / ornstein** | Manual ATG entry | `pending/proposals/` |
 
-When rules conflict: Nisse wins on trotting/ATG rules; Povl wins on math/odds; Kricke/Jonte win on usability.
+When rules conflict: Nisse wins on trotting/ATG rules; Povl wins on math/odds; Kricke/ornstein win on usability.
 
 ## Documentation map
 
@@ -74,7 +74,7 @@ ATG/
 ## Working conventions
 
 1. **AIRUP always** — analyze before acting; inbox raw inputs; draft in pending; publish only when approved.
-2. **Proposals are artifacts, not bets** — Kricke/Jonte transcribe to ATG manually.
+2. **Proposals are artifacts, not bets** — Kricke/ornstein transcribe to ATG manually.
 3. **Mark uncertainty** — `DRAFT` / `TBD` until Nisse or Povl approves.
 4. **Cost formula (V85):** ∏(horses per leg) × 0.50 SEK.
 5. **Log significant updates** in `docs/TRACE-LOG.md`.

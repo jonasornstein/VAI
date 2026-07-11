@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Artifact** | UC-15, race-info-v1.md |
-| **Reviewer** | Nisse (terminology), Jonte (operator) |
+| **Reviewer** | Nisse (terminology), ornstein (operator) |
 | **Date** | 2026-07-08 |
 | **Verdict** | **APPROVED** |
 

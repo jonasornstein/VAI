@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Artifacts** | `docs/requirements/use-cases/UC-*.md` (13 files) |
-| **Reviewer** | Jonte (operator), Povl (math), Nisse (rules) |
+| **Reviewer** | ornstein (operator), Povl (math), Nisse (rules) |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
 

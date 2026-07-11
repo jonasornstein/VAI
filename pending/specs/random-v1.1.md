@@ -7,7 +7,7 @@
 | **AIRUP phase** | R |
 | **Reviewer** | Povl |
 | **Approved** | 2026-07-07 · Povl |
-| **Author** | Assistant (Jonte direction 2026-07-07) |
+| **Author** | Assistant (ornstein direction 2026-07-07) |
 | **Last updated** | 2026-07-07 |
 | **Supersedes** | [random-v1.md](./random-v1.md) algorithm §5 (greedy shrink) |
 | **Implements** | UC-11 extensions, F-030–F-032, F-052 (basic), nearest stake |

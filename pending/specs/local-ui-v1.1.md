@@ -5,7 +5,7 @@
 | **Version** | 0.2 |
 | **Status** | APPROVED |
 | **AIRUP phase** | R → P |
-| **Reviewer** | Jonte |
+| **Reviewer** | ornstein |
 | **Last updated** | 2026-07-07 |
 | **Parent** | [scope-lock-v1-random.md](./scope-lock-v1-random.md) |
 | **Related** | [random-v1.1.md](./random-v1.1.md), [atg-data-source.md](./atg-data-source.md) |

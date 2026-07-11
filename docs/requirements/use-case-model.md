@@ -4,10 +4,10 @@
 |-------|-------|
 | **Version** | 0.4 |
 | **Status** | APPROVED |
-| **Reviewer** | Jonte |
+| **Reviewer** | ornstein |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
-| **Owner** | Jonte (M-004) |
+| **Owner** | ornstein (M-004) |
 | **Supersedes** | SRS §3 (functional requirements) |
 
 Step-by-step narratives live in [use-cases/](./use-cases/). This document holds the **model**: actors, diagram, and catalog.
@@ -18,7 +18,7 @@ Step-by-step narratives live in [use-cases/](./use-cases/). This document holds 
 
 | Actor | Description | Maps to |
 |-------|-------------|---------|
-| **Operator** | Kricke or Jonte — generates, reviews, and manually enters proposals at ATG | M-003, M-004 |
+| **Operator** | Kricke or ornstein — generates, reviews, and manually enters proposals at ATG | M-003, M-004 |
 | **Trotting expert** | Nisse — rules research, expert-mode patterns, betting doc approval | M-001 |
 | **Quant analyst** | Povl — odds math, quantitative mode, simulation specs | M-002 |
 | **Agent** | Grok assistant — drafts artifacts, runs generators, follows AIRUP | M-005 |

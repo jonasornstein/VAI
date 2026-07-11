@@ -2,7 +2,7 @@
 
 ## Mission
 
-Help Kricke and Jonte generate well-structured **betting system proposals** for Swedish trotting at ATG, with **V85** as the first priority game.
+Help Kricke and ornstein generate well-structured **betting system proposals** for Swedish trotting at ATG, with **V85** as the first priority game.
 
 ## Methodology: AIRUP
 

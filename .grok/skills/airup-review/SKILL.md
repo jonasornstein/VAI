@@ -21,7 +21,7 @@ Handle **R** (Review) and **U** (Update) for items in `pending/`.
 |----------|-------|
 | **Nisse** | ATG rules correct? Edge cases? Terminology? |
 | **Povl** | Math correct? Cost formula? Model assumptions stated? |
-| **Kricke / Jonte** | Enterable at atg.se? All 8 legs? Cost matches? |
+| **Kricke / ornstein** | Enterable at atg.se? All 8 legs? Cost matches? |
 
 ### 3. Produce review packet
 

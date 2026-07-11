@@ -5,7 +5,7 @@
 | **Artifact** | `outbox/proposals/v85/2026-07-05-halmstad/proposal.md` |
 | **Race card** | `inbox/race-cards/2026-07-05-halmstad.yaml` |
 | **Mode** | random (seed 42) |
-| **Reviewer** | Jonte (operator) |
+| **Reviewer** | ornstein (operator) |
 | **Review type** | UC-20 / F-071 operator checklist |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
@@ -19,7 +19,7 @@
 - [x] Inga ogiltiga hästnummer
 - [x] Strukna hästar kontrollerade mot race card
 - [x] Reserver noterade där relevant (leg 1: 7, 12)
-- [x] ATG UI transcribability confirmed by Jonte
+- [x] ATG UI transcribability confirmed by ornstein
 - [ ] Scratch/reserve status still current on race day (operator re-check before play)
 
 ---
@@ -47,4 +47,4 @@
 |-------|-------|
 | Published | 2026-07-07 |
 | Path | `outbox/proposals/v85/2026-07-05-halmstad/proposal.md` |
-| Approved by | Jonte |
+| Approved by | ornstein |

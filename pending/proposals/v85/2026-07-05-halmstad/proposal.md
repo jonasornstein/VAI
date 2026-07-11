@@ -4,7 +4,7 @@
 |-------|-------|
 | Mode | random |
 | AIRUP status | APPROVED |
-| Approved | 2026-07-07 · Jonte |
+| Approved | 2026-07-07 · ornstein |
 | Generated | 2026-07-07T07:17:11Z |
 | SYSTEMKOSTNAD | 500.00 SEK |
 | Total cost | 500.00 SEK |

@@ -5,7 +5,7 @@
 | **Artifact** | `pending/proposals/v85/2026-07-05-halmstad/proposal.md` |
 | **Race card** | `inbox/race-cards/2026-07-05-halmstad.yaml` |
 | **Mode** | random (seed 42) |
-| **Reviewer** | Jonte (operator) |
+| **Reviewer** | ornstein (operator) |
 | **Review type** | UC-20 / F-071 operator checklist |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
@@ -33,7 +33,7 @@
 - [x] Inga ogiltiga hästnummer
 - [x] Strukna hästar kontrollerade mot race card
 - [x] Reserver noterade där relevant (leg 1: 7, 12)
-- [x] **ATG UI transcribability confirmed by Jonte**
+- [x] **ATG UI transcribability confirmed by ornstein**
 - [ ] **Scratch/reserve status still current on race day**
 
 ---
@@ -87,7 +87,7 @@ No quant review required (random mode).
 
 ## Required for APPROVE (operator)
 
-1. Jonte or Kricke confirms slip is enterable on [atg.se/v85](https://www.atg.se/v85) without rework.
+1. ornstein or Kricke confirms slip is enterable on [atg.se/v85](https://www.atg.se/v85) without rework.
 2. Reply **APPROVED** (or list revisions).
 
 On **APPROVED**:
@@ -100,4 +100,4 @@ On **APPROVED**:
 
 ## Verdict summary
 
-**APPROVED** by Jonte 2026-07-07 — published to `outbox/`.
+**APPROVED** by ornstein 2026-07-07 — published to `outbox/`.

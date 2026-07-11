@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Artifact** | `docs/requirements/functions.md` |
-| **Reviewer** | Povl (math), Jonte (operator) |
+| **Reviewer** | Povl (math), ornstein (operator) |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
 

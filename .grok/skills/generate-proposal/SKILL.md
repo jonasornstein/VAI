@@ -12,7 +12,7 @@ Create a **betting system proposal** for manual ATG entry. Follows **AIRUP** —
 
 | Phase | Action |
 |-------|--------|
-| **A** | Confirm game, date, track, mode, reviewer (Kricke/Jonte) |
+| **A** | Confirm game, date, track, mode, reviewer (Kricke/ornstein) |
 | **I** | Ingest race card → `inbox/race-cards/`; odds → `inbox/odds/` |
 | **R** | Generate draft → `pending/proposals/<game>/` status `AWAITING_OPERATOR` |
 | **U** | Revise from operator feedback |

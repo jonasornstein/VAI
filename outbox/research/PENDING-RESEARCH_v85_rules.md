@@ -171,7 +171,7 @@ Per S-004 and S-009a §4:
 - Optional **1st and 2nd reserve** per leg (ATG UI → *välj reserver*).
 - If not chosen, ATG uses **established reserve order** (not only stake distribution — kundservice simplifies to "insatsfördelning" for auto-assigned reserves at bet time).
 
-### 6.3 Operator note (Kricke/Jonte)
+### 6.3 Operator note (Kricke/ornstein)
 
 On race day: **check scratches** before start; reserves activate automatically on the ATG coupon. Proposals should note if specific reserves were planned.
 

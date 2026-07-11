@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | **Artifact** | `docs/requirements/ux-workflow.md` |
-| **Reviewer** | Jonte (operator) |
+| **Reviewer** | ornstein (operator) |
 | **Date** | 2026-07-07 |
 | **Verdict** | **APPROVED** |
 

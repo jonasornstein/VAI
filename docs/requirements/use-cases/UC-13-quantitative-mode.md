@@ -5,7 +5,7 @@
 | **ID** | UC-13 |
 | **Status** | APPROVED |
 | **Version** | 1.0 |
-| **Reviewer** | Povl (math), Jonte (operator) |
+| **Reviewer** | Povl (math), ornstein (operator) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Quant analyst |

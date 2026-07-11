@@ -5,7 +5,7 @@
 | **ID** | UC-20 |
 | **Status** | APPROVED |
 | **Version** | 1.0 |
-| **Reviewer** | Jonte (operator) |
+| **Reviewer** | ornstein (operator) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator, Trotting expert, Quant analyst |
@@ -44,7 +44,7 @@ F-070, F-071, F-072, F-073
 ## Special requirements
 
 - [SUP-U-001](../supplementary-specification.md#2-usability) through [SUP-U-005](../supplementary-specification.md#2-usability)
-- Operator gate: Kricke or Jonte for race-day **P**
+- Operator gate: Kricke or ornstein for race-day **P**
 - v1.1: **Innan spel** checklist wired in local UI (F-071 auto-updates from slip + race card)
 
 ---

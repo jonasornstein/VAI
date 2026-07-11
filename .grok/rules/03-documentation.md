@@ -33,7 +33,7 @@ Each `docs/betting/<game>.md` should eventually contain:
 3. Stake rules (minimum, reduced-stake variants if any)
 4. Payout structure (8 correct, consolation for 7/6/5)
 5. System cost formula with examples
-6. ATG entry notes for Kricke/Jonte
+6. ATG entry notes for Kricke/ornstein
 7. Edge cases (scratches, late withdrawals, reserves) — Nisse
 8. References to official ATG materials
 

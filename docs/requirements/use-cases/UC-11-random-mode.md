@@ -5,7 +5,7 @@
 | **ID** | UC-11 |
 | **Status** | APPROVED |
 | **Version** | 1.0 |
-| **Reviewer** | Povl (algorithm), Jonte (operator) |
+| **Reviewer** | Povl (algorithm), ornstein (operator) |
 | **Approved** | 2026-07-07 |
 | **Last updated** | 2026-07-07 |
 | **Primary actor** | Operator |

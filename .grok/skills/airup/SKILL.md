@@ -28,7 +28,7 @@ Answer:
 - Date / track?
 - Mode? (random / expert / quantitative)
 - Artifact type? (proposal / research / spec)
-- Who reviews? (Nisse / Povl / Kricke / Jonte)
+- Who reviews? (Nisse / Povl / Kricke / ornstein)
 
 ### 2. Inbox (I)
 
