@@ -38,6 +38,7 @@ Canonical file location: `inbox/race-cards/<YYYY-MM-DD>-<track>.yaml`
 | `start_time` | string | No | Local time `HH:MM` |
 | `horses` | int[] | Yes | Eligible start numbers (non-scratched) |
 | `scratches` | int[] | No | Strukna hästar (excluded from `horses`) |
+| `horse_names` | object | No | Start number → horse name (display-only; ATG `starts[].horse.name`) |
 | `reserves` | int[] | No | Reserve order if applicable |
 | `race_info` | object | No | Race-level metadata (UC-15); see below |
 

@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | Jonte |
-| **Last updated** | 2026-07-08 |
+| **Last updated** | 2026-07-11 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. Jonte requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-11 | P | Jonte | **Release v1.1.2** — strukna hästar synliga (röda, ej valbara); spik-namn i betslip; `horse_names` i race card API | Tag `v1.1.2` |
 | 2026-07-08 | R | Jonte | **Träffsannolikhet** — F-052 basic formula reference (pool-share proxy, independent-leg DP) | See [§ Träffsannolikhet](#träffsannolikhet-f-052-basic) |
 | 2026-07-08 | P | Jonte | **End of session** — UC-15 race info in leg headers; operator verified in local UI | See [§ End of day — 2026-07-08](#end-of-day--2026-07-08) |
 | 2026-07-08 | P | Nisse, Jonte | **UC-15 race info shipped** — F-029 leg headers; ATG metadata; scratches fix | [UC-15-race-info.md](./requirements/use-cases/UC-15-race-info.md), [race-info-v1.md](../../outbox/specs/race-info-v1.md) |
@@ -104,6 +105,26 @@ Dynamic programming over k = 0..8:
 - Not utdelning, EV, or guaranteed return
 - Full quantitative model deferred to UC-13
 - Hidden when `leg_distributions` missing (manual YAML / no ATG bet %)
+
+---
+
+## Release v1.1.2 — 2026-07-11
+
+**Product line:** Hari (random) local UI patch on v1.1. **v1.2** remains reserved for reduced-stake (UC-14 §3a) and ATG disk cache.
+
+### Shipped
+
+| Area | Change |
+|------|--------|
+| UX | Strukna hästar shown in leg grid — red number, strikethrough, unselectable |
+| UX | Betslip spik rows show `7 Hankypanky Leonie` (number + name) when one horse selected |
+| API | `legs[].horse_names` from ATG `starts[].horse.name`; optional in manual YAML |
+| Package | `pyproject.toml` / `atg.__version__` → **1.1.2** |
+
+### Verification
+
+- 37 pytest tests pass
+- Local UI: `python -m atg serve` → http://127.0.0.1:8765/
 
 ---
 

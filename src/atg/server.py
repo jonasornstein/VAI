@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random API (v1.1)."""
+"""Local HTTP server — mockup + random API (v1.1.2)."""
 
 from __future__ import annotations
 

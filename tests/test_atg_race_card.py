@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from atg.atg_race_card import extract_race_info, parse_atg_game
+from atg.atg_race_card import extract_horse_names, extract_race_info, parse_atg_game
 
 SAMPLE_RACE = {
     "name": "Hästkraft Årjäng 2026 - STL Stodivisionen",
@@ -13,9 +13,9 @@ SAMPLE_RACE = {
     "terms": ["3-åriga och äldre svenska ston 100.001 - 725.000 kr."],
     "status": "upcoming",
     "starts": [
-        {"number": 1, "scratched": False},
-        {"number": 2, "scratched": True},
-        {"number": 3, "scratched": False},
+        {"number": 1, "scratched": False, "horse": {"name": "Easy Pick"}},
+        {"number": 2, "scratched": True, "horse": {"name": "Bee My Clementine"}},
+        {"number": 3, "scratched": False, "horse": {"name": "Amelia Earhart"}},
     ],
 }
 
@@ -38,6 +38,11 @@ def test_extract_race_info_from_atg_race() -> None:
     assert info.status == "upcoming"
 
 
+def test_extract_horse_names_from_atg_starts() -> None:
+    names = extract_horse_names(SAMPLE_RACE["starts"])
+    assert names == ((1, "Easy Pick"), (2, "Bee My Clementine"), (3, "Amelia Earhart"))
+
+
 def test_parse_atg_game_includes_race_info_and_excludes_scratches() -> None:
     card = parse_atg_game("V85_2026-07-11_31_5", _game_payload())
     leg1 = card.leg_by_number(1)
@@ -47,3 +52,8 @@ def test_parse_atg_game_includes_race_info_and_excludes_scratches() -> None:
     assert 2 not in leg1.horses
     assert 1 in leg1.horses
     assert 3 in leg1.horses
+    assert dict(leg1.horse_names) == {
+        1: "Easy Pick",
+        2: "Bee My Clementine",
+        3: "Amelia Earhart",
+    }

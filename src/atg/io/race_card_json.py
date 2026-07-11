@@ -50,6 +50,8 @@ def _leg_to_dict(leg: Leg) -> dict[str, Any]:
         data["start_time"] = leg.start_time
     if leg.race_info is not None:
         data["race_info"] = _race_info_to_dict(leg.race_info)
+    if leg.horse_names:
+        data["horse_names"] = {str(number): name for number, name in leg.horse_names}
     return data
 
 

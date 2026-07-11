@@ -40,3 +40,26 @@ def test_race_card_to_dict_includes_race_info() -> None:
     assert leg1["race_info"]["start_method"] == "volt"
     assert leg1["race_info"]["race_name"] == "STL Stodivisionen"
     assert "race_info" not in payload["legs"][1]
+
+
+def test_race_card_to_dict_includes_horse_names() -> None:
+    card = RaceCard(
+        game="v85",
+        date="2026-07-11",
+        track="Årjäng",
+        legs=(
+            Leg(
+                leg=1,
+                race_label="V85-1",
+                horses=(1, 7),
+                horse_names=((1, "Easy Pick"), (7, "Hankypanky Leonie")),
+            ),
+        )
+        + tuple(Leg(leg=i, race_label=f"V85-{i}", horses=(1,)) for i in range(2, 9)),
+        source="atg",
+        fetched_at="2026-07-11T10:00:00Z",
+        settled=False,
+    )
+    payload = race_card_to_dict(card)
+    assert payload["legs"][0]["horse_names"] == {"1": "Easy Pick", "7": "Hankypanky Leonie"}
+    assert "horse_names" not in payload["legs"][1]

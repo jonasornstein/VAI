@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 
 ATG_PRODUCTS_V85_URL = "https://www.atg.se/services/racinginfo/v1/api/products/V85"
 ATG_GAME_URL_TEMPLATE = "https://www.atg.se/services/racinginfo/v1/api/games/{game_id}"
-USER_AGENT = "ATG-Proposal-Toolkit/1.1 (read-only; local operator UI)"
+USER_AGENT = "ATG-Proposal-Toolkit/1.1.2 (read-only; local operator UI)"
 
 
 class AtgFetchError(RuntimeError):

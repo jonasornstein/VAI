@@ -1,7 +1,7 @@
 [project]
 name = "atg"
-version = "0.1.0"
-description = "ATG V85 proposal toolkit — random mode v1"
+version = "1.1.2"
+description = "ATG V85 proposal toolkit — Hari random mode v1.1.2"
 requires-python = ">=3.11"
 dependencies = [
     "pyyaml>=6.0",

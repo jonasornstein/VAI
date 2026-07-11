@@ -89,7 +89,24 @@ def _parse_leg(item: Any) -> Leg:
         scratches=scratches,
         reserves=reserves,
         race_info=_parse_race_info(item.get("race_info"), leg_num),
+        horse_names=_parse_horse_names(item.get("horse_names"), leg_num),
     )
+
+
+def _parse_horse_names(value: Any, leg_num: int) -> tuple[tuple[int, str], ...]:
+    if value is None:
+        return ()
+    _require_mapping(value, f"leg {leg_num} horse_names")
+    names: list[tuple[int, str]] = []
+    for key, name in value.items():
+        number = int(key) if isinstance(key, str) and key.isdigit() else key
+        if not isinstance(number, int) or number <= 0:
+            raise RaceCardValidationError(f"Leg {leg_num}: horse_names keys must be positive integers")
+        if not isinstance(name, str) or not name.strip():
+            raise RaceCardValidationError(f"Leg {leg_num}: horse_names values must be non-empty strings")
+        names.append((number, name.strip()))
+    names.sort(key=lambda item: item[0])
+    return tuple(names)
 
 
 def _parse_race_info(value: Any, leg_num: int) -> RaceInfo | None:

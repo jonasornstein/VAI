@@ -34,6 +34,25 @@ def _normalize_start_method(value: str | None) -> str | None:
     return key
 
 
+def extract_horse_names(starts: list[Any]) -> tuple[tuple[int, str], ...]:
+    """Map start number -> horse name from ATG starts[].horse.name."""
+    names: list[tuple[int, str]] = []
+    for start in starts:
+        if not isinstance(start, dict):
+            continue
+        number = start.get("number")
+        if not isinstance(number, int) or number <= 0:
+            continue
+        horse = start.get("horse")
+        if not isinstance(horse, dict):
+            continue
+        name = horse.get("name")
+        if isinstance(name, str) and name.strip():
+            names.append((number, name.strip()))
+    names.sort(key=lambda item: item[0])
+    return tuple(names)
+
+
 def extract_race_info(race: dict[str, Any]) -> RaceInfo | None:
     """F-029 — per-leg race metadata from ATG races[] object."""
     race_name = race.get("name")
@@ -139,6 +158,7 @@ def parse_atg_game(game_id: str, payload: dict[str, Any]) -> RaceCard:
                 ),
                 scratches=tuple(scratches),
                 race_info=extract_race_info(race),
+                horse_names=extract_horse_names(starts),
             )
         )
 

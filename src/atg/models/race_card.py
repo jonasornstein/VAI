@@ -21,6 +21,7 @@ class Leg:
     scratches: tuple[int, ...] = ()
     reserves: tuple[int, ...] = ()
     race_info: RaceInfo | None = None
+    horse_names: tuple[tuple[int, str], ...] = ()
 
 
 @dataclass(frozen=True)
