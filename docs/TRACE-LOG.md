@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-08 | R | Jonte | **Träffsannolikhet** — F-052 basic formula reference (pool-share proxy, independent-leg DP) | See [§ Träffsannolikhet](#träffsannolikhet-f-052-basic) |
 | 2026-07-08 | P | Jonte | **End of session** — UC-15 race info in leg headers; operator verified in local UI | See [§ End of day — 2026-07-08](#end-of-day--2026-07-08) |
 | 2026-07-08 | P | Nisse, Jonte | **UC-15 race info shipped** — F-029 leg headers; ATG metadata; scratches fix | [UC-15-race-info.md](./requirements/use-cases/UC-15-race-info.md), [race-info-v1.md](../../outbox/specs/race-info-v1.md) |
 | 2026-07-07 | P | Jonte | **End of session** — v1.1 Hari shipped; RUP trilogy APPROVED; Phase 2b complete; race day Årjäng 2026-07-11 next | See [§ End of day — 2026-07-07](#end-of-day--2026-07-07) |
@@ -72,6 +73,37 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 ## When not to log
 
 - Routine agent edits, typo fixes, or exploratory drafts still in `pending/`
+
+---
+
+## Träffsannolikhet (F-052 basic)
+
+**UI:** `#hit-summary-help-btn` in [v85-proposal-ux-mockup-atg.html](../../outbox/mockups/v85-proposal-ux-mockup-atg.html)  
+**Code:** [hit_summary.py](../../src/atg/hit_summary.py) · **Spec:** [random-v1.1.md §6](../../outbox/specs/random-v1.1.md)
+
+### Data
+
+- ATG `starts[].pools.V85.betDistribution` ÷ 10 000 → fraction per horse per leg
+
+### Per leg i = 1..8
+
+\(p_i = \min(1,\ \sum_{h \in \text{selection}_i} \text{distribution}_{i,h}\)\)
+
+Interpretation: sum of V85 pool shares on your picks ≈ P(win leg i). **Proxy only** — not true win odds.
+
+### Across legs (independence assumption)
+
+Dynamic programming over k = 0..8:
+
+- P(exactly k correct) after each leg: wrong leg adds mass at k; right leg at k+1
+- Outputs: P(8), P(≥7), P(≥6), P(≥5) → sidebar bars after **Generera system**
+
+### Limitations
+
+- Legs treated as independent (simplified)
+- Not utdelning, EV, or guaranteed return
+- Full quantitative model deferred to UC-13
+- Hidden when `leg_distributions` missing (manual YAML / no ATG bet %)
 
 ---
 
