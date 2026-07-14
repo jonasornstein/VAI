@@ -1,4 +1,4 @@
-# ATG — Supplementary Specification
+# VAI — Supplementary Specification
 
 | Field | Value |
 |-------|-------|

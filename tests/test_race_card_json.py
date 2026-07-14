@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from atg.io.race_card_json import race_card_to_dict
-from atg.models.race_card import Leg, RaceCard, RaceInfo
+from vai.io.race_card_json import race_card_to_dict
+from vai.models.race_card import Leg, RaceCard, RaceInfo
 
 
 def test_race_card_to_dict_includes_race_info() -> None:

@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 
 import yaml
 
-from atg.models.proposal import RandomManifest, RandomResult
-from atg.models.race_card import RaceCard
+from vai.models.proposal import RandomManifest, RandomResult
+from vai.models.race_card import RaceCard
 
 
 def format_proposal_markdown(

@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from atg.models.race_card import Leg, RaceCard, RaceInfo
+from vai.models.race_card import Leg, RaceCard, RaceInfo
 
 
 class RaceCardValidationError(ValueError):

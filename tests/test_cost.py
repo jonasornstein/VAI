@@ -1,4 +1,4 @@
-from atg.cost import compute_cost_sek, count_combinations, format_cost_breakdown
+from vai.cost import compute_cost_sek, count_combinations, format_cost_breakdown
 
 
 def test_v85_example_from_rules() -> None:

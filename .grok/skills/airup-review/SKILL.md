@@ -1,6 +1,6 @@
 ---
 name: airup-review
-description: Review pending ATG artifacts in the AIRUP Review and Update phases. Use for expert sign-off, operator acceptance, pending items, or /airup-review.
+description: Review pending VAI artifacts in the AIRUP Review and Update phases. Use for expert sign-off, operator acceptance, pending items, or /airup-review.
 argument-hint: "<pending artifact path or ID>"
 ---
 

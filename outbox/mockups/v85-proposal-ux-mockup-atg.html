@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — ATG UX v1.1.2 (Local UI)</title>
+  <title>VAI V85 — Local UI v1.1.2</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -127,7 +127,7 @@
     }
     .game-header__logo:hover { transform: rotate(-3deg) scale(1.04); }
     .game-header__logo svg { display: block; width: 100%; height: 100%; }
-    .game-header__title .ATGheadline {
+    .game-header__title .vai-headline {
       color: #fff;
       font-size: 28px;
       padding: 0;
@@ -774,7 +774,7 @@
           </svg>
         </div>
         <div class="game-header__title">
-          <div class="ATGheadline" id="app-headline">VAI V85</div>
+          <div class="vai-headline" id="app-headline">VAI V85</div>
           <div class="game-header__sub">Hämtar startlista från ATG · du väljer hästar · modellen bygger spelet</div>
         </div>
       </div>
@@ -911,7 +911,7 @@
     </div>
   </div>
 
-  <p class="footer-note">ATG Trotting Betting Systems · v1.1.2 Local UI · Random · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.1.2 Local UI · Random · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -1143,7 +1143,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — ATG UX v1.1.2 (Local UI)";
+        document.title = title + " — Local UI v1.1.2";
         var logo = document.getElementById("app-logo");
         if (logo) logo.setAttribute("title", title);
         updateOpenAtgButton();
@@ -1496,7 +1496,7 @@
           })
           .catch(function (e) {
             document.getElementById("btn-generate").disabled = false;
-            alert("API fel — kör python -m atg serve");
+            alert("API fel — kör python -m vai serve");
             console.error(e);
           });
       }
@@ -1531,7 +1531,7 @@
           populateDropdowns(res.j);
         })
         .catch(function () {
-          setApiStatus(false, "offline — kör python -m atg serve");
+          setApiStatus(false, "offline — kör python -m vai serve");
         });
     })();
   </script>

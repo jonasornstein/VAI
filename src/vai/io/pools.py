@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from atg.models.race_card import RaceCard
+from vai.models.race_card import RaceCard
 
 
 class PoolsValidationError(ValueError):

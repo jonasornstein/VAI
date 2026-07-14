@@ -1,7 +1,7 @@
-"""Vercel serverless entrypoint — reuses AtgRequestHandler from local UI."""
+"""Vercel serverless entrypoint — reuses VaiRequestHandler from local UI."""
 
-from atg.server import AtgRequestHandler
+from vai.server import VaiRequestHandler
 
 
-class handler(AtgRequestHandler):
+class handler(VaiRequestHandler):
     pass

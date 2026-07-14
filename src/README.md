@@ -2,13 +2,13 @@
 
 **v1 status:** Random mode vertical slice per [random-v1.md](../outbox/specs/random-v1.md).
 
-**v1.1.2:** Local UI — `python -m atg serve` → http://127.0.0.1:8765/
+**v1.1.2:** Local UI — `python -m vai serve` → http://127.0.0.1:8765/
 
 ## Layout
 
 ```
 src/
-├── atg/
+├── vai/
 │   ├── models/          # RaceCard, RandomResult, …
 │   ├── io/              # YAML race card, pools, proposal markdown
 │   ├── strategies/      # random.py (v1); expert/quant later
@@ -31,4 +31,4 @@ tests/                   # pytest suite + golden seed test
 
 - Python 3.11+
 - Type hints on public APIs
-- No ATG API calls in v1
+- Operator API integration via `atg_fetch.py` / `atg_race_card.py` (atg.se)

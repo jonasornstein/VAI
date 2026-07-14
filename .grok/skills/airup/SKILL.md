@@ -1,12 +1,12 @@
 ---
 name: airup
-description: Orchestrate the AIRUP methodology (Analyze, Inbox, Review, Update, Publish) for ATG project work. Use when starting tasks, processing inputs, or when the user mentions AIRUP, workflow, or /airup.
+description: Orchestrate the AIRUP methodology (Analyze, Inbox, Review, Update, Publish) for VAI project work. Use when starting tasks, processing inputs, or when the user mentions AIRUP, workflow, or /airup.
 argument-hint: "<task description>"
 ---
 
 # AIRUP Orchestrator
 
-Run the **AIRUP** cycle for any ATG task. Full spec: `docs/AIRUP.md`.
+Run the **AIRUP** cycle for any VAI task. Full spec: `docs/AIRUP.md`.
 
 ## Phases
 

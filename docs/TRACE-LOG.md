@@ -1,4 +1,4 @@
-# ATG — Trace Log
+# VAI — Trace Log
 
 | Field | Value |
 |-------|-------|
@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-14 | U | ornstein | **Project rename ATG → VAI** — package `src/vai/`, `VaiRequestHandler`, UI branding; operator integration (`atg_fetch`, `ATG_UNAVAILABLE`) unchanged | `pyproject.toml`, `AGENTS.md`, mockup |
 | 2026-07-11 | U | ornstein | **Operator rename** — persona Jonte → ornstein across docs, specs, proposals, rules, skills; `docs/ornsteinDocs/` | ROSTER M-004 |
 | 2026-07-11 | P | ornstein | **Release v1.1.2** — strukna hästar synliga (röda, ej valbara); spik-namn i betslip; `horse_names` i race card API | Tag `v1.1.2` |
 | 2026-07-08 | R | ornstein | **Träffsannolikhet** — F-052 basic formula reference (pool-share proxy, independent-leg DP) | See [§ Träffsannolikhet](#träffsannolikhet-f-052-basic) |

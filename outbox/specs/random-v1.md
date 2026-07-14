@@ -277,7 +277,7 @@ def generate_random_v1(
 ### 8.2 CLI sketch (v1)
 
 ```
-python -m atg.cli random \
+python -m vai.cli random \
   --race-card inbox/race-cards/2026-07-05-halmstad.yaml \
   --pools pools.yaml \
   --budget 500 \

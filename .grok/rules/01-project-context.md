@@ -1,4 +1,4 @@
-# Project Context — ATG Trotting Betting Systems
+# Project Context — VAI Trotting Betting Systems
 
 ## Mission
 

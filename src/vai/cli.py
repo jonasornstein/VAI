@@ -6,17 +6,17 @@ import argparse
 import sys
 from pathlib import Path
 
-from atg.io.pools import empty_operator_pools, load_operator_pools
-from atg.io.proposal import format_proposal_markdown
-from atg.io.race_card import load_race_card
-from atg.models.proposal import RandomError, RandomResult
-from atg.strategies.random import generate_random_v1
+from vai.io.pools import empty_operator_pools, load_operator_pools
+from vai.io.proposal import format_proposal_markdown
+from vai.io.race_card import load_race_card
+from vai.models.proposal import RandomError, RandomResult
+from vai.strategies.random import generate_random_v1
 
 DEFAULT_BUDGET_SEK = 500.0
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="ATG V85 proposal toolkit")
+    parser = argparse.ArgumentParser(description="VAI V85 proposal toolkit")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     random_parser = subparsers.add_parser("random", help="Generate random-mode V85 proposal")
@@ -51,7 +51,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _run_serve(args: argparse.Namespace) -> int:
-    from atg.server import serve
+    from vai.server import serve
 
     serve(host=args.host, port=args.port)
     return 0

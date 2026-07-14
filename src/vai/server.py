@@ -12,13 +12,13 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from atg.atg_fetch import AtgFetchError
-from atg.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
-from atg.hit_summary import compute_hit_summary
-from atg.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
-from atg.models.proposal import RandomError, RandomResult
-from atg.schedule import fetch_atg_schedule, schedule_to_dict
-from atg.strategies.random import generate_random_v1
+from vai.atg_fetch import AtgFetchError
+from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
+from vai.hit_summary import compute_hit_summary
+from vai.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
+from vai.models.proposal import RandomError, RandomResult
+from vai.schedule import fetch_atg_schedule, schedule_to_dict
+from vai.strategies.random import generate_random_v1
 
 CARD_ID_PATTERN = re.compile(r"^[a-zA-Z0-9._-]+$")
 ATG_GAME_ID_PATTERN = re.compile(r"^V85_\d{4}-\d{2}-\d{2}_\d+_\d+$")
@@ -33,10 +33,10 @@ def find_repo_root() -> Path:
     cwd = Path.cwd()
     if (cwd / "pyproject.toml").is_file() and (cwd / "inbox").is_dir():
         return cwd
-    raise RuntimeError("Could not locate ATG repo root")
+    raise RuntimeError("Could not locate VAI repo root")
 
 
-class AtgRequestHandler(BaseHTTPRequestHandler):
+class VaiRequestHandler(BaseHTTPRequestHandler):
     repo_root: Path = find_repo_root()
     mockup_dir: Path = repo_root / "outbox" / "mockups"
     race_cards_dir: Path = repo_root / "inbox" / "race-cards"
@@ -272,11 +272,11 @@ class AtgRequestHandler(BaseHTTPRequestHandler):
 
 def serve(*, host: str = "127.0.0.1", port: int = DEFAULT_PORT) -> None:
     root = find_repo_root()
-    AtgRequestHandler.repo_root = root
-    AtgRequestHandler.mockup_dir = root / "outbox" / "mockups"
-    AtgRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
-    server = ThreadingHTTPServer((host, port), AtgRequestHandler)
-    print(f"ATG local UI: http://{host}:{port}/")
+    VaiRequestHandler.repo_root = root
+    VaiRequestHandler.mockup_dir = root / "outbox" / "mockups"
+    VaiRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
+    server = ThreadingHTTPServer((host, port), VaiRequestHandler)
+    print(f"VAI local UI: http://{host}:{port}/")
     print("Press Ctrl+C to stop.")
     try:
         server.serve_forever()

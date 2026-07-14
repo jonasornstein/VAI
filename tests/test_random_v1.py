@@ -1,11 +1,11 @@
-from atg.io.pools import empty_operator_pools
-from atg.models.proposal import RandomError, RandomResult
-from atg.models.race_card import RaceCard
-from atg.strategies.random import generate_random_v1
+from vai.io.pools import empty_operator_pools
+from vai.models.proposal import RandomError, RandomResult
+from vai.models.race_card import RaceCard
+from vai.strategies.random import generate_random_v1
 
 
 def _minimal_race_card() -> RaceCard:
-    from atg.io.race_card import parse_race_card
+    from vai.io.race_card import parse_race_card
 
     legs = []
     for leg in range(1, 9):

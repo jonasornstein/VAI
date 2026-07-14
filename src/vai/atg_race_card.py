@@ -6,9 +6,9 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
-from atg.atg_fetch import fetch_v85_game
-from atg.models.race_card import Leg, RaceCard, RaceInfo
-from atg.schedule import parse_date_from_game_id
+from vai.atg_fetch import fetch_v85_game
+from vai.models.race_card import Leg, RaceCard, RaceInfo
+from vai.schedule import parse_date_from_game_id
 
 ATG_GAME_ID_RE = re.compile(r"^V85_\d{4}-\d{2}-\d{2}_\d+_\d+$")
 

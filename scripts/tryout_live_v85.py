@@ -8,11 +8,11 @@ import urllib.error
 import urllib.request
 from datetime import date
 
-from atg.atg_race_card import fetch_atg_race_card_bundle
-from atg.io.pools import empty_operator_pools
-from atg.schedule import fetch_atg_schedule, rounds_for_date
-from atg.strategies.random import generate_random_v1
-from atg.models.proposal import RandomResult
+from vai.atg_race_card import fetch_atg_race_card_bundle
+from vai.io.pools import empty_operator_pools
+from vai.schedule import fetch_atg_schedule, rounds_for_date
+from vai.strategies.random import generate_random_v1
+from vai.models.proposal import RandomResult
 
 URL = "http://127.0.0.1:8765/"
 TODAY = date.today().isoformat()

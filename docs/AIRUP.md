@@ -8,7 +8,7 @@
 | **Requirements model** | IBM RUP — see [requirements/README.md](./requirements/README.md) |
 | **Owner** | ornstein |
 
-**AIRUP** is the mandatory workflow for all ATG project work — documentation, research, proposals, and implementation. Every artifact moves through five phases in order. Do not skip phases.
+**AIRUP** is the mandatory workflow for all VAI project work — documentation, research, proposals, and implementation. Every artifact moves through five phases in order. Do not skip phases.
 
 ---
 

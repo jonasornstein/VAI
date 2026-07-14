@@ -19,7 +19,7 @@ Wire the **ATG mockup** to the **Hari (random) generator** via a local HTTP API,
 ## 2. Architecture
 
 ```
-Browser (mockup HTML + JS)  →  localhost:8765  →  atg.server
+Browser (mockup HTML + JS)  →  localhost:8765  →  vai.server
                               GET  /api/v1/schedule/v85
                               GET  /api/v1/race-cards
                               GET  /api/v1/race-cards/{id}
@@ -70,7 +70,7 @@ Error `400`: `BUDGET_NOT_MET` may include `suggested_stake_sek`, `suggested_comb
 
 ```powershell
 pip install -e .
-python -m atg serve
+python -m vai serve
 # Open http://127.0.0.1:8765/
 ```
 

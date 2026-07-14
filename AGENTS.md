@@ -1,6 +1,6 @@
-# ATG Trotting Betting Systems — Agent Instructions
+# VAI Trotting Betting Systems — Agent Instructions
 
-You are working on **ATG**, a project that generates **betting system proposals** for Swedish trotting (trav) at [ATG](https://www.atg.se). Proposals are **manually entered** on the ATG website by gamblers **Kricke** or **ornstein** — this project does not automate placement of bets.
+You are working on **VAI**, a project that generates **betting system proposals** for Swedish trotting (trav) at [ATG](https://www.atg.se). Proposals are **manually entered** on the ATG website by gamblers **Kricke** or **ornstein** — this project does not automate placement of bets.
 
 ## Methodology: AIRUP (mandatory)
 
@@ -50,7 +50,7 @@ When rules conflict: Nisse wins on trotting/ATG rules; Povl wins on math/odds; K
 ## Project layout
 
 ```
-ATG/
+VAI/
 ├── inbox/          # I — raw inputs
 ├── pending/        # R, U — drafts
 ├── outbox/         # P — approved artifacts

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import yaml
 
-from atg.atg_race_card import fetch_race_card_from_atg
+from vai.atg_race_card import fetch_race_card_from_atg
 
 
 def _slug_track(track: str) -> str:

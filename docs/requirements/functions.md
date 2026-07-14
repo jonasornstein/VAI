@@ -1,4 +1,4 @@
-# ATG — System Functions Catalog
+# VAI — System Functions Catalog
 
 | Field | Value |
 |-------|-------|
@@ -10,7 +10,7 @@
 | **Owner** | ornstein (M-004) |
 | **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md) |
 
-Concrete system functions referenced by use-case steps (`F-*`). Implementation: `src/atg/` per [src/README.md](../../src/README.md).
+Concrete system functions referenced by use-case steps (`F-*`). Implementation: `src/vai/` per [src/README.md](../../src/README.md).
 
 ---
 
@@ -147,8 +147,8 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 | Priority | Functions | Notes |
 |----------|-----------|-------|
-| **Shipped (v1.0 — CLI)** | F-001, F-004–005, F-020–021, F-023–026, F-030–032, F-060–062 | Manual YAML race cards; `python -m atg random` |
-| **Shipped (v1.1 — local UI + ATG)** | F-006–007, F-025–028, F-052 (basic), F-071, F-091 | `python -m atg serve`; see [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
+| **Shipped (v1.0 — CLI)** | F-001, F-004–005, F-020–021, F-023–026, F-030–032, F-060–062 | Manual YAML race cards; `python -m vai random` |
+| **Shipped (v1.1 — local UI + ATG)** | F-006–007, F-025–028, F-052 (basic), F-071, F-091 | `python -m vai serve`; see [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
 | **Shipped (v1.2 — race info)** | F-029 | Leg header metadata; [race-info-v1](../../outbox/specs/race-info-v1.md) |
 | **Partial** | F-009 | V85 `betDistribution` only; no `inbox/odds/` archive |
 | **UX / mockup only** | F-070, F-090, F-092 | Print slip (not PDF export); theme toggle in mockup variants |

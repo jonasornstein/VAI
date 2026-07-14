@@ -1,4 +1,4 @@
-# ATG — Vision Document
+# VAI — Vision Document
 
 | Field | Value |
 |-------|-------|

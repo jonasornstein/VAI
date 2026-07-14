@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from atg.io.race_card import load_race_card
-from atg.models.race_card import Leg, RaceCard, RaceInfo
+from vai.io.race_card import load_race_card
+from vai.models.race_card import Leg, RaceCard, RaceInfo
 
 
 def list_race_card_ids(race_cards_dir: Path) -> list[dict[str, str]]:

@@ -1,4 +1,4 @@
-"""F-006, F-027, F-028 — V85 schedule from ATG."""
+"""F-006, F-027, F-028 — V85 schedule from vai."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from typing import Any, Callable
 
-from atg.atg_fetch import AtgFetchError, fetch_v85_products
+from vai.atg_fetch import AtgFetchError, fetch_v85_products
 
 GAME_ID_DATE_RE = re.compile(r"^V85_(\d{4}-\d{2}-\d{2})_")
 
@@ -151,7 +151,7 @@ def fetch_atg_schedule(
     today: date | None = None,
     fetch_products: Callable[[], dict[str, Any]] = fetch_v85_products,
 ) -> V85Schedule:
-    """F-006 — fetch V85 schedule from ATG."""
+    """F-006 — fetch V85 schedule from vai."""
     payload = fetch_products()
     return build_schedule(payload, today=today)
 

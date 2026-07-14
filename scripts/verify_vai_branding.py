@@ -39,7 +39,7 @@ def main() -> int:
 
         ok = (
             headline == "VAI V85"
-            and page_title == "VAI V85 — ATG UX v1.1 (Local UI)"
+            and page_title == "VAI V85 — Local UI v1.1.2"
             and logo_title == "VAI V85"
             and logo_text == "VAI"
             and "TRAVHÄST + VAI" in footer.upper()

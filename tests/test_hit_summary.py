@@ -1,4 +1,4 @@
-from atg.hit_summary import compute_hit_summary
+from vai.hit_summary import compute_hit_summary
 
 
 def test_hit_summary_independent_legs() -> None:

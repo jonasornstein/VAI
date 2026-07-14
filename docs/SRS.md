@@ -1,4 +1,4 @@
-# ATG — Software Requirements Specification (Index)
+# VAI — Software Requirements Specification (Index)
 
 | Field | Value |
 |-------|-------|

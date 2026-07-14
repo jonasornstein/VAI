@@ -11,9 +11,9 @@ import random
 from collections.abc import Mapping, Sequence
 from math import prod
 
-from atg.cost import V85_ROW_PRICE_SEK, compute_cost_sek, format_cost_breakdown
-from atg.models.proposal import RandomError, RandomManifest, RandomResult
-from atg.models.race_card import RaceCard
+from vai.cost import V85_ROW_PRICE_SEK, compute_cost_sek, format_cost_breakdown
+from vai.models.proposal import RandomError, RandomManifest, RandomResult
+from vai.models.race_card import RaceCard
 
 COST_TOLERANCE_SEK = 0.001
 NUM_LEGS = 8

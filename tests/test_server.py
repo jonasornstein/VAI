@@ -5,8 +5,8 @@ from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from atg.schedule import V85Round, V85Schedule
-from atg.server import AtgRequestHandler, find_repo_root
+from vai.schedule import V85Round, V85Schedule
+from vai.server import VaiRequestHandler, find_repo_root
 
 MOCK_SCHEDULE = V85Schedule(
     source="atg",
@@ -29,10 +29,10 @@ MOCK_SCHEDULE = V85Schedule(
 
 def _start_test_server() -> tuple[ThreadingHTTPServer, str]:
     root = find_repo_root()
-    AtgRequestHandler.repo_root = root
-    AtgRequestHandler.mockup_dir = root / "outbox" / "mockups"
-    AtgRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
-    server = ThreadingHTTPServer(("127.0.0.1", 0), AtgRequestHandler)
+    VaiRequestHandler.repo_root = root
+    VaiRequestHandler.mockup_dir = root / "outbox" / "mockups"
+    VaiRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
+    server = ThreadingHTTPServer(("127.0.0.1", 0), VaiRequestHandler)
     port = server.server_address[1]
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -57,7 +57,7 @@ def _post(url: str, payload: dict) -> tuple[int, dict]:
 def test_api_schedule_v85() -> None:
     server, base = _start_test_server()
     try:
-        with patch("atg.server.fetch_atg_schedule", return_value=MOCK_SCHEDULE):
+        with patch("vai.server.fetch_atg_schedule", return_value=MOCK_SCHEDULE):
             schedule = _get(f"{base}/api/v1/schedule/v85")
         assert schedule["default_date"] == "2026-07-11"
         assert schedule["dates"] == ["2026-07-11"]

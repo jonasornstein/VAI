@@ -1,6 +1,6 @@
 ---
 name: generate-proposal
-description: Generate a betting system proposal for ATG trotting (V85 priority) following AIRUP. Draft to pending/; publish to outbox/ after approval. Use for betting system, proposal, spelsystem, or /generate-proposal.
+description: Generate a betting system proposal for VAI trotting (V85 priority) following AIRUP. Draft to pending/; publish to outbox/ after approval. Use for betting system, proposal, spelsystem, or /generate-proposal.
 argument-hint: "<mode> <game> <date> [options]"
 ---
 

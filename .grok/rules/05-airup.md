@@ -1,6 +1,6 @@
 # AIRUP Methodology (mandatory)
 
-All ATG work follows **AIRUP**: **A**nalyze → **I**nbox → **R**eview ⇄ **U**pdate → **P**ublish.
+All VAI work follows **AIRUP**: **A**nalyze → **I**nbox → **R**eview ⇄ **U**pdate → **P**ublish.
 
 Full spec: [docs/AIRUP.md](../../docs/AIRUP.md)
 

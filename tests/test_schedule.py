@@ -2,9 +2,9 @@ from datetime import date
 
 import pytest
 
-from atg.atg_fetch import AtgFetchError
-from atg.atg_race_card import is_atg_game_id, parse_atg_game
-from atg.schedule import (
+from vai.atg_fetch import AtgFetchError
+from vai.atg_race_card import is_atg_game_id, parse_atg_game
+from vai.schedule import (
     build_schedule,
     parse_date_from_game_id,
     parse_v85_products,

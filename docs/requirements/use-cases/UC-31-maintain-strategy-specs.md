@@ -24,7 +24,7 @@ Author and approve strategy specifications that drive UC-11, UC-12, UC-13 implem
 4. Povl reviews; quant proposals using model require **F-012** → `APPROVED`.
 5. **F-103** `promote_strategy_spec` → `docs/strategies/<mode>.md`.
 6. **F-081** review record if major version (e.g. quantitative v0.3).
-7. Implementation in `src/atg/strategies/` references spec version in code comments.
+7. Implementation in `src/vai/strategies/` references spec version in code comments.
 
 ## Extensions
 

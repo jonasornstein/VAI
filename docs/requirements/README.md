@@ -1,4 +1,4 @@
-# ATG — Requirements Package (RUP)
+# VAI — Requirements Package (RUP)
 
 | Field | Value |
 |-------|-------|

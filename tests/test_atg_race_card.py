@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from atg.atg_race_card import extract_horse_names, extract_race_info, parse_atg_game
+from vai.atg_race_card import extract_horse_names, extract_race_info, parse_atg_game
 
 SAMPLE_RACE = {
     "name": "Hästkraft Årjäng 2026 - STL Stodivisionen",

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from atg.io.race_card import RaceCardValidationError, load_race_card, parse_race_card
+from vai.io.race_card import RaceCardValidationError, load_race_card, parse_race_card
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_RACE_CARD = REPO_ROOT / "inbox" / "race-cards" / "2026-07-05-halmstad.yaml"

@@ -1,4 +1,4 @@
-# ATG — Use-Case Model
+# VAI — Use-Case Model
 
 | Field | Value |
 |-------|-------|
