@@ -54,6 +54,19 @@ def _post(url: str, payload: dict) -> tuple[int, dict]:
         return exc.code, json.loads(exc.read().decode("utf-8"))
 
 
+def test_head_index_returns_200_without_body() -> None:
+    server, base = _start_test_server()
+    try:
+        request = Request(f"{base}/", method="HEAD")
+        with urlopen(request) as response:
+            assert response.status == 200
+            assert response.read() == b""
+            assert int(response.headers["Content-Length"]) > 0
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
 def test_api_schedule_v85() -> None:
     server, base = _start_test_server()
     try:
