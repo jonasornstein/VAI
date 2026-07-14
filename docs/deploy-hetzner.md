@@ -9,7 +9,7 @@
 | **Server** | Hetzner Ubuntu — `168.119.155.11` (`dev-server`) |
 | **GitHub** | https://github.com/jonasornstein/VAI.git (public, branch `master`) |
 
-Operator guide for deploying and updating VAI on the Hetzner server. Scripts live in [`deploy/`](../deploy/).
+Operator guide for deploying and updating VAI on the Hetzner server. **Production hosting is Hetzner only** (no Vercel). Scripts live in [`deploy/`](../deploy/).
 
 ---
 
