@@ -5,7 +5,8 @@ set -euo pipefail
 
 APP_USER=vai
 APP_DIR=/opt/vai
-REPO_URL="${VAI_REPO_URL:-https://github.com/jonasornstein/VAI.git}"
+# After GitHub rename ATG→VAI, both URLs work (GitHub redirects the old name).
+REPO_URL="${VAI_REPO_URL:-https://github.com/jonasornstein/ATG.git}"
 SERVER_NAME="${VAI_SERVER_NAME:-_}"
 
 echo "==> Installing system packages"

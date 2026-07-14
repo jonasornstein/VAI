@@ -6,14 +6,14 @@ Runs `python -m vai serve` behind nginx on port 80. The app binds to `127.0.0.1:
 
 - Ubuntu 22.04 or 24.04
 - Root SSH access
-- GitHub repo cloned (default: `https://github.com/jonasornstein/VAI.git`)
+- GitHub repo cloned (default: `https://github.com/jonasornstein/ATG.git`; use `VAI` after repo rename)
 
 ## Quick install
 
 On the server:
 
 ```bash
-export VAI_REPO_URL=https://github.com/jonasornstein/VAI.git
+export VAI_REPO_URL=https://github.com/jonasornstein/ATG.git
 export VAI_SERVER_NAME=your.domain.example   # or server IP
 sudo bash deploy/install-ubuntu.sh
 ```
@@ -23,7 +23,7 @@ sudo bash deploy/install-ubuntu.sh
 ```bash
 # Clone
 sudo useradd --system --home-dir /opt/vai --shell /usr/sbin/nologin vai
-sudo git clone https://github.com/jonasornstein/VAI.git /opt/vai
+sudo git clone https://github.com/jonasornstein/ATG.git /opt/vai
 sudo chown -R vai:vai /opt/vai
 
 # Python
