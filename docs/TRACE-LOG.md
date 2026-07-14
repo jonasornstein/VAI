@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-11 |
+| **Last updated** | 2026-07-14 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,10 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-14 | P | ornstein | **End of session (O&O)** — production live at https://vai.ornstein.work/; Hetzner deploy; Vercel removed | See [§ End of day — 2026-07-14](#end-of-day--2026-07-14) |
+| 2026-07-14 | P | ornstein | **Hetzner production** — `dev-server` 168.119.155.11; nginx + Let's Encrypt; systemd `vai.service` | [deploy-hetzner.md](./deploy-hetzner.md), [`deploy/`](../deploy/) |
+| 2026-07-14 | P | ornstein | **GitHub VAI public** — repo renamed `jonasornstein/VAI`; `master` canonical; `main` synced | https://github.com/jonasornstein/VAI |
+| 2026-07-14 | U | ornstein | **Vercel deploy removed** — deleted `vercel.json`, `api/`, `requirements.txt`, `[tool.vercel]`; Hetzner-only hosting | `9102c4e` |
 | 2026-07-14 | U | ornstein | **Project rename ATG → VAI** — package `src/vai/`, `VaiRequestHandler`, UI branding; operator integration (`atg_fetch`, `ATG_UNAVAILABLE`) unchanged | `pyproject.toml`, `AGENTS.md`, mockup |
 | 2026-07-11 | U | ornstein | **Operator rename** — persona Jonte → ornstein across docs, specs, proposals, rules, skills; `docs/ornsteinDocs/` | ROSTER M-004 |
 | 2026-07-11 | P | ornstein | **Release v1.1.2** — strukna hästar synliga (röda, ej valbara); spik-namn i betslip; `horse_names` i race card API | Tag `v1.1.2` |
@@ -107,6 +111,53 @@ Dynamic programming over k = 0..8:
 - Not utdelning, EV, or guaranteed return
 - Full quantitative model deferred to UC-13
 - Hidden when `leg_distributions` missing (manual YAML / no ATG bet %)
+
+---
+
+## End of day — 2026-07-14
+
+**Session owner:** ornstein (O&O)  
+**Git remote:** `origin` → `https://github.com/jonasornstein/VAI.git` (`master` synced)  
+**Production:** https://vai.ornstein.work/ (Hetzner `dev-server`, `168.119.155.11`)
+
+### Completed
+
+| Phase | Deliverable | Status |
+|-------|-------------|--------|
+| Ship | ATG → VAI package rename (`src/vai/`, `python -m vai serve`) | `4d0e120` |
+| Ship | GitHub repo renamed and made **public** | VAI.git |
+| Ship | Hetzner first deploy — systemd + nginx + certbot TLS | Live ✓ |
+| Fix | nginx HTTPS 403 → `deploy/fix-nginx-https.sh` | Done |
+| Fix | Server git drift — `reset --hard origin/master`, git as `vai` user | Done |
+| Fix | HEAD requests for `curl -I` health checks | `7716174` |
+| Ship | Operator deploy doc | [deploy-hetzner.md](./deploy-hetzner.md) |
+| Ship | `deploy/update-server.sh` routine update path | `c87b38a` |
+| U | Vercel deployment artifacts removed (Hetzner-only production) | `9102c4e` |
+| Verify | HTTPS 200; Hari UI loads in browser | ornstein ✓ |
+
+### Published / deployed artifacts (today)
+
+- **Production URL:** https://vai.ornstein.work/
+- **Docs:** `docs/deploy-hetzner.md`
+- **Deploy:** `deploy/install-ubuntu.sh`, `setup-domain.sh`, `fix-nginx-https.sh`, `update-server.sh`
+- **Code:** `src/vai/server.py` (HEAD), branch `master` on GitHub
+
+### Open for next session
+
+| ID | Item | Owner |
+|----|------|-------|
+| — | **Race day** — V85 Axevalla 2026-07-18; ATG fetch + Hari proposal; UC-22 entry | Kricke / ornstein |
+| — | Optional server sync after `9102c4e` (Vercel file cleanup on disk) | ornstein |
+| — | **v1.2** — reduced-stake (UC-14 §3a); ATG disk cache | Povl |
+| — | Housekeeping — archive duplicate `pending/` copies | Assistant |
+| OI-004 | Spelstopp after Sept 2026 schedule change — TBD | Nisse |
+
+### Notes
+
+- Production stack: nginx :443 → `127.0.0.1:8765` (`vai.service`). No Vercel.
+- Server updates: `bash /opt/vai/deploy/update-server.sh` (git as `vai`, not root).
+- `curl -I` and browser GET both return 200 after HEAD fix.
+- Local dev unchanged: `python -m vai serve` → http://127.0.0.1:8765/
 
 ---
 
