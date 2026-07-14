@@ -1,6 +1,8 @@
 # VAI — Ubuntu server deploy (Hetzner)
 
-Runs `python -m vai serve` behind nginx on port 80. The app binds to `127.0.0.1:8765`; nginx proxies public traffic.
+**Operator guide:** [docs/deploy-hetzner.md](../docs/deploy-hetzner.md)
+
+Runs `python -m vai serve` behind nginx. The app binds to `127.0.0.1:8765`; nginx proxies public traffic (HTTPS on production).
 
 ## Prerequisites
 
@@ -65,10 +67,10 @@ sudo nginx -t && sudo systemctl reload nginx
 ## Update after git push
 
 ```bash
-sudo -u vai git -C /opt/vai pull
-sudo -u vai /opt/vai/.venv/bin/pip install -e /opt/vai
-sudo systemctl restart vai
+bash /opt/vai/deploy/update-server.sh
 ```
+
+See [docs/deploy-hetzner.md](../docs/deploy-hetzner.md) for the full update workflow.
 
 ## Custom domain + HTTPS (vai.ornstein.work)
 
