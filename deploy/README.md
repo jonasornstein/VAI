@@ -8,7 +8,7 @@ Runs `python -m vai serve` behind nginx on port 80. The app binds to `127.0.0.1:
 - Root SSH access
 - GitHub repo cloned (default: `https://github.com/jonasornstein/VAI.git`)
 
-## Quick install
+## Quick install (public GitHub repo)
 
 On the server:
 
@@ -17,6 +17,29 @@ export VAI_REPO_URL=https://github.com/jonasornstein/VAI.git
 export VAI_SERVER_NAME=your.domain.example   # or server IP
 sudo bash deploy/install-ubuntu.sh
 ```
+
+## Private repo / no GitHub login
+
+If the repo is private (or you cannot sign in to GitHub), copy the project from your PC — no GitHub on the server.
+
+**On your PC** (PowerShell; you only need Hetzner SSH access):
+
+```powershell
+cd "C:\Users\jonte\OneDrive\grok\vai"
+tar -czf vai-deploy.tgz --exclude=.git --exclude=__pycache__ --exclude=.venv --exclude=mcps .
+scp vai-deploy.tgz root@168.119.155.11:/tmp/
+```
+
+**On the Hetzner server** (SSH or web console):
+
+```bash
+mkdir -p /opt/vai
+tar -xzf /tmp/vai-deploy.tgz -C /opt/vai
+export VAI_SERVER_NAME=168.119.155.11
+bash /opt/vai/deploy/install-ubuntu-local.sh
+```
+
+Then open http://168.119.155.11/
 
 ## Manual steps
 
@@ -47,11 +70,25 @@ sudo -u vai /opt/vai/.venv/bin/pip install -e /opt/vai
 sudo systemctl restart vai
 ```
 
-## TLS (optional)
+## Custom domain + HTTPS (vai.ornstein.work)
+
+**DNS:** `A` record `vai` → `168.119.155.11` (already configured).
+
+After `install-ubuntu.sh`, on the server:
+
+```bash
+export VAI_CERT_EMAIL=you@ornstein.work
+export VAI_DOMAIN=vai.ornstein.work
+bash /opt/vai/deploy/setup-domain.sh
+```
+
+Opens **https://vai.ornstein.work/** with automatic HTTP→HTTPS redirect.
+
+Manual certbot alternative:
 
 ```bash
 sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d your.domain.example
+sudo certbot --nginx -d vai.ornstein.work
 ```
 
 ## Firewall (UFW)
