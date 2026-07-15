@@ -2,7 +2,7 @@
 
 **v1 status:** Random mode vertical slice per [random-v1.md](../outbox/specs/random-v1.md).
 
-**v1.1.3:** Local UI — `python -m vai serve` → http://127.0.0.1:8765/
+**v1.1.4:** Local UI — `python -m vai serve` → http://127.0.0.1:8765/
 
 ## Layout
 

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <title>VAI mockup — horse buttons with V85 pool % + odds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --atg-bg: #f5f3ef;
+      --atg-surface: #fff;
+      --atg-border: #d9d5cd;
+      --atg-text: #1a1a1a;
+      --atg-link: #006bb3;
+      --atg-horse-border: #b8c4d0;
+      --atg-horse-bg: linear-gradient(180deg, #f8fafc 0%, #e8eef4 100%);
+      --atg-horse-pool: #ffe08a;
+      --atg-horse-pool-border: #e0a800;
+      --v85-headline: #0a2540;
+      --v85-gradient: linear-gradient(180deg, #0080d0 0%, #006bb3 100%);
+      --v85-dark: #004d80;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Roboto, system-ui, sans-serif;
+      background: var(--atg-bg);
+      color: var(--atg-text);
+      padding: 24px;
+      line-height: 1.4;
+    }
+    .banner {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 900;
+      margin: 0 0 6px;
+      color: var(--v85-headline);
+    }
+    .lead {
+      margin: 0 0 20px;
+      max-width: 720px;
+      font-size: 14px;
+      color: #333;
+    }
+    .panel {
+      background: var(--atg-surface);
+      border: 1px solid var(--atg-border);
+      padding: 16px 18px 20px;
+      max-width: 720px;
+      margin-bottom: 20px;
+    }
+    .panel h2 {
+      margin: 0 0 4px;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .panel .hint {
+      margin: 0 0 14px;
+      font-size: 12px;
+      color: #555;
+    }
+    .badge-rec {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: #0a7a3e;
+      color: #fff;
+      padding: 2px 8px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .badge-alt {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: #666;
+      color: #fff;
+      padding: 2px 8px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* —— Leg card chrome (simplified) —— */
+    .leg-card {
+      border: 1px solid var(--atg-border);
+      overflow: hidden;
+    }
+    .leg-col {
+      background: var(--v85-gradient);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+      padding: 8px;
+      border-bottom: 2px solid var(--v85-dark);
+    }
+    .leg-body { padding: 12px; }
+    .race-info-primary {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .horses { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    /* —— A: Recommended stacked button —— */
+    .horse-a {
+      min-width: 44px;
+      height: auto;
+      min-height: 42px;
+      padding: 4px 6px 5px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      border: 1px solid var(--atg-horse-border);
+      background-image: var(--atg-horse-bg);
+      color: var(--atg-link);
+      cursor: pointer;
+      font-family: Roboto, sans-serif;
+      -webkit-appearance: none;
+      line-height: 1.1;
+    }
+    .horse-a .hn {
+      font-weight: 900;
+      font-size: 14px;
+    }
+    .horse-a .meta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      font-size: 9px;
+      font-weight: 700;
+      color: #3a4a5a;
+      letter-spacing: 0.01em;
+    }
+    .horse-a .meta .pool { color: #0d5c8c; }
+    .horse-a .meta .odds { color: #444; font-weight: 500; }
+    .horse-a.pool-selected {
+      background: var(--atg-horse-pool);
+      border-color: var(--atg-horse-pool-border);
+      color: var(--v85-headline);
+      box-shadow: inset 0 0 0 1px var(--atg-horse-pool-border);
+    }
+    .horse-a.pool-selected .meta .pool,
+    .horse-a.pool-selected .meta .odds { color: #3a3010; }
+    .horse-a.random-selected {
+      border: 2px solid #e85d04;
+      box-shadow: 0 0 0 1px #e85d04;
+      color: var(--v85-headline);
+    }
+    .horse-a.scratched {
+      color: #c41e3a;
+      border-color: #c41e3a;
+      background: rgba(196, 30, 58, 0.08);
+      text-decoration: line-through;
+      cursor: not-allowed;
+      opacity: 0.9;
+    }
+    .horse-a.scratched .meta { text-decoration: none; opacity: 0.55; }
+
+    /* —— B: Compact single-line —— */
+    .horse-b {
+      min-width: 52px;
+      height: 34px;
+      padding: 0 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border: 1px solid var(--atg-horse-border);
+      background-image: var(--atg-horse-bg);
+      color: var(--atg-link);
+      cursor: pointer;
+      font-family: Roboto, sans-serif;
+      font-weight: 900;
+      font-size: 13px;
+      -webkit-appearance: none;
+    }
+    .horse-b .sub {
+      font-size: 9px;
+      font-weight: 700;
+      color: #3a4a5a;
+      white-space: nowrap;
+    }
+    .horse-b.pool-selected {
+      background: var(--atg-horse-pool);
+      border-color: var(--atg-horse-pool-border);
+      color: var(--v85-headline);
+    }
+
+    /* —— C: Tooltip-only (status quo size) —— */
+    .horse-c {
+      min-width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 13px;
+      border: 1px solid var(--atg-horse-border);
+      background-image: var(--atg-horse-bg);
+      color: var(--atg-link);
+      cursor: pointer;
+      padding: 0 4px;
+      font-family: Roboto, sans-serif;
+      -webkit-appearance: none;
+      position: relative;
+    }
+    .horse-c:hover::after,
+    .horse-c:focus-visible::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 8px;
+      white-space: nowrap;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin: 12px 0 0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border: 1px solid #999;
+      display: inline-block;
+    }
+    .swatch.op { background: var(--atg-horse-pool); border-color: var(--atg-horse-pool-border); }
+    .swatch.sys { border: 2px solid #e85d04; background: #fff; }
+    .swatch.sc { background: rgba(196, 30, 58, 0.08); border-color: #c41e3a; }
+
+    .notes {
+      max-width: 720px;
+      font-size: 13px;
+      border: 1px dashed var(--atg-border);
+      background: #fff;
+      padding: 14px 16px;
+    }
+    .notes h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; }
+    .notes ul { margin: 0; padding-left: 18px; }
+    .notes li { margin-bottom: 6px; }
+    .notes code {
+      font-size: 12px;
+      background: #eee;
+      padding: 1px 4px;
+    }
+    .callout {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #e8f4fc;
+      border-left: 3px solid var(--atg-link);
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">VAI · DRAFT mockup · not wired to serve · v1.1.3+</div>
+  <h1>Horse buttons: V85 pool % + odds</h1>
+  <p class="lead">
+    Small UX feature mockup for the leg grid. <strong>Recommended:</strong> stacked
+    number + V85 pool share + win odds on every horse button. Selection colours
+    (operator / system / scratched) stay as today.
+  </p>
+
+  <!-- A: Recommended -->
+  <div class="panel">
+    <h2>A — Stacked button <span class="badge-rec">Recommended</span></h2>
+    <p class="hint">
+      Always-visible data. Number stays dominant; pool % (V85 share) and odds below.
+      Format: pool as percent with Swedish comma; odds as decimal (e.g. 4,20).
+    </p>
+    <div class="leg-card">
+      <div class="leg-col">1</div>
+      <div class="leg-body">
+        <div class="race-info-primary">2140 m · Autostart · Klass I</div>
+        <div class="horses" aria-label="Avdelning 1 — mock data">
+          <button type="button" class="horse-a pool-selected" title="Operatörens val">
+            <span class="hn">1</span>
+            <span class="meta">
+              <span class="pool">18,4%</span>
+              <span class="odds">3,80</span>
+            </span>
+          </button>
+          <button type="button" class="horse-a" title="Ej vald">
+            <span class="hn">2</span>
+            <span class="meta">
+              <span class="pool">9,1%</span>
+              <span class="odds">7,50</span>
+            </span>
+          </button>
+          <button type="button" class="horse-a random-selected" title="Slumpens häst">
+            <span class="hn">3</span>
+            <span class="meta">
+              <span class="pool">14,2%</span>
+              <span class="odds">5,10</span>
+            </span>
+          </button>
+          <button type="button" class="horse-a" title="Ej vald">
+            <span class="hn">4</span>
+            <span class="meta">
+              <span class="pool">6,8%</span>
+              <span class="odds">11,0</span>
+            </span>
+          </button>
+          <button type="button" class="horse-a" title="Ej vald">
+            <span class="hn">5</span>
+            <span class="meta">
+              <span class="pool">22,0%</span>
+              <span class="odds">2,90</span>
+            </span>
+          </button>
+          <button type="button" class="horse-a scratched" disabled title="Struken">
+            <span class="hn">6</span>
+            <span class="meta">
+              <span class="pool">—</span>
+              <span class="odds">—</span>
+            </span>
+          </button>
+          <button type="button" class="horse-a" title="Ej vald">
+            <span class="hn">7</span>
+            <span class="meta">
+              <span class="pool">11,5%</span>
+              <span class="odds">6,20</span>
+            </span>
+          </button>
+          <button type="button" class="horse-a pool-selected" title="Operatörens val">
+            <span class="hn">12</span>
+            <span class="meta">
+              <span class="pool">4,3%</span>
+              <span class="odds">18,0</span>
+            </span>
+          </button>
+        </div>
+        <div class="legend">
+          <span><i class="swatch op"></i> Operatörens val</span>
+          <span><i class="swatch sys"></i> Slumpens hästar</span>
+          <span><i class="swatch sc"></i> Struken</span>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Labels on button:</strong> top = start number · middle = V85 pool %
+      (<code>betDistribution</code> / 100) · bottom = win odds (when available).
+      Tooltip can still show full horse name.
+    </div>
+  </div>
+
+  <!-- B: Compact -->
+  <div class="panel">
+    <h2>B — Compact single line <span class="badge-alt">Alt</span></h2>
+    <p class="hint">Shorter row height; denser. Pool % only beside number (odds in tooltip) — or both as “18% · 3,80”.</p>
+    <div class="horses">
+      <button type="button" class="horse-b pool-selected">
+        1 <span class="sub">18% · 3,8</span>
+      </button>
+      <button type="button" class="horse-b">
+        2 <span class="sub">9% · 7,5</span>
+      </button>
+      <button type="button" class="horse-b">
+        5 <span class="sub">22% · 2,9</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- C: Tooltip only -->
+  <div class="panel">
+    <h2>C — Number only + hover tip <span class="badge-alt">Minimal</span></h2>
+    <p class="hint">Keeps today’s 30×30 buttons. Hover (or focus) shows “18,4% · odds 3,80”. Harder to scan whole field.</p>
+    <div class="horses">
+      <button type="button" class="horse-c" data-tip="18,4% · 3,80">1</button>
+      <button type="button" class="horse-c" data-tip="9,1% · 7,50">2</button>
+      <button type="button" class="horse-c" data-tip="14,2% · 5,10">3</button>
+      <button type="button" class="horse-c" data-tip="22,0% · 2,90">5</button>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h3>Data notes (for implementation)</h3>
+    <ul>
+      <li><strong>V85 pool %</strong> — already available from ATG
+        <code>starts[].pools.V85.betDistribution</code> ÷ 10000 → fraction;
+        display as percent with 1 decimal (sv: comma).</li>
+      <li><strong>Odds</strong> — not on race card today. Mock shows decimal win odds.
+        Ship options: (1) pool-only first, odds when F-009 full lands;
+        (2) imply rough odds from pool share for display only (label clearly as approx.).</li>
+      <li><strong>Missing data</strong> — show <code>—</code> rather than inventing numbers.</li>
+      <li><strong>Bet slip</strong> — out of scope for this small feature (leg grid only).</li>
+      <li><strong>Accessibility</strong> — <code>title</code> / <code>aria-label</code>:
+        “Häst 3, V85 14,2 procent, odds 5,10”.</li>
+    </ul>
+  </div>
+</body>
+</html>

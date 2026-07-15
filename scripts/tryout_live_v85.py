@@ -37,7 +37,7 @@ def main() -> int:
             print(f"  upcoming: {r.game_id} · {r.track} · {r.date} · bettable={r.bettable}")
 
     game_id = next(r.game_id for r in schedule.rounds if not r.settled)
-    card, dists = fetch_atg_race_card_bundle(game_id)
+    card, dists, _odds = fetch_atg_race_card_bundle(game_id)
     print(f"\nRace card: {card.track} {card.date}")
     for leg in card.legs:
         print(f"  leg {leg.leg}: {len(leg.horses)} horses", end="")

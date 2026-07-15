@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random API (v1.1.3)."""
+"""Local HTTP server — mockup + random API (v1.1.4)."""
 
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_ID", "message": card_id}})
                 return
             try:
-                card, leg_distributions = fetch_atg_race_card_bundle(card_id)
+                card, leg_distributions, leg_odds = fetch_atg_race_card_bundle(card_id)
             except AtgFetchError as exc:
                 self._send_json(
                     HTTPStatus.BAD_GATEWAY,
@@ -127,6 +127,11 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                     str(leg): {str(horse): value for horse, value in horses.items()}
                     for leg, horses in leg_distributions.items()
                 }
+            if leg_odds:
+                payload["leg_odds"] = {
+                    str(leg): {str(horse): value for horse, value in horses.items()}
+                    for leg, horses in leg_odds.items()
+                }
             self._send_json(HTTPStatus.OK, payload)
             return
 
@@ -145,7 +150,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
     def _load_race_card_bundle(self, card_id: str) -> tuple:
         if is_atg_game_id(card_id):
             return fetch_atg_race_card_bundle(card_id)
-        return load_race_card_by_id(self.race_cards_dir, card_id), None
+        return load_race_card_by_id(self.race_cards_dir, card_id), None, None
 
     def _handle_generate_random(self) -> None:
         try:
@@ -160,7 +165,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            card, leg_distributions = self._load_race_card_bundle(card_id)
+            card, leg_distributions, _leg_odds = self._load_race_card_bundle(card_id)
         except FileNotFoundError:
             self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": card_id}})
             return

@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.1.3</title>
+  <title>VAI V85 — Local UI v1.1.4</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,6 +32,11 @@
       --atg-horse-border: #bacbdf;
       --atg-horse-pool: #e8f4fc;
       --atg-horse-pool-border: #006db6;
+      --horse-meta: #3a4a5a;
+      --horse-pool-pct: #0d5c8c;
+      --horse-odds: #444444;
+      --horse-meta-selected: #3a3010;
+      --slip-odds: #555555;
       --atg-banner-bg: #fff8e6;
       --atg-banner-border: #f39332;
       --atg-approved-bg: #e8f5ee;
@@ -58,6 +63,11 @@
       --atg-horse-border: #3a556f;
       --atg-horse-pool: #1e3a52;
       --atg-horse-pool-border: #79bae5;
+      --horse-meta: #c5d6e6;
+      --horse-pool-pct: #9ed4ff;
+      --horse-odds: #e8eef5;
+      --horse-meta-selected: #dceefc;
+      --slip-odds: #c8d6e4;
       --atg-banner-bg: #2a2418;
       --atg-banner-border: #b36d1a;
       --atg-approved-bg: #1a3d22;
@@ -334,23 +344,45 @@
       margin-top: 2px;
     }
     .horses { display: flex; flex-wrap: wrap; gap: 5px; }
+    /* Option A: stacked number + V85 pool% + win odds */
     .horse {
-      min-width: 30px;
-      height: 30px;
+      min-width: 42px;
+      min-height: 40px;
+      height: auto;
       display: inline-flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 0;
       font-weight: 900;
       font-size: 13px;
       border: 1px solid var(--atg-horse-border);
       background-image: var(--atg-horse-bg);
       color: var(--atg-link);
       cursor: pointer;
-      padding: 0 4px;
+      padding: 3px 5px 4px;
       transition: background 0.12s, transform 0.1s;
       -webkit-appearance: none;
       font-family: Roboto, sans-serif;
+      line-height: 1.05;
     }
+    .horse .hn {
+      font-weight: 900;
+      font-size: 13px;
+      line-height: 1.1;
+    }
+    .horse .meta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 8px;
+      font-weight: 700;
+      color: var(--horse-meta);
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+    }
+    .horse .meta .pool { color: var(--horse-pool-pct); }
+    .horse .meta .odds { color: var(--horse-odds); font-weight: 500; }
     .horse:hover { transform: scale(1.06); }
     .horse.pool-selected {
       background: var(--atg-horse-pool);
@@ -358,6 +390,8 @@
       color: var(--v85-headline);
       box-shadow: inset 0 0 0 1px var(--atg-horse-pool-border);
     }
+    .horse.pool-selected .meta .pool,
+    .horse.pool-selected .meta .odds { color: var(--horse-meta-selected); }
     .horse.random-selected {
       border: 2px solid #e85d04;
       box-shadow: 0 0 0 1px #e85d04;
@@ -372,6 +406,10 @@
       text-decoration: line-through;
       cursor: not-allowed;
       pointer-events: none;
+    }
+    .horse.scratched .meta {
+      text-decoration: none;
+      opacity: 0.55;
     }
     .horse.scratched:hover {
       transform: none;
@@ -483,23 +521,45 @@
     .slip-row-horses {
       display: flex;
       align-items: center;
-      padding: 10px 16px;
+      padding: 8px 14px;
       font-size: 15px;
       font-weight: 400;
       color: #1a1a1a;
       letter-spacing: 0.02em;
       line-height: 1.35;
       background: #fff;
+      min-height: 48px;
     }
     .slip-row-horses .slip-horses-inner {
-      /* Single flex child so spaces between <strong> numbers are not dropped */
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0 14px;
+      row-gap: 6px;
       min-width: 0;
     }
-    .slip-row-horses .slip-horse-op {
-      font-weight: 700;
+    .slip-chip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      font-size: 15px;
+      color: #1a1a1a;
+      white-space: nowrap;
     }
-    .slip-row-horses .slip-horse-sys {
-      font-style: italic;
+    .slip-chip .num { font-weight: 400; }
+    .slip-chip.op .num { font-weight: 700; }
+    .slip-chip.sys .num { font-style: italic; font-weight: 400; }
+    .slip-chip .od {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--slip-odds);
+      font-style: normal;
+    }
+    .slip-chip .spik-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      font-style: normal;
     }
     .slip-footer {
       background: #f2efe8;
@@ -754,7 +814,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.1.3 Local UI · Random · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.1.4 Local UI · Random · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -794,7 +854,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.1.3</span>
+        <span class="game-header__pill">v1.1.4</span>
       </div>
     </header>
 
@@ -921,7 +981,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.1.3 Local UI · Random · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.1.4 Local UI · Random · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -985,11 +1045,53 @@
       }
 
       function findHorseBtn(leg, num) {
-        var buttons = document.querySelectorAll('.horse[data-leg="' + leg + '"]:not(.scratched)');
-        for (var i = 0; i < buttons.length; i++) {
-          if (parseInt(buttons[i].textContent, 10) === num) return buttons[i];
-        }
-        return null;
+        return document.querySelector(
+          '.horse[data-leg="' + leg + '"][data-horse="' + num + '"]:not(.scratched)'
+        );
+      }
+
+      function horseNumFromBtn(btn) {
+        var raw = btn.getAttribute("data-horse");
+        if (raw != null && raw !== "") return parseInt(raw, 10);
+        return parseInt(btn.textContent, 10);
+      }
+
+      function lookupLegMap(mapObj, leg, num) {
+        if (!mapObj) return null;
+        var legMap = mapObj[String(leg)] || mapObj[leg];
+        if (!legMap) return null;
+        var v = legMap[String(num)];
+        if (v == null) v = legMap[num];
+        return v == null ? null : v;
+      }
+
+      function formatPoolPct(frac) {
+        if (frac == null || isNaN(frac)) return "—";
+        return (frac * 100).toFixed(1).replace(".", ",") + "%";
+      }
+
+      function formatOdds(odds) {
+        if (odds == null || isNaN(odds) || odds <= 0) return "—";
+        var s = odds >= 10 ? odds.toFixed(1) : odds.toFixed(2);
+        return s.replace(".", ",");
+      }
+
+      function horseMetaHtml(leg, num) {
+        var pool = lookupLegMap(currentCard && currentCard.leg_distributions, leg, num);
+        var odds = lookupLegMap(currentCard && currentCard.leg_odds, leg, num);
+        return (
+          '<span class="meta">' +
+          '<span class="pool">' + formatPoolPct(pool) + "</span>" +
+          '<span class="odds">' + formatOdds(odds) + "</span>" +
+          "</span>"
+        );
+      }
+
+      function horseAriaLabel(leg, num, scratched) {
+        var pool = formatPoolPct(lookupLegMap(currentCard && currentCard.leg_distributions, leg, num));
+        var odds = formatOdds(lookupLegMap(currentCard && currentCard.leg_odds, leg, num));
+        var base = "Häst " + num + ", V85 " + pool + ", odds " + odds;
+        return scratched ? base + ", struken" : base;
       }
 
       function clearHorseSelection(btn) {
@@ -1034,8 +1136,8 @@
         for (var i = 1; i <= 8; i++) pools[String(i)] = [];
         document.querySelectorAll(".horse.pool-selected").forEach(function (btn) {
           var leg = btn.getAttribute("data-leg");
-          var num = parseInt(btn.textContent, 10);
-          pools[leg].push(num);
+          var num = horseNumFromBtn(btn);
+          if (!isNaN(num)) pools[leg].push(num);
         });
         return pools;
       }
@@ -1101,10 +1203,20 @@
           cardEl.className = "leg-card";
           cardEl.setAttribute("data-leg", String(leg.leg));
           var horsesHtml = displayNumbers.map(function (h) {
+            var meta = horseMetaHtml(leg.leg, h);
+            var aria = horseAriaLabel(leg.leg, h, scratches.has(h));
             if (scratches.has(h)) {
-              return '<button type="button" class="horse scratched" data-leg="' + leg.leg + '" disabled aria-disabled="true" title="Struken">' + h + "</button>";
+              return (
+                '<button type="button" class="horse scratched" data-leg="' + leg.leg +
+                '" data-horse="' + h + '" disabled aria-disabled="true" title="Struken" aria-label="' +
+                aria + '"><span class="hn">' + h + "</span>" + meta + "</button>"
+              );
             }
-            return '<button type="button" class="horse" data-leg="' + leg.leg + '">' + h + "</button>";
+            return (
+              '<button type="button" class="horse" data-leg="' + leg.leg +
+              '" data-horse="' + h + '" aria-label="' + aria +
+              '"><span class="hn">' + h + "</span>" + meta + "</button>"
+            );
           }).join("");
           var reserveHtml = (leg.reserves && leg.reserves.length)
             ? '<div class="reserves">Reserver: ' + leg.reserves.join(", ") + "</div>" : "";
@@ -1153,7 +1265,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.1.3";
+        document.title = title + " — Local UI v1.1.4";
         var logo = document.getElementById("app-logo");
         if (logo) logo.setAttribute("title", title);
         updateOpenAtgButton();
@@ -1340,12 +1452,18 @@
         }).join("");
       }
 
-      function formatSlipHorseNum(num, operatorSet) {
-        var s = String(num);
-        if (operatorSet && operatorSet.has(num)) {
-          return '<strong class="slip-horse-op">' + s + "</strong>";
+      function formatSlipChip(legNum, num, operatorSet, name) {
+        operatorSet = operatorSet || new Set();
+        var role = operatorSet.has(num) ? "op" : "sys";
+        var odds = formatOdds(lookupLegMap(currentCard && currentCard.leg_odds, legNum, num));
+        var html =
+          '<span class="slip-chip ' + role + '">' +
+          '<span class="num">' + num + "</span>" +
+          '<span class="od">' + odds + "</span>";
+        if (name) {
+          html += '<span class="spik-name">' + name + "</span>";
         }
-        return '<em class="slip-horse-sys">' + s + "</em>";
+        return html + "</span>";
       }
 
       function formatSlipLegHorses(legNum, horses, operatorSet) {
@@ -1355,16 +1473,13 @@
           var legData = currentCard && currentCard.legs ? currentCard.legs[legNum - 1] : null;
           var names = (legData && legData.horse_names) || {};
           var name = names[String(num)] || names[num];
-          var numHtml = formatSlipHorseNum(num, operatorSet);
-          return name ? numHtml + " " + name : numHtml;
+          return formatSlipChip(legNum, num, operatorSet, name || null);
         }
-        // Five non-breaking spaces: flex + normal HTML would collapse plain spaces
-        // between adjacent <strong> operator numbers.
         return horses
           .map(function (n) {
-            return formatSlipHorseNum(n, operatorSet);
+            return formatSlipChip(legNum, n, operatorSet, null);
           })
-          .join("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+          .join("");
       }
 
       function renderSlip(selections, seed, operatorPools) {
@@ -1379,7 +1494,7 @@
           row.className = "slip-row";
           row.innerHTML =
             '<div class="slip-row-leg">' + i + '</div>' +
-            '<div class="slip-row-horses"><span class="slip-horses-inner">' + text + "</span></div>";
+            '<div class="slip-row-horses"><div class="slip-horses-inner">' + text + "</div></div>";
           grid.appendChild(row);
         }
         slipReady = true;

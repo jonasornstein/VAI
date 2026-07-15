@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from vai.atg_race_card import extract_horse_names, extract_race_info, parse_atg_game
+from vai.atg_race_card import (
+    extract_horse_names,
+    extract_leg_distributions,
+    extract_leg_odds,
+    extract_race_info,
+    parse_atg_game,
+)
 
 SAMPLE_RACE = {
     "name": "Hästkraft Årjäng 2026 - STL Stodivisionen",
@@ -57,3 +63,34 @@ def test_parse_atg_game_includes_race_info_and_excludes_scratches() -> None:
         2: "Bee My Clementine",
         3: "Amelia Earhart",
     }
+
+
+def _start_with_pools(number: int, bet_dist: int, vinnare_odds: int) -> dict:
+    return {
+        "number": number,
+        "scratched": False,
+        "horse": {"name": f"Horse {number}"},
+        "pools": {
+            "V85": {"betDistribution": bet_dist},
+            "vinnare": {"odds": vinnare_odds},
+        },
+    }
+
+
+def test_extract_leg_distributions_and_odds() -> None:
+    payload = {
+        "races": [
+            {
+                "starts": [
+                    _start_with_pools(1, 2730, 813),  # 27.3% pool, odds 8.13
+                    _start_with_pools(2, 1500, 450),
+                ]
+            }
+        ]
+    }
+    dists = extract_leg_distributions(payload)
+    odds = extract_leg_odds(payload)
+    assert dists[1][1] == 0.273
+    assert dists[1][2] == 0.15
+    assert odds[1][1] == 8.13
+    assert odds[1][2] == 4.5

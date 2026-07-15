@@ -173,20 +173,20 @@ def parse_atg_game(game_id: str, payload: dict[str, Any]) -> RaceCard:
     )
 
 
-def extract_leg_distributions(payload: dict[str, Any]) -> dict[int, dict[int, float]]:
-    """Map leg -> horse -> V85 bet fraction from ATG game JSON."""
+def _iter_start_pools(
+    payload: dict[str, Any],
+) -> list[tuple[int, int, dict[str, Any]]]:
+    """Yield (leg_index, start_number, pools_dict) for each start with pools."""
     races = payload.get("races")
     if not isinstance(races, list):
-        return {}
-
-    distributions: dict[int, dict[int, float]] = {}
+        return []
+    out: list[tuple[int, int, dict[str, Any]]] = []
     for index, race in enumerate(races, start=1):
         if not isinstance(race, dict):
             continue
         starts = race.get("starts")
         if not isinstance(starts, list):
             continue
-        leg_map: dict[int, float] = {}
         for start in starts:
             if not isinstance(start, dict):
                 continue
@@ -196,24 +196,53 @@ def extract_leg_distributions(payload: dict[str, Any]) -> dict[int, dict[int, fl
             pools = start.get("pools")
             if not isinstance(pools, dict):
                 continue
-            v85_pool = pools.get("V85")
-            if not isinstance(v85_pool, dict):
-                continue
-            bet_distribution = v85_pool.get("betDistribution")
-            if isinstance(bet_distribution, (int, float)):
-                leg_map[number] = float(bet_distribution) / 10000.0
-        if leg_map:
-            distributions[index] = leg_map
+            out.append((index, number, pools))
+    return out
+
+
+def extract_leg_distributions(payload: dict[str, Any]) -> dict[int, dict[int, float]]:
+    """Map leg -> horse -> V85 bet fraction from ATG game JSON."""
+    distributions: dict[int, dict[int, float]] = {}
+    for index, number, pools in _iter_start_pools(payload):
+        v85_pool = pools.get("V85")
+        if not isinstance(v85_pool, dict):
+            continue
+        bet_distribution = v85_pool.get("betDistribution")
+        if isinstance(bet_distribution, (int, float)):
+            distributions.setdefault(index, {})[number] = float(bet_distribution) / 10000.0
     return distributions
 
 
+def extract_leg_odds(payload: dict[str, Any]) -> dict[int, dict[int, float]]:
+    """Map leg -> horse -> win odds (decimal) from ATG vinnare pool.
+
+    ATG stores odds as integer hundredths (e.g. 813 → 8.13).
+    """
+    odds_map: dict[int, dict[int, float]] = {}
+    for index, number, pools in _iter_start_pools(payload):
+        vinnare = pools.get("vinnare")
+        if not isinstance(vinnare, dict):
+            continue
+        raw = vinnare.get("odds")
+        if isinstance(raw, (int, float)) and raw > 0:
+            odds_map.setdefault(index, {})[number] = float(raw) / 100.0
+    return odds_map
+
+
 def fetch_race_card_from_atg(game_id: str) -> RaceCard:
-    card, _ = fetch_atg_race_card_bundle(game_id)
+    card, _, _ = fetch_atg_race_card_bundle(game_id)
     return card
 
 
-def fetch_atg_race_card_bundle(game_id: str) -> tuple[RaceCard, dict[int, dict[int, float]]]:
+def fetch_atg_race_card_bundle(
+    game_id: str,
+) -> tuple[RaceCard, dict[int, dict[int, float]], dict[int, dict[int, float]]]:
+    """Return (race_card, leg_distributions, leg_odds)."""
     if not is_atg_game_id(game_id):
         raise ValueError(f"Invalid ATG game id: {game_id}")
     payload = fetch_v85_game(game_id)
-    return parse_atg_game(game_id, payload), extract_leg_distributions(payload)
+    return (
+        parse_atg_game(game_id, payload),
+        extract_leg_distributions(payload),
+        extract_leg_odds(payload),
+    )

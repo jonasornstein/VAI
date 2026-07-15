@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <title>VAI mockup — 8 legs + bet slip with odds (option A)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --atg-bg: #f5f3ef;
+      --atg-surface: #fff;
+      --atg-border: #d9d5cd;
+      --atg-text: #1a1a1a;
+      --atg-link: #006bb3;
+      --atg-horse-border: #b8c4d0;
+      --atg-horse-bg: linear-gradient(180deg, #f8fafc 0%, #e8eef4 100%);
+      --atg-horse-pool: #ffe08a;
+      --atg-horse-pool-border: #e0a800;
+      --v85-headline: #0a2540;
+      --v85-gradient: linear-gradient(180deg, #0080d0 0%, #006bb3 100%);
+      --v85-dark: #004d80;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Roboto, system-ui, sans-serif;
+      background: var(--atg-bg);
+      color: var(--atg-text);
+      line-height: 1.35;
+    }
+    .banner {
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 8px 16px;
+    }
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--v85-headline);
+      margin: 12px 0 4px;
+    }
+    .lead {
+      font-size: 13px;
+      color: #444;
+      margin: 0 0 14px;
+      max-width: 900px;
+    }
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 0;
+      border: 1px solid var(--atg-border);
+      background: var(--atg-surface);
+    }
+    .legs-panel { padding: 16px; }
+    .sidebar {
+      border-left: 1px solid var(--atg-border);
+      padding: 14px;
+      background: #faf9f6;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--v85-headline);
+      margin: 0 0 4px;
+    }
+    .section-hint {
+      font-size: 11px;
+      color: #555;
+      margin: 0 0 10px;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 0 0 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .swatch {
+      width: 12px; height: 12px;
+      border: 1px solid #999;
+      display: inline-block;
+    }
+    .swatch.op { background: var(--atg-horse-pool); border-color: var(--atg-horse-pool-border); }
+    .swatch.sys { border: 2px solid #e85d04; background: #fff; }
+    .swatch.sc { background: rgba(196, 30, 58, 0.08); border-color: #c41e3a; }
+
+    .legs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .leg-card {
+      border: 1px solid var(--atg-border);
+      background: var(--atg-surface);
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      min-height: 0;
+    }
+    .leg-col {
+      background: var(--v85-gradient);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid var(--v85-dark);
+    }
+    .leg-body { padding: 8px 10px 10px; }
+    .race-info {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #333;
+    }
+    .horses { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    /* Option A horse buttons */
+    .horse {
+      min-width: 42px;
+      min-height: 40px;
+      padding: 3px 5px 4px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      border: 1px solid var(--atg-horse-border);
+      background-image: var(--atg-horse-bg);
+      color: var(--atg-link);
+      cursor: default;
+      font-family: Roboto, sans-serif;
+      line-height: 1.05;
+      -webkit-appearance: none;
+    }
+    .horse .hn { font-weight: 900; font-size: 13px; }
+    .horse .meta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 8px;
+      font-weight: 700;
+      color: #3a4a5a;
+    }
+    .horse .meta .pool { color: #0d5c8c; }
+    .horse .meta .odds { color: #444; font-weight: 500; }
+    .horse.pool-selected {
+      background: var(--atg-horse-pool);
+      border-color: var(--atg-horse-pool-border);
+      color: var(--v85-headline);
+      box-shadow: inset 0 0 0 1px var(--atg-horse-pool-border);
+    }
+    .horse.pool-selected .meta .pool,
+    .horse.pool-selected .meta .odds { color: #3a3010; }
+    .horse.random-selected {
+      border: 2px solid #e85d04;
+      box-shadow: 0 0 0 1px #e85d04;
+      color: var(--v85-headline);
+    }
+    .horse.scratched {
+      color: #c41e3a;
+      border-color: #c41e3a;
+      background: rgba(196, 30, 58, 0.08);
+      text-decoration: line-through;
+      opacity: 0.9;
+    }
+    .horse.scratched .meta { text-decoration: none; opacity: 0.5; }
+
+    /* Bet slip with odds */
+    .slip-preview {
+      border: 1px solid var(--atg-border);
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .slip-print-meta {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-bottom: 1px solid #ececec;
+      background: #fff;
+    }
+    .slip-table { background: #fff; }
+    .slip-row {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      border-bottom: 1px solid #ececec;
+      min-height: 48px;
+    }
+    .slip-row:last-child { border-bottom: none; }
+    .slip-row-leg {
+      background: #006bb3;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slip-row-horses {
+      display: flex;
+      align-items: center;
+      padding: 8px 14px;
+      background: #fff;
+    }
+    .slip-horses-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0 14px; /* visual gap ≈ multi-space between chips */
+      row-gap: 6px;
+    }
+    .slip-chip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      font-size: 15px;
+      color: #1a1a1a;
+      white-space: nowrap;
+    }
+    .slip-chip .num { font-weight: 400; }
+    .slip-chip.op .num { font-weight: 700; }
+    .slip-chip.sys .num { font-style: italic; font-weight: 400; }
+    .slip-chip .od {
+      font-size: 11px;
+      font-weight: 500;
+      color: #555;
+      font-style: normal;
+    }
+    .slip-chip.spik-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      font-style: normal;
+    }
+    .slip-footer {
+      background: #f2efe8;
+      border-top: 1px solid #e0ddd6;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .slip-footer strong { font-weight: 700; }
+    .slip-legend {
+      font-size: 10px;
+      color: #666;
+      padding: 6px 14px 10px;
+      background: #fff;
+      border-top: 1px dashed #e5e5e5;
+    }
+
+    .summary-card {
+      border: 1px solid var(--atg-border);
+      background: #fff;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .summary-card h3 {
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .cost-big {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--v85-headline);
+    }
+    .notes {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border: 1px dashed var(--atg-border);
+      background: #fff;
+      font-size: 12px;
+      max-width: 1100px;
+    }
+    .notes h3 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; }
+    .notes ul { margin: 0; padding-left: 18px; }
+    .notes li { margin-bottom: 4px; }
+    code { font-size: 11px; background: #eee; padding: 1px 4px; }
+
+    @media (max-width: 900px) {
+      .content { grid-template-columns: 1fr; }
+      .sidebar { border-left: none; border-top: 1px solid var(--atg-border); }
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">VAI · DRAFT mockup · option A · 8 legs + bet slip with odds · not wired to serve</div>
+  <div class="app">
+    <h1>Full screen: 8 legs (option A) + Genererat spel with odds</h1>
+    <p class="lead">
+      Mock data for layout density. Horse buttons show <strong>number · V85 pool% · odds</strong>.
+      Bet slip keeps operator <strong>bold</strong> / system <em>italic</em>, and adds
+      <strong>odds next to each number</strong> (spik also shows name).
+    </p>
+
+    <div class="content">
+      <section class="legs-panel">
+        <h2 class="section-title">Välj hästar för modellen</h2>
+        <p class="section-hint">
+          Option A on every start. Yellow = operator lock · orange border = system fill · red = scratched.
+        </p>
+        <div class="legend">
+          <span><i class="swatch op"></i> Operatörens val</span>
+          <span><i class="swatch sys"></i> Slumpens hästar</span>
+          <span><i class="swatch sc"></i> Struken</span>
+        </div>
+
+        <div class="legs-grid" id="legs-grid"></div>
+
+        <div class="slip-preview" id="slip">
+          <div class="slip-print-meta">VAI V85 · Mock bana · 2026-07-18 · seed 42</div>
+          <div class="slip-table" id="slip-table"></div>
+          <div class="slip-footer">1&nbsp;000 rader x 0,50 kr = <strong>500,00 kr</strong></div>
+          <div class="slip-legend">
+            Slip: <strong>bold</strong> = operator · <em>italic</em> = system · small number after = win odds
+            (e.g. <strong>3</strong> 5,10). Gaps between horses preserved for scanning.
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <div class="summary-card">
+          <h3>Systemkostnad</h3>
+          <div class="cost-big">500 SEK</div>
+          <p style="margin:6px 0 0;font-size:11px;color:#555">= budget (mock)</p>
+        </div>
+        <div class="summary-card">
+          <h3>Seed</h3>
+          <div style="font-weight:700">42</div>
+        </div>
+        <div class="summary-card">
+          <h3>Träffsannolikhet</h3>
+          <p style="margin:0;font-size:11px;color:#555">Bars unchanged — still use pool shares under the hood.</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="notes">
+      <h3>Layout takeaways</h3>
+      <ul>
+        <li>All <strong>8 legs</strong> in the existing 2-column grid; page scrolls to the slip (same as today).</li>
+        <li>Option A adds ~10–15&nbsp;px height per button; long fields wrap to a second row of horses inside the leg card.</li>
+        <li>Slip shows odds as a small suffix on each start number; operator/system styling only on the number.</li>
+        <li>If true odds missing later: show pool% on buttons and odds as <code>—</code> on slip, or omit odds suffix.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Mock: [leg, raceInfo, horses as {n, pool, odds, state}]
+      // state: '' | 'pool-selected' | 'random-selected' | 'scratched'
+      var legs = [
+        {
+          leg: 1,
+          info: "2140 m · Autostart · Klass I",
+          horses: [
+            { n: 1, p: "18,4%", o: "3,80", s: "pool-selected" },
+            { n: 2, p: "9,1%", o: "7,50", s: "" },
+            { n: 3, p: "14,2%", o: "5,10", s: "random-selected" },
+            { n: 4, p: "6,8%", o: "11,0", s: "" },
+            { n: 5, p: "22,0%", o: "2,90", s: "random-selected" },
+            { n: 6, p: "—", o: "—", s: "scratched" },
+            { n: 7, p: "11,5%", o: "6,20", s: "" },
+            { n: 8, p: "5,2%", o: "14,0", s: "" },
+            { n: 9, p: "4,1%", o: "18,0", s: "random-selected" },
+            { n: 10, p: "3,0%", o: "22,0", s: "" },
+            { n: 11, p: "2,4%", o: "28,0", s: "" },
+            { n: 12, p: "3,3%", o: "20,0", s: "" }
+          ]
+        },
+        {
+          leg: 2,
+          info: "1640 m · Volt · Klass II",
+          horses: [
+            { n: 1, p: "12,0%", o: "6,00", s: "pool-selected" },
+            { n: 2, p: "15,5%", o: "4,80", s: "pool-selected" },
+            { n: 3, p: "8,0%", o: "9,00", s: "random-selected" },
+            { n: 4, p: "20,1%", o: "3,40", s: "" },
+            { n: 5, p: "10,2%", o: "7,20", s: "random-selected" },
+            { n: 6, p: "7,7%", o: "10,0", s: "" },
+            { n: 7, p: "9,0%", o: "8,00", s: "random-selected" },
+            { n: 8, p: "6,5%", o: "12,0", s: "" },
+            { n: 9, p: "5,5%", o: "14,0", s: "" },
+            { n: 10, p: "5,5%", o: "14,0", s: "" }
+          ]
+        },
+        {
+          leg: 3,
+          info: "2140 m · Autostart · Sto",
+          horses: [
+            { n: 1, p: "25,0%", o: "2,60", s: "pool-selected" },
+            { n: 2, p: "11,0%", o: "6,50", s: "" },
+            { n: 3, p: "9,5%", o: "7,80", s: "" },
+            { n: 4, p: "14,0%", o: "5,20", s: "" },
+            { n: 5, p: "8,2%", o: "9,50", s: "" },
+            { n: 6, p: "7,1%", o: "11,0", s: "" },
+            { n: 7, p: "6,0%", o: "13,0", s: "" },
+            { n: 8, p: "5,0%", o: "16,0", s: "" },
+            { n: 9, p: "7,2%", o: "10,5", s: "" },
+            { n: 10, p: "7,0%", o: "11,0", s: "" }
+          ]
+        },
+        {
+          leg: 4,
+          info: "2640 m · Volt · Klass I",
+          horses: [
+            { n: 1, p: "10,0%", o: "7,50", s: "random-selected" },
+            { n: 2, p: "16,0%", o: "4,60", s: "pool-selected" },
+            { n: 3, p: "12,5%", o: "5,80", s: "random-selected" },
+            { n: 4, p: "8,0%", o: "9,20", s: "random-selected" },
+            { n: 5, p: "19,0%", o: "3,70", s: "" },
+            { n: 6, p: "9,5%", o: "7,90", s: "random-selected" },
+            { n: 7, p: "7,0%", o: "11,0", s: "" },
+            { n: 8, p: "6,0%", o: "13,0", s: "" },
+            { n: 9, p: "6,0%", o: "13,0", s: "" },
+            { n: 10, p: "6,0%", o: "13,0", s: "" }
+          ]
+        },
+        {
+          leg: 5,
+          info: "1640 m · Autostart · Unghäst",
+          horses: [
+            { n: 1, p: "13,0%", o: "5,60", s: "random-selected" },
+            { n: 2, p: "17,5%", o: "4,20", s: "pool-selected" },
+            { n: 3, p: "11,0%", o: "6,80", s: "random-selected" },
+            { n: 4, p: "9,0%", o: "8,50", s: "" },
+            { n: 5, p: "14,0%", o: "5,30", s: "random-selected" },
+            { n: 6, p: "8,5%", o: "9,00", s: "" },
+            { n: 7, p: "7,5%", o: "10,5", s: "" },
+            { n: 8, p: "7,0%", o: "11,5", s: "" },
+            { n: 9, p: "6,5%", o: "12,5", s: "" },
+            { n: 10, p: "6,0%", o: "13,5", s: "" }
+          ]
+        },
+        {
+          leg: 6,
+          info: "2140 m · Volt · Klass II",
+          horses: [
+            { n: 1, p: "21,0%", o: "3,20", s: "pool-selected" },
+            { n: 2, p: "10,0%", o: "7,40", s: "random-selected" },
+            { n: 3, p: "12,0%", o: "6,10", s: "random-selected" },
+            { n: 4, p: "15,0%", o: "4,90", s: "" },
+            { n: 5, p: "9,0%", o: "8,20", s: "random-selected" },
+            { n: 6, p: "8,0%", o: "9,40", s: "" },
+            { n: 7, p: "7,0%", o: "11,0", s: "" },
+            { n: 8, p: "6,0%", o: "13,0", s: "" },
+            { n: 9, p: "6,0%", o: "13,0", s: "" },
+            { n: 10, p: "6,0%", o: "13,0", s: "" },
+            { n: 11, p: "—", o: "—", s: "scratched" },
+            { n: 12, p: "5,0%", o: "16,0", s: "" }
+          ]
+        },
+        {
+          leg: 7,
+          info: "1640 m · Autostart · Klass I",
+          horses: [
+            { n: 1, p: "30,0%", o: "2,20", s: "pool-selected" },
+            { n: 2, p: "12,0%", o: "6,00", s: "" },
+            { n: 3, p: "10,0%", o: "7,40", s: "" },
+            { n: 4, p: "9,0%", o: "8,30", s: "" },
+            { n: 5, p: "8,0%", o: "9,50", s: "" },
+            { n: 6, p: "7,0%", o: "11,0", s: "" },
+            { n: 7, p: "6,5%", o: "12,0", s: "" },
+            { n: 8, p: "6,0%", o: "13,0", s: "" },
+            { n: 9, p: "5,5%", o: "14,0", s: "" },
+            { n: 10, p: "6,0%", o: "13,0", s: "" }
+          ]
+        },
+        {
+          leg: 8,
+          info: "2140 m · Volt · Final",
+          horses: [
+            { n: 1, p: "11,0%", o: "6,70", s: "random-selected" },
+            { n: 2, p: "14,0%", o: "5,30", s: "pool-selected" },
+            { n: 3, p: "16,0%", o: "4,50", s: "pool-selected" },
+            { n: 4, p: "10,0%", o: "7,50", s: "random-selected" },
+            { n: 5, p: "9,0%", o: "8,40", s: "random-selected" },
+            { n: 6, p: "8,0%", o: "9,60", s: "" },
+            { n: 7, p: "7,5%", o: "10,5", s: "random-selected" },
+            { n: 8, p: "7,0%", o: "11,5", s: "" },
+            { n: 9, p: "6,5%", o: "12,5", s: "" },
+            { n: 10, p: "5,5%", o: "14,5", s: "" },
+            { n: 11, p: "5,5%", o: "14,5", s: "" }
+          ]
+        }
+      ];
+
+      // Slip picks: which numbers appear + role + odds + optional name for spik
+      var slip = [
+        { leg: 1, picks: [
+          { n: 1, role: "op", o: "3,80" },
+          { n: 3, role: "sys", o: "5,10" },
+          { n: 5, role: "sys", o: "2,90" },
+          { n: 9, role: "sys", o: "18,0" }
+        ]},
+        { leg: 2, picks: [
+          { n: 1, role: "op", o: "6,00" },
+          { n: 2, role: "op", o: "4,80" },
+          { n: 3, role: "sys", o: "9,00" },
+          { n: 5, role: "sys", o: "7,20" },
+          { n: 7, role: "sys", o: "8,00" }
+        ]},
+        { leg: 3, picks: [
+          { n: 1, role: "op", o: "2,60", name: "Mock Super Star" }
+        ]},
+        { leg: 4, picks: [
+          { n: 1, role: "sys", o: "7,50" },
+          { n: 2, role: "op", o: "4,60" },
+          { n: 3, role: "sys", o: "5,80" },
+          { n: 4, role: "sys", o: "9,20" },
+          { n: 6, role: "sys", o: "7,90" }
+        ]},
+        { leg: 5, picks: [
+          { n: 1, role: "sys", o: "5,60" },
+          { n: 2, role: "op", o: "4,20" },
+          { n: 3, role: "sys", o: "6,80" },
+          { n: 5, role: "sys", o: "5,30" }
+        ]},
+        { leg: 6, picks: [
+          { n: 1, role: "op", o: "3,20" },
+          { n: 2, role: "sys", o: "7,40" },
+          { n: 3, role: "sys", o: "6,10" },
+          { n: 5, role: "sys", o: "8,20" }
+        ]},
+        { leg: 7, picks: [
+          { n: 1, role: "op", o: "2,20", name: "Mock Favorite" }
+        ]},
+        { leg: 8, picks: [
+          { n: 1, role: "sys", o: "6,70" },
+          { n: 2, role: "op", o: "5,30" },
+          { n: 3, role: "op", o: "4,50" },
+          { n: 4, role: "sys", o: "7,50" },
+          { n: 5, role: "sys", o: "8,40" },
+          { n: 7, role: "sys", o: "10,5" }
+        ]}
+      ];
+
+      function horseBtn(h) {
+        var cls = "horse" + (h.s ? " " + h.s : "");
+        return (
+          '<button type="button" class="' + cls + '" disabled>' +
+          '<span class="hn">' + h.n + "</span>" +
+          '<span class="meta"><span class="pool">' + h.p + "</span>" +
+          '<span class="odds">' + h.o + "</span></span></button>"
+        );
+      }
+
+      var grid = document.getElementById("legs-grid");
+      grid.innerHTML = legs
+        .map(function (L) {
+          return (
+            '<div class="leg-card">' +
+            '<div class="leg-col">' + L.leg + "</div>" +
+            '<div class="leg-body">' +
+            '<div class="race-info">' + L.info + "</div>" +
+            '<div class="horses">' + L.horses.map(horseBtn).join("") + "</div>" +
+            "</div></div>"
+          );
+        })
+        .join("");
+
+      function slipChip(p) {
+        var role = p.role === "op" ? "op" : "sys";
+        var html =
+          '<span class="slip-chip ' + role + '">' +
+          '<span class="num">' + p.n + "</span>" +
+          '<span class="od">' + p.o + "</span>";
+        if (p.name) {
+          html += '<span class="spik-name">' + p.name + "</span>";
+        }
+        html += "</span>";
+        return html;
+      }
+
+      var table = document.getElementById("slip-table");
+      table.innerHTML = slip
+        .map(function (row) {
+          return (
+            '<div class="slip-row">' +
+            '<div class="slip-row-leg">' + row.leg + "</div>" +
+            '<div class="slip-row-horses"><div class="slip-horses-inner">' +
+            row.picks.map(slipChip).join("") +
+            "</div></div></div>"
+          );
+        })
+        .join("");
+    })();
+  </script>
+</body>
+</html>
