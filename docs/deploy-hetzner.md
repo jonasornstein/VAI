@@ -172,6 +172,41 @@ Dev and production share the **same Hetzner VM** (`dev-server`), with separate t
 
 Avoid logging in as root for routine work. Use `ornstein` + `sudo` for deploy; git operations under `/opt/vai` stay as `sudo -u vai` (see [Rules](#rules-learned-from-production)).
 
+### Browse dev UI from your PC (SSH tunnel)
+
+`python -m vai serve` binds **localhost only** (`127.0.0.1`). It is not public on the internet. **Usual case:** SSH from your PC with a local port forward, then open the browser **on the PC**.
+
+**1. On the server** (as `ornstein`, leave running):
+
+```bash
+cd ~/grok/vai
+source .venv/bin/activate   # if needed
+python -m vai serve --host 127.0.0.1 --port 8766
+```
+
+Use **8766** for the dev clone so it does not clash with production’s app on **8765** (`vai.service`).
+
+**2. On your PC** (PowerShell, Terminal, or Windows OpenSSH):
+
+```bash
+ssh -L 8766:127.0.0.1:8766 ornstein@168.119.155.11
+```
+
+Keep this SSH session open. It forwards PC port `8766` → server `127.0.0.1:8766`.
+
+**3. On your PC browser:**
+
+- http://127.0.0.1:8766/
+
+Optional other local port: `ssh -L 8767:127.0.0.1:8766 …` → http://127.0.0.1:8767/
+
+| URL | What |
+|-----|------|
+| https://vai.ornstein.work/ | Production (`/opt/vai`, nginx → `:8765`) |
+| http://127.0.0.1:8766/ via tunnel | Dev clone `~/grok/vai` |
+
+**Stop:** `Ctrl+C` in the serve terminal; close the SSH tunnel session when done.
+
 ---
 
 ## Related files
@@ -190,5 +225,6 @@ Avoid logging in as root for routine work. Use `ornstein` + `sudo` for deploy; g
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.2 | 2026-07-15 | SSH tunnel from PC to browse dev UI (`-L 8766:127.0.0.1:8766`) |
 | 1.1 | 2026-07-15 | Workstation local-vs-prod — dev `~/grok/vai` as ornstein, prod `/opt/vai` as vai, ship bridge |
 | 1.0 | 2026-07-14 | Initial operator doc — Hetzner + vai.ornstein.work production path |

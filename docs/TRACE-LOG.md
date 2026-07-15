@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-15 | P | ornstein | **V85 Axevalla 2026-07-18 proposal APPROVED** — Hari seed 42, 500 SEK, 1 000 rader; race-day UC-22 Saturday | [proposal.md](../../outbox/proposals/v85/2026-07-18-axevalla/proposal.md) |
+| 2026-07-15 | U | ornstein | **Exit PC to test Mac** — leaving Windows PC session; next verify SSH + tunnel (`-L 8766:…`) and browser from Mac Terminal | [deploy-hetzner.md](./deploy-hetzner.md#browse-dev-ui-from-your-pc-ssh-tunnel) |
+| 2026-07-15 | U | ornstein | **SSH tunnel from PC** — usual case: `ssh -L 8766:127.0.0.1:8766 ornstein@168.119.155.11` then open http://127.0.0.1:8766/ in PC browser (dev serve binds localhost only) | [deploy-hetzner.md](./deploy-hetzner.md#browse-dev-ui-from-your-pc-ssh-tunnel) |
 | 2026-07-15 | P | ornstein | **Release v1.1.4** — horse buttons pool%+odds; slip odds; dark-theme meta colors; production deploy | Tag `v1.1.4`, See [§ Release v1.1.4](#release-v114--2026-07-15) |
 | 2026-07-15 | U | ornstein | **Horse odds UX** — option A buttons (V85 pool% + vinnare odds); slip chips with odds; API `leg_odds` from ATG | `outbox/mockups/…`, `atg_race_card.extract_leg_odds`, server race-card payload |
 | 2026-07-15 | P | ornstein | **Release v1.1.3** — bet slip: operator numbers bold, system numbers italic, five-space gaps | Tag `v1.1.3`, See [§ Release v1.1.3](#release-v113--2026-07-15) |
