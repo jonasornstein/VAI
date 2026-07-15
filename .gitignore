@@ -11,6 +11,7 @@ venv/
 agent-tools/
 terminals/
 README.md.workspace
+mcps/
 
 # Inbox — large or sensitive raw inputs
 inbox/odds/*.csv

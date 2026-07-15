@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-14 |
+| **Last updated** | 2026-07-15 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-15 | U | ornstein | **GitHub check status** — historical Vercel red checks left on old SHAs (cannot scrub in UI); ignore; new `master` HEAD clean after push; no history rewrite | See [§ GitHub cleanup — 2026-07-15](#github-cleanup--2026-07-15) |
+| 2026-07-15 | U | ornstein | **GitHub cleanup** — default branch `master`; remote `main` deleted; Vercel GitHub integration disconnected and VAI project deleted at Vercel; Hetzner-only | See [§ GitHub cleanup — 2026-07-15](#github-cleanup--2026-07-15) |
+| 2026-07-15 | U | ornstein | **Workstation plan (PAUSED)** — Windows → Hetzner Ubuntu SSH; user `ornstein` (sudo); dev `~/grok/vai`; prod stays `/opt/vai` (not `/var/www/html`); Grok CLI + GitHub only; no daily root | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-14 | P | ornstein | **End of session (O&O)** — production live at https://vai.ornstein.work/; Hetzner deploy; Vercel removed | See [§ End of day — 2026-07-14](#end-of-day--2026-07-14) |
 | 2026-07-14 | P | ornstein | **Hetzner production** — `dev-server` 168.119.155.11; nginx + Let's Encrypt; systemd `vai.service` | [deploy-hetzner.md](./deploy-hetzner.md), [`deploy/`](../deploy/) |
 | 2026-07-14 | P | ornstein | **GitHub VAI public** — repo renamed `jonasornstein/VAI`; `master` canonical; `main` synced | https://github.com/jonasornstein/VAI |
@@ -111,6 +114,79 @@ Dynamic programming over k = 0..8:
 - Not utdelning, EV, or guaranteed return
 - Full quantitative model deferred to UC-13
 - Hidden when `leg_distributions` missing (manual YAML / no ATG bet %)
+
+---
+
+## GitHub cleanup — 2026-07-15
+
+**AIRUP:** Update  
+**Actor:** ornstein (+ assistant for remote `main` delete)
+
+### Done
+
+| Item | Result |
+|------|--------|
+| Default branch | Set to **`master`** on GitHub |
+| Remote branch `main` | **Deleted** (`git push origin --delete main`); local `main` removed |
+| Remote branches remaining | **`master` only** |
+| Vercel GitHub integration | **Disconnected** |
+| Vercel project | **VAI project deleted** at Vercel |
+| Production host | Unchanged — Hetzner https://vai.ornstein.work/ via `/opt/vai` |
+
+### Notes
+
+- Failed Vercel status on older commits may remain in history; new pushes should not create Vercel checks.
+- Deploy path unchanged: `origin/master` → `deploy/update-server.sh`.
+- Repo artifact removal for Vercel was earlier (`9102c4e`); this entry is integration + branch hygiene.
+
+### Check status (commit checks UI)
+
+| Decision | Detail |
+|----------|--------|
+| **Historical Vercel “Deployment has failed”** | Stored on old commit SHAs; **no bulk delete** in GitHub UI after disconnect |
+| **Policy** | **Ignore** red checks on past commits — archaeological only; do not force-push history to scrub |
+| **Going forward** | New commits on `master` must not get Vercel checks (integration + project already removed) |
+| **Practical clean tip** | Next normal push to `master` makes **HEAD** the day-to-day view; empty checks on tip is fine |
+| **Also verify manually** | Apps / webhooks / branch-protection required checks / Deployments list — remove Vercel leftovers if any |
+| **Not done** | History rewrite, re-adding Vercel to “pass” checks |
+
+---
+
+## Workstation migration plan — 2026-07-15
+
+**Status:** PAUSED — decision recorded; Ubuntu user/clone/execute deferred (ornstein checking other items first).  
+**AIRUP:** Analyze / Update (planning only; no Publish of new prod path).
+
+### Decisions locked
+
+| Topic | Choice |
+|-------|--------|
+| Daily SSH user | **`ornstein`** (group `sudo`); not root |
+| Service user | **`vai`** (unchanged; owns `/opt/vai`) |
+| Development path | `/home/ornstein/grok/vai` |
+| Production path | **`/opt/vai`** — do **not** use `/var/www/html/vai` |
+| Deploy bridge | GitHub `master` → `sudo bash /opt/vai/deploy/update-server.sh` |
+| Tools on new workstation | Grok Build CLI + Git + SSH only (no Cursor/Vercel/Obsidian) |
+| Same VM for dev+prod | Yes, with path and user separation |
+
+### Why not `/var/www/html`
+
+VAI is `python -m vai serve` behind nginx proxy, not static files. Existing install/systemd paths assume `/opt/vai`.
+
+### Why not daily root
+
+Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricted root, SSH attack surface.
+
+### Pre-execute gate (still open)
+
+Before creating `ornstein` / cloning on the server: commit and push any Windows-only files still needed (checked 2026-07-15: uncommitted `.gitignore` `mcps/`, possible `TRACE-LOG` noise, untracked `docs/Rename-ATG-to-VAI.md`). Pushed commits were already at `origin/master` `8e0f209`.
+
+### Resume later
+
+1. Clean git gate on Windows (or from whatever is source of truth).  
+2. As root once: `adduser ornstein`, `usermod -aG sudo`, SSH keys.  
+3. As ornstein: clone `~/grok/vai`, venv, Grok CLI.  
+4. Optional: refresh [deploy-hetzner.md](./deploy-hetzner.md) “local vs production” for Ubuntu SSH workstation.
 
 ---
 
