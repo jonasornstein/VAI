@@ -14,9 +14,12 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-15 | U | ornstein | **Workstation Phase 2 complete** — `which grok` → `~/.grok/bin/grok`; 0.2.101; clone + 38 tests; PATH fixed | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
+| 2026-07-15 | U | ornstein | **Workstation Phase 2** — dev clone `/home/ornstein/grok/vai` @ `0223f67`; venv; 38 tests pass; Grok CLI 0.2.101 installed | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
+| 2026-07-15 | U | ornstein | **Workstation migration RESUMED** — Phase 0 pushed (`0223f67`); Phase 1 user `ornstein` + SSH; Phase 2 clone | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-15 | U | ornstein | **GitHub check status** — historical Vercel red checks left on old SHAs (cannot scrub in UI); ignore; new `master` HEAD clean after push; no history rewrite | See [§ GitHub cleanup — 2026-07-15](#github-cleanup--2026-07-15) |
 | 2026-07-15 | U | ornstein | **GitHub cleanup** — default branch `master`; remote `main` deleted; Vercel GitHub integration disconnected and VAI project deleted at Vercel; Hetzner-only | See [§ GitHub cleanup — 2026-07-15](#github-cleanup--2026-07-15) |
-| 2026-07-15 | U | ornstein | **Workstation plan (PAUSED)** — Windows → Hetzner Ubuntu SSH; user `ornstein` (sudo); dev `~/grok/vai`; prod stays `/opt/vai` (not `/var/www/html`); Grok CLI + GitHub only; no daily root | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
+| 2026-07-15 | U | ornstein | **Workstation plan (logged)** — Windows → Hetzner Ubuntu SSH; user `ornstein` (sudo); dev `~/grok/vai`; prod stays `/opt/vai` (not `/var/www/html`); Grok CLI + GitHub only; no daily root | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-14 | P | ornstein | **End of session (O&O)** — production live at https://vai.ornstein.work/; Hetzner deploy; Vercel removed | See [§ End of day — 2026-07-14](#end-of-day--2026-07-14) |
 | 2026-07-14 | P | ornstein | **Hetzner production** — `dev-server` 168.119.155.11; nginx + Let's Encrypt; systemd `vai.service` | [deploy-hetzner.md](./deploy-hetzner.md), [`deploy/`](../deploy/) |
 | 2026-07-14 | P | ornstein | **GitHub VAI public** — repo renamed `jonasornstein/VAI`; `master` canonical; `main` synced | https://github.com/jonasornstein/VAI |
@@ -154,8 +157,8 @@ Dynamic programming over k = 0..8:
 
 ## Workstation migration plan — 2026-07-15
 
-**Status:** PAUSED — decision recorded; Ubuntu user/clone/execute deferred (ornstein checking other items first).  
-**AIRUP:** Analyze / Update (planning only; no Publish of new prod path).
+**Status:** **Phase 0–2 complete** — Grok CLI verified on server (`which grok`, 0.2.101).  
+**AIRUP:** Update (ops / workstation; production path unchanged).
 
 ### Decisions locked
 
@@ -177,16 +180,27 @@ VAI is `python -m vai serve` behind nginx proxy, not static files. Existing inst
 
 Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricted root, SSH attack surface.
 
-### Pre-execute gate (still open)
+### Progress
 
-Before creating `ornstein` / cloning on the server: commit and push any Windows-only files still needed (checked 2026-07-15: uncommitted `.gitignore` `mcps/`, possible `TRACE-LOG` noise, untracked `docs/Rename-ATG-to-VAI.md`). Pushed commits were already at `origin/master` `8e0f209`.
+| Phase | Item | Status |
+|-------|------|--------|
+| 0 | Git gate — TRACE-LOG + `.gitignore` (`mcps/`) on GitHub | **Done** — `0223f67` |
+| 0 | `docs/Rename-ATG-to-VAI.md` | Left untracked on Windows (optional) |
+| 1 | Linux user `ornstein` + sudo | **Done** (`ornstein` in group `sudo`) |
+| 1 | SSH as ornstein from Windows | **Done** (key login works) |
+| 2 | Clone `/home/ornstein/grok/vai` | **Done** — `master` @ `0223f67` |
+| 2 | Python venv + `pip install -e '.[dev]'` | **Done** (Python 3.12.3) |
+| 2 | `pytest -q` | **Done** — **38 passed** |
+| 2 | Grok Build CLI install | **Done** — 0.2.101 at `~/.grok/bin/grok` |
+| 2 | PATH / `which grok` | **Done** — operator verified `/home/ornstein/.grok/bin/grok` |
+| 2 | Grok CLI session auth | Operator confirmed CLI runs; complete login in TUI if prompted |
+| 3 | Optional `deploy-hetzner.md` local-vs-prod refresh | Pending |
 
-### Resume later
+### Next
 
-1. Clean git gate on Windows (or from whatever is source of truth).  
-2. As root once: `adduser ornstein`, `usermod -aG sudo`, SSH keys.  
-3. As ornstein: clone `~/grok/vai`, venv, Grok CLI.  
-4. Optional: refresh [deploy-hetzner.md](./deploy-hetzner.md) “local vs production” for Ubuntu SSH workstation.
+1. Day-to-day: develop in `~/grok/vai` as `ornstein` with `grok`; ship with `git push` + `sudo bash /opt/vai/deploy/update-server.sh`.  
+2. Optional Phase 3: update [deploy-hetzner.md](./deploy-hetzner.md) for Ubuntu workstation paths.  
+3. Push local TRACE-LOG updates from Windows when convenient.
 
 ---
 
