@@ -39,7 +39,7 @@ def main() -> int:
 
         ok = (
             state["headline"] == "VAI V85"
-            and state["pageTitle"] == "VAI V85 — Local UI v1.1.2"
+            and state["pageTitle"] == "VAI V85 — Local UI v1.1.3"
             and state["logoTitle"] == "VAI V85"
             and state["spelform"] == "V85"
             and state["spelformOptions"] == ["V85"]

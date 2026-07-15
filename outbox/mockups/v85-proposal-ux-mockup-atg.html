@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.1.2</title>
+  <title>VAI V85 — Local UI v1.1.3</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -491,6 +491,16 @@
       line-height: 1.35;
       background: #fff;
     }
+    .slip-row-horses .slip-horses-inner {
+      /* Single flex child so spaces between <strong> numbers are not dropped */
+      min-width: 0;
+    }
+    .slip-row-horses .slip-horse-op {
+      font-weight: 700;
+    }
+    .slip-row-horses .slip-horse-sys {
+      font-style: italic;
+    }
     .slip-footer {
       background: #f2efe8;
       border-top: 1px solid #e0ddd6;
@@ -744,7 +754,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.1.2 Local UI · Random · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.1.3 Local UI · Random · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -784,7 +794,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.1.2</span>
+        <span class="game-header__pill">v1.1.3</span>
       </div>
     </header>
 
@@ -911,7 +921,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.1.2 Local UI · Random · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.1.3 Local UI · Random · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -1143,7 +1153,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.1.2";
+        document.title = title + " — Local UI v1.1.3";
         var logo = document.getElementById("app-logo");
         if (logo) logo.setAttribute("title", title);
         updateOpenAtgButton();
@@ -1330,28 +1340,46 @@
         }).join("");
       }
 
-      function formatSlipLegHorses(legNum, horses) {
+      function formatSlipHorseNum(num, operatorSet) {
+        var s = String(num);
+        if (operatorSet && operatorSet.has(num)) {
+          return '<strong class="slip-horse-op">' + s + "</strong>";
+        }
+        return '<em class="slip-horse-sys">' + s + "</em>";
+      }
+
+      function formatSlipLegHorses(legNum, horses, operatorSet) {
+        operatorSet = operatorSet || new Set();
         if (horses.length === 1) {
           var num = horses[0];
           var legData = currentCard && currentCard.legs ? currentCard.legs[legNum - 1] : null;
           var names = (legData && legData.horse_names) || {};
           var name = names[String(num)] || names[num];
-          return name ? num + " " + name : String(num);
+          var numHtml = formatSlipHorseNum(num, operatorSet);
+          return name ? numHtml + " " + name : numHtml;
         }
-        return horses.join(" ");
+        // Five non-breaking spaces: flex + normal HTML would collapse plain spaces
+        // between adjacent <strong> operator numbers.
+        return horses
+          .map(function (n) {
+            return formatSlipHorseNum(n, operatorSet);
+          })
+          .join("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
       }
 
-      function renderSlip(selections, seed) {
+      function renderSlip(selections, seed, operatorPools) {
         var grid = document.getElementById("slip-grid");
         grid.innerHTML = "";
+        operatorPools = operatorPools || {};
         for (var i = 1; i <= 8; i++) {
           var horses = selections[String(i)] || selections[i] || [];
-          var text = formatSlipLegHorses(i, horses);
+          var operatorSet = new Set(operatorPools[String(i)] || operatorPools[i] || []);
+          var text = formatSlipLegHorses(i, horses, operatorSet);
           var row = document.createElement("div");
           row.className = "slip-row";
           row.innerHTML =
             '<div class="slip-row-leg">' + i + '</div>' +
-            '<div class="slip-row-horses">' + text + "</div>";
+            '<div class="slip-row-horses"><span class="slip-horses-inner">' + text + "</span></div>";
           grid.appendChild(row);
         }
         slipReady = true;
@@ -1491,7 +1519,7 @@
               return;
             }
             applyGeneratedSelections(operatorPools, res.j.selections);
-            renderSlip(res.j.selections, res.j.seed);
+            renderSlip(res.j.selections, res.j.seed, operatorPools);
             updateCost(res.j, budget);
           })
           .catch(function (e) {

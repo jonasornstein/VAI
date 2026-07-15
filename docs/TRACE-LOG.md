@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-15 | P | ornstein | **Release v1.1.3** — bet slip: operator numbers bold, system numbers italic, five-space gaps | Tag `v1.1.3`, See [§ Release v1.1.3](#release-v113--2026-07-15) |
+| 2026-07-15 | U | ornstein | **Bet slip UX** — operator horse numbers **bold**, system/random numbers *italic*; five-space gap between numbers (nbsp + inner span so flex keeps gaps) | `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
+| 2026-07-15 | U | ornstein | **Ready on new dev machine** — Hetzner Ubuntu as `ornstein`; Grok CLI; clone `~/grok/vai`; GitHub SSH push works (`fd20da0`); ship path documented | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-15 | U | ornstein | **Workstation Phase 3** — `deploy-hetzner.md` local-vs-prod refresh (dev `~/grok/vai` / prod `/opt/vai`); related notes in `deploy/README.md` | [deploy-hetzner.md](./deploy-hetzner.md), See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-15 | U | ornstein | **Workstation Phase 2 complete** — `which grok` → `~/.grok/bin/grok`; 0.2.101; clone + 38 tests; PATH fixed | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-15 | U | ornstein | **Workstation Phase 2** — dev clone `/home/ornstein/grok/vai` @ `0223f67`; venv; 38 tests pass; Grok CLI 0.2.101 installed | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
@@ -158,7 +161,7 @@ Dynamic programming over k = 0..8:
 
 ## Workstation migration plan — 2026-07-15
 
-**Status:** **Phase 0–3 complete** — Grok CLI verified; local-vs-prod docs refreshed.  
+**Status:** **COMPLETE — ornstein ready to work on new dev machine** (Phase 0–3 + GitHub SSH).  
 **AIRUP:** Update (ops / workstation; production path unchanged).
 
 ### Decisions locked
@@ -196,11 +199,14 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 | 2 | PATH / `which grok` | **Done** — operator verified `/home/ornstein/.grok/bin/grok` |
 | 2 | Grok CLI session auth | Operator confirmed CLI runs; complete login in TUI if prompted |
 | 3 | `deploy-hetzner.md` local-vs-prod refresh | **Done** — v1.1; also `deploy/README.md` primary vs fallback |
+| 4 | GitHub SSH as `ornstein` + push | **Done** — `ssh -T git@github.com` OK; remote `git@…/VAI.git`; `2819d2e..fd20da0` on `master` |
+| — | **ornstein ready on new dev machine** | **Yes** — daily work on Hetzner Ubuntu (`dev-server`) |
 
-### Next
+### Day-to-day (locked)
 
-1. Day-to-day: develop in `~/grok/vai` as `ornstein` with `grok`; ship with `git push origin master` + `sudo bash /opt/vai/deploy/update-server.sh`.  
-2. Push ops doc updates to GitHub when convenient so production `/opt/vai` can pull them via the ship path.
+1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
+2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
+3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
 
 ---
 
@@ -248,6 +254,26 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 - Server updates: `bash /opt/vai/deploy/update-server.sh` (git as `vai`, not root).
 - `curl -I` and browser GET both return 200 after HEAD fix.
 - Local dev unchanged: `python -m vai serve` → http://127.0.0.1:8765/
+
+---
+
+## Release v1.1.3 — 2026-07-15
+
+**Product line:** Hari (random) local UI patch on v1.1. **v1.2** remains reserved for reduced-stake (UC-14 §3a) and ATG disk cache.
+
+### Shipped
+
+| Area | Change |
+|------|--------|
+| UX | Bet slip: operator-selected horse numbers **bold** (`.slip-horse-op`) |
+| UX | Bet slip: system/random horse numbers *italic* (`.slip-horse-sys`) |
+| UX | Bet slip: five-space gaps between numbers (`&nbsp;` × 5 + inner span so flex keeps gaps) |
+| Package | `pyproject.toml` / `vai.__version__` → **1.1.3** |
+
+### Verification
+
+- Operator confirmed bold/italic/spacing on Genererat spel
+- Local UI: `python -m vai serve` → http://127.0.0.1:8765/ (prod after deploy)
 
 ---
 
