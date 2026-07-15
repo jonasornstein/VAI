@@ -4,7 +4,7 @@
 |-------|-------|
 | **Status** | APPROVED |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-14 |
+| **Last updated** | 2026-07-15 |
 | **Production URL** | https://vai.ornstein.work/ |
 | **Server** | Hetzner Ubuntu — `168.119.155.11` (`dev-server`) |
 | **GitHub** | https://github.com/jonasornstein/VAI.git (public, branch `master`) |
@@ -83,12 +83,13 @@ Expect **`active (running)`** and **`200`** for both curls. Open https://vai.orn
 
 ## Update after pushing to GitHub
 
-Run on the server as **root** after you push to `master` on your PC.
+Day-to-day: develop and push from the **dev clone** (`/home/ornstein/grok/vai` as `ornstein`), then on the same server run the update with **sudo** (not a daily root shell).
 
 ### Standard update (recommended)
 
 ```bash
-bash /opt/vai/deploy/update-server.sh
+# as ornstein, after: git push origin master
+sudo bash /opt/vai/deploy/update-server.sh
 ```
 
 ### Manual update (same steps)
@@ -97,7 +98,7 @@ bash /opt/vai/deploy/update-server.sh
 sudo -u vai git -C /opt/vai fetch origin master
 sudo -u vai git -C /opt/vai reset --hard origin/master
 sudo -u vai /opt/vai/.venv/bin/pip install -e /opt/vai
-systemctl restart vai
+sudo systemctl restart vai
 ```
 
 ### Verify after update
@@ -145,11 +146,31 @@ ufw enable
 
 ## Local development vs production
 
-| | Local (PC) | Production (Hetzner) |
-|--|------------|----------------------|
-| Start | `python -m vai serve` | `systemctl start vai` |
+Dev and production share the **same Hetzner VM** (`dev-server`), with separate trees and users.
+
+| | Development (workstation) | Production |
+|--|---------------------------|------------|
+| Host | Same Hetzner VM (`dev-server`) | Same VM |
+| Path | `/home/ornstein/grok/vai` | `/opt/vai` |
+| User | `ornstein` (sudo when needed) | `vai` (systemd) |
+| Start | `python -m vai serve` (venv) | `systemctl start vai` |
 | URL | http://127.0.0.1:8765/ | https://vai.ornstein.work/ |
-| Update code | `git pull` on PC | `deploy/update-server.sh` on server |
+| Update code | work on `master` / `git pull` | `sudo bash /opt/vai/deploy/update-server.sh` |
+| Tools | Grok CLI + Git + SSH | nginx + `vai.service` |
+
+**Same VM, separate trees**
+
+- Develop only under `/home/ornstein/grok/vai` — do **not** edit or `git pull` as your daily workflow inside `/opt/vai`.
+- Do **not** install the app under `/var/www/html` (VAI is not static files; install and systemd assume `/opt/vai`).
+
+**Ship path**
+
+1. As `ornstein`: develop in `~/grok/vai`, then `git push origin master`.
+2. Still as `ornstein`: `sudo bash /opt/vai/deploy/update-server.sh` (script runs git as user `vai`).
+
+**Daily root**
+
+Avoid logging in as root for routine work. Use `ornstein` + `sudo` for deploy; git operations under `/opt/vai` stay as `sudo -u vai` (see [Rules](#rules-learned-from-production)).
 
 ---
 
@@ -169,4 +190,5 @@ ufw enable
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.1 | 2026-07-15 | Workstation local-vs-prod — dev `~/grok/vai` as ornstein, prod `/opt/vai` as vai, ship bridge |
 | 1.0 | 2026-07-14 | Initial operator doc — Hetzner + vai.ornstein.work production path |

@@ -4,11 +4,13 @@
 
 Runs `python -m vai serve` behind nginx. The app binds to `127.0.0.1:8765`; nginx proxies public traffic (HTTPS on production).
 
+**Day-to-day (primary):** develop on the same Ubuntu host at `/home/ornstein/grok/vai` as user `ornstein`, push `master` to GitHub, then ship with `sudo bash /opt/vai/deploy/update-server.sh`. See [local development vs production](../docs/deploy-hetzner.md#local-development-vs-production).
+
 ## Prerequisites
 
 - Ubuntu 22.04 or 24.04
-- Root SSH access
-- GitHub repo cloned (default: `https://github.com/jonasornstein/VAI.git`)
+- Root or sudo for first-time install and deploy updates
+- GitHub repo (default: `https://github.com/jonasornstein/VAI.git`)
 
 ## Quick install (public GitHub repo)
 
@@ -20,28 +22,28 @@ export VAI_SERVER_NAME=your.domain.example   # or server IP
 sudo bash deploy/install-ubuntu.sh
 ```
 
-## Private repo / no GitHub login
+## Fallback: offline copy (no GitHub on the server)
 
-If the repo is private (or you cannot sign in to GitHub), copy the project from your PC — no GitHub on the server.
+Rare path when the repo is private or the server cannot reach GitHub. Prefer the public-repo install above when possible.
 
-**On your PC** (PowerShell; you only need Hetzner SSH access):
-
-```powershell
-cd "C:\Users\jonte\OneDrive\grok\vai"
-tar -czf vai-deploy.tgz --exclude=.git --exclude=__pycache__ --exclude=.venv --exclude=mcps .
-scp vai-deploy.tgz root@168.119.155.11:/tmp/
-```
-
-**On the Hetzner server** (SSH or web console):
+**From a machine that has the tree** (example; adjust path):
 
 ```bash
-mkdir -p /opt/vai
-tar -xzf /tmp/vai-deploy.tgz -C /opt/vai
-export VAI_SERVER_NAME=168.119.155.11
-bash /opt/vai/deploy/install-ubuntu-local.sh
+cd /path/to/vai
+tar -czf vai-deploy.tgz --exclude=.git --exclude=__pycache__ --exclude=.venv --exclude=mcps .
+scp vai-deploy.tgz ornstein@168.119.155.11:/tmp/
 ```
 
-Then open http://168.119.155.11/
+**On the Hetzner server:**
+
+```bash
+sudo mkdir -p /opt/vai
+sudo tar -xzf /tmp/vai-deploy.tgz -C /opt/vai
+export VAI_SERVER_NAME=168.119.155.11
+sudo bash /opt/vai/deploy/install-ubuntu-local.sh
+```
+
+Then open http://168.119.155.11/ (or the configured domain after TLS).
 
 ## Manual steps
 
@@ -66,11 +68,13 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ## Update after git push
 
+From the workstation (as `ornstein`), after `git push origin master`:
+
 ```bash
-bash /opt/vai/deploy/update-server.sh
+sudo bash /opt/vai/deploy/update-server.sh
 ```
 
-See [docs/deploy-hetzner.md](../docs/deploy-hetzner.md) for the full update workflow.
+See [docs/deploy-hetzner.md](../docs/deploy-hetzner.md) for the full update workflow and local-vs-production layout.
 
 ## Custom domain + HTTPS (vai.ornstein.work)
 

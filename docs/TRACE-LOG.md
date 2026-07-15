@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-15 | U | ornstein | **Workstation Phase 3** — `deploy-hetzner.md` local-vs-prod refresh (dev `~/grok/vai` / prod `/opt/vai`); related notes in `deploy/README.md` | [deploy-hetzner.md](./deploy-hetzner.md), See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-15 | U | ornstein | **Workstation Phase 2 complete** — `which grok` → `~/.grok/bin/grok`; 0.2.101; clone + 38 tests; PATH fixed | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-15 | U | ornstein | **Workstation Phase 2** — dev clone `/home/ornstein/grok/vai` @ `0223f67`; venv; 38 tests pass; Grok CLI 0.2.101 installed | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
 | 2026-07-15 | U | ornstein | **Workstation migration RESUMED** — Phase 0 pushed (`0223f67`); Phase 1 user `ornstein` + SSH; Phase 2 clone | See [§ Workstation migration plan — 2026-07-15](#workstation-migration-plan--2026-07-15) |
@@ -157,7 +158,7 @@ Dynamic programming over k = 0..8:
 
 ## Workstation migration plan — 2026-07-15
 
-**Status:** **Phase 0–2 complete** — Grok CLI verified on server (`which grok`, 0.2.101).  
+**Status:** **Phase 0–3 complete** — Grok CLI verified; local-vs-prod docs refreshed.  
 **AIRUP:** Update (ops / workstation; production path unchanged).
 
 ### Decisions locked
@@ -194,13 +195,12 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 | 2 | Grok Build CLI install | **Done** — 0.2.101 at `~/.grok/bin/grok` |
 | 2 | PATH / `which grok` | **Done** — operator verified `/home/ornstein/.grok/bin/grok` |
 | 2 | Grok CLI session auth | Operator confirmed CLI runs; complete login in TUI if prompted |
-| 3 | Optional `deploy-hetzner.md` local-vs-prod refresh | Pending |
+| 3 | `deploy-hetzner.md` local-vs-prod refresh | **Done** — v1.1; also `deploy/README.md` primary vs fallback |
 
 ### Next
 
-1. Day-to-day: develop in `~/grok/vai` as `ornstein` with `grok`; ship with `git push` + `sudo bash /opt/vai/deploy/update-server.sh`.  
-2. Optional Phase 3: update [deploy-hetzner.md](./deploy-hetzner.md) for Ubuntu workstation paths.  
-3. Push local TRACE-LOG updates from Windows when convenient.
+1. Day-to-day: develop in `~/grok/vai` as `ornstein` with `grok`; ship with `git push origin master` + `sudo bash /opt/vai/deploy/update-server.sh`.  
+2. Push ops doc updates to GitHub when convenient so production `/opt/vai` can pull them via the ship path.
 
 ---
 
