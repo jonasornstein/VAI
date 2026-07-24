@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-15 |
+| **Last updated** | 2026-07-24 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-24 | P | ornstein | **End of session** — Expert v1.3.0 live on production; TRACE-LOG closed | See [§ End of session — 2026-07-24](#end-of-session--2026-07-24) |
+| 2026-07-24 | P | ornstein | **Production deploy v1.3.0** — Expert mode on https://vai.ornstein.work/ (`update-server.sh` as root) | `fa09597`, See [§ Release v1.3.0](#release-v130--2026-07-24) |
+| 2026-07-24 | P | Assistant | **Release commit + push** — `fa09597` Expert betslip catalog (UC-12) on `origin/master` | https://github.com/jonasornstein/VAI |
 | 2026-07-15 | I | ornstein | **Experts Travet research** — directory of free V85 systems, named spelläggare, andelsspel markets | [2026-07-15-experts-travet.md](../../inbox/research/2026-07-15-experts-travet.md) |
 | 2026-07-15 | U | Assistant | **Expert roster expanded** from Travet research → `experts.yaml` + expert.md v0.3 | [experts.yaml](../../src/vai/strategies/experts.yaml), [expert.md](./strategies/expert.md) |
 | 2026-07-15 | P | Assistant | **UC-12 Expert betslips v1.3** — list/select professional tips (YAML inbox); API + CLI + Expert tab; F-040–043 remapped; fixture tip Axevalla | [expert-v1.md](../../outbox/specs/expert-v1.md), [expert.md](./strategies/expert.md) |
@@ -215,6 +218,75 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-24
+
+**Session owner:** ornstein  
+**Git:** `origin/master` @ `fa09597` (Expert release); TRACE-LOG close-out may be a follow-up commit  
+**Production:** https://vai.ornstein.work/ — **v1.3.0** deployed (ornstein as root + `update-server.sh`)  
+**Dev:** `/home/ornstein/grok/vai` · serve default port **8766** (prod uses **8765**)
+
+### Completed this arc (Expert / UC-12)
+
+| Phase | Deliverable | Status |
+|-------|-------------|--------|
+| A / product | Expert = **select published betslips** (not spik/halvleg pattern engine) | Done |
+| I | Travet experts research inbox → `inbox/research/2026-07-15-experts-travet.*` | Done |
+| R | UC-12 rewrite, `expert-v1.md`, `docs/strategies/expert.md` v0.3 | Done |
+| Code | Tip YAML I/O, `generate_expert_v1`, CLI `expert list/apply` | Done |
+| API | `GET /api/v1/experts`, `GET /api/v1/expert-tips`, `POST /api/v1/generate/expert` | Done |
+| UX | Expert tab: roster, tips list, load tip, **edit horses**, live cost/slip, dark theme | Done |
+| Roster | ~30 experts in `experts.yaml` (Goop, Referenten, Travstugan, Leboff, …) | Done |
+| Ops | SSH tunnel docs verified; dev port default **8766** | Done |
+| P | Commit `fa09597` + push + **production deploy v1.3.0** | Done ✓ |
+
+### Verified on production (2026-07-24)
+
+- https://vai.ornstein.work/ serves **v1.3.0**
+- `GET /api/v1/experts` → **200** (roster JSON)
+- Expert tab enabled (no longer “Kommer senare”)
+
+### Open for next session
+
+| Item | Owner |
+|------|--------|
+| Next Saturday V85 — Hari and/or Expert; UC-22 entry | Kricke / ornstein |
+| Transcribe **real** expert tips into `inbox/expert-tips/` (fixture only today) | ornstein |
+| Optional: commit this TRACE-LOG close-out + redeploy if needed | ornstein |
+| **v1.2** — reduced-stake (UC-14 §3a); ATG disk cache | Povl |
+| Housekeeping — archive duplicate `pending/` copies of published artifacts | Assistant |
+| OI-004 — Spelstopp after Sept 2026 schedule change | Nisse |
+
+### Notes
+
+- **Ingestion remains manual** (YAML transcription); no ATG tip scrape in v1.3.
+- Daily work as **`ornstein`**; deploy as root/`sudo` only when shipping.
+- Tunnel for unreleased dev: `ssh -L 8766:127.0.0.1:8766 ornstein@168.119.155.11` then http://127.0.0.1:8766/
+
+---
+
+## Release v1.3.0 — 2026-07-24
+
+**Product line:** Expert mode (UC-12 betslip catalog) + Hari unchanged. **v1.2** still reserved for reduced-stake / ATG disk cache.
+
+### Shipped
+
+| Area | Change |
+|------|--------|
+| Mode | Expert tab: list/select professional tips; load full 8-leg system |
+| Data | `inbox/expert-tips/` YAML schema; fixture tip Axevalla 2026-07-18 |
+| Roster | `src/vai/strategies/experts.yaml` + `GET /api/v1/experts` |
+| UX | Edit horses after load; auto + **Uppdatera spelkvitto**; dark theme for Expert |
+| API/CLI | `generate/expert`, `expert-tips`; `python -m vai expert list\|apply` |
+| Package | `pyproject.toml` / `vai.__version__` → **1.3.0** |
+| Specs | `outbox/specs/expert-v1.md`; UC-12, expert.md, functions F-040–043 remapped |
+
+### Commit / deploy
+
+- Commit: `fa09597`
+- Deploy: `bash /opt/vai/deploy/update-server.sh` (ornstein as root) → https://vai.ornstein.work/
 
 ---
 
