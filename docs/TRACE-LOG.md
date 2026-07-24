@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-15 | I | ornstein | **Experts Travet research** — directory of free V85 systems, named spelläggare, andelsspel markets | [2026-07-15-experts-travet.md](../../inbox/research/2026-07-15-experts-travet.md) |
+| 2026-07-15 | U | Assistant | **Expert roster expanded** from Travet research → `experts.yaml` + expert.md v0.3 | [experts.yaml](../../src/vai/strategies/experts.yaml), [expert.md](./strategies/expert.md) |
+| 2026-07-15 | P | Assistant | **UC-12 Expert betslips v1.3** — list/select professional tips (YAML inbox); API + CLI + Expert tab; F-040–043 remapped; fixture tip Axevalla | [expert-v1.md](../../outbox/specs/expert-v1.md), [expert.md](./strategies/expert.md) |
 | 2026-07-15 | P | ornstein | **V85 Axevalla 2026-07-18 proposal APPROVED** — Hari seed 42, 500 SEK, 1 000 rader; race-day UC-22 Saturday | [proposal.md](../../outbox/proposals/v85/2026-07-18-axevalla/proposal.md) |
 | 2026-07-15 | U | ornstein | **Exit PC to test Mac** — leaving Windows PC session; next verify SSH + tunnel (`-L 8766:…`) and browser from Mac Terminal | [deploy-hetzner.md](./deploy-hetzner.md#browse-dev-ui-from-your-pc-ssh-tunnel) |
 | 2026-07-15 | U | ornstein | **SSH tunnel from PC** — usual case: `ssh -L 8766:127.0.0.1:8766 ornstein@168.119.155.11` then open http://127.0.0.1:8766/ in PC browser (dev serve binds localhost only) | [deploy-hetzner.md](./deploy-hetzner.md#browse-dev-ui-from-your-pc-ssh-tunnel) |

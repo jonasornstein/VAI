@@ -1,0 +1,269 @@
+# Static expert roster (display metadata). Tip YAML may override expert_name.
+# Source research: inbox/research/2026-07-15-experts-travet.md (mid-2026 snapshot).
+# Priority: free weekly systems first; andelsspel/paid listed for operator awareness.
+
+experts:
+  # --- Official / ATG ---
+  - expert_id: bjorn-goop
+    display_name: Björn Goop
+    product_name: Björnkollen
+    outlet: ATG
+    source_url: https://www.atg.se/V85/tips/bjornkollen-v85-lordag
+    notes: Per-omgång analysis; often analysis-heavy vs full rad
+    publishes_full_system: partial
+    free: true
+
+  - expert_id: krillekrukan
+    display_name: Christer "Krillekrukan" Eriksson
+    product_name: KorsDragaren
+    outlet: ATG
+    source_url: https://www.atg.se/V85/tips/
+    notes: Early system angles on ATG V85 tips
+    publishes_full_system: partial
+    free: true
+
+  - expert_id: atg-mixen
+    display_name: ATG V85 Mixen
+    product_name: V85 Mixen
+    outlet: ATG
+    source_url: https://www.atg.se/V85/tips/
+    notes: Official tip mix hub
+    publishes_full_system: partial
+    free: true
+
+  - expert_id: fem-tippar
+    display_name: Fem Tippar V85
+    product_name: Fem Tippar
+    outlet: ATG / media
+    source_url: https://www.atg.se/V85/tips/
+    notes: Four actives + guest tipster each omgång
+    publishes_full_system: partial
+    free: true
+
+  - expert_id: vass-eller-kass
+    display_name: Vass eller Kass
+    product_name: Vass eller Kass
+    outlet: ATG / media
+    source_url: https://www.gratistravtips.se/
+    notes: Which favorites hold / get cut
+    publishes_full_system: partial
+    free: true
+
+  # --- Free weekly systems (priority for VAI transcription) ---
+  - expert_id: referenten
+    display_name: Albin "Referenten" Engdahl
+    product_name: Travcash / Travcashpodden
+    outlet: Travcash
+    source_url: https://travcash.se/v85-tips/
+    notes: Full V85 analysis + systems; builds systems live in podd
+    publishes_full_system: true
+    free: true
+
+  - expert_id: albin-kjellberg
+    display_name: Albin Kjellberg
+    product_name: Travcash
+    outlet: Travcash
+    source_url: https://travcash.se/
+    notes: Co-founder; tips, systems, andelar
+    publishes_full_system: true
+    free: true
+
+  - expert_id: helena-holm
+    display_name: Helena Holm
+    product_name: Travcash andelsspel
+    outlet: Travcash
+    source_url: https://travcash.se/andelsspel/
+    notes: Travcash andelsspel team
+    publishes_full_system: true
+    free: false
+
+  - expert_id: oliver-pihlstrom
+    display_name: Oliver Pihlström
+    product_name: Travcash andelsspel
+    outlet: Travcash
+    source_url: https://travcash.se/andelsspel/
+    notes: Travcash andelsspel team
+    publishes_full_system: true
+    free: false
+
+  - expert_id: johan-sunnanangs
+    display_name: Johan Sunnanängs
+    product_name: Travcash andelsspel
+    outlet: Travcash
+    source_url: https://travcash.se/andelsspel/
+    notes: Travcash andelsspel team
+    publishes_full_system: true
+    free: false
+
+  - expert_id: grakka
+    display_name: Gustav "Grakka" Grahn
+    product_name: Travcash andelsspel
+    outlet: Travcash
+    source_url: https://travcash.se/andelsspel/
+    notes: Travcash andelsspel team
+    publishes_full_system: true
+    free: false
+
+  - expert_id: leboff
+    display_name: Leboff
+    product_name: Rekatochklart V85
+    outlet: Rekatochklart
+    source_url: https://www.rekatochklart.com/trav/v85-tips/
+    notes: Written V85 systems at budget-friendly sizes
+    publishes_full_system: true
+    free: true
+
+  - expert_id: stridbeck
+    display_name: Stridbeck
+    product_name: Stridbecks Stora / Lilla V85
+    outlet: Travstugan
+    source_url: https://travstugan.se/andelsspel
+    notes: Stora/Lilla andelar via Travstugan
+    publishes_full_system: true
+    free: false
+
+  - expert_id: travstugan
+    display_name: Travstugan (team)
+    product_name: Travstugan V85
+    outlet: Travstugan
+    source_url: https://travstugan.se/v85
+    notes: "Team spelläggare e.g. Stenberg, Sandholm, Nordberg, Engström m.fl."
+    publishes_full_system: true
+    free: true
+
+  - expert_id: trav-se
+    display_name: Trav.se
+    product_name: Stora / Lilla systemet
+    outlet: Trav.se
+    source_url: https://trav.se/
+    notes: Stora + lilla systems with written motivation Saturdays
+    publishes_full_system: true
+    free: true
+
+  - expert_id: travmaskinen
+    display_name: Travmaskinen
+    product_name: Travmaskinen V85
+    outlet: Travmaskinen
+    source_url: https://travmaskinen.se/v85-tips
+    notes: AI ranking + system builder by budget
+    publishes_full_system: true
+    free: true
+
+  - expert_id: systemet-podd
+    display_name: Jonas Noreen & Eskil Hellberg
+    product_name: Systemet (Expressen)
+    outlet: Expressen
+    source_url: https://www.expressen.se/
+    notes: Podd picks best systemförslag each week
+    publishes_full_system: true
+    free: true
+
+  - expert_id: thomas-uhrberg
+    display_name: Thomas Uhrberg
+    product_name: Uhrberg tips
+    outlet: thomasuhrberg.se
+    source_url: https://thomasuhrberg.se/
+    notes: Late tips (trainer/driver perspective)
+    publishes_full_system: partial
+    free: true
+
+  - expert_id: sportbladet-trav365
+    display_name: Sportbladet Trav365
+    product_name: Trav365
+    outlet: Aftonbladet
+    source_url: https://www.aftonbladet.se/sportbladet/trav365
+    notes: Weekly expert picks + andelar to rygga
+    publishes_full_system: partial
+    free: true
+
+  # --- Andelsspel marketplaces (named spelläggare samples) ---
+  - expert_id: niclas-carlson
+    display_name: Niclas Carlson
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  - expert_id: johan-sjostrom
+    display_name: Johan Sjöström
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  - expert_id: david-norismaa
+    display_name: David Norismaa
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  - expert_id: fredrik-berglund
+    display_name: Fredrik Berglund
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  - expert_id: jimmy-simonsson
+    display_name: Jimmy Simonsson
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  - expert_id: anders-svensson
+    display_name: Anders Svensson
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  - expert_id: bosse-eklof
+    display_name: Bosse Eklöf
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  - expert_id: johan-ulvestal
+    display_name: Johan Ulvestål
+    product_name: MinAndel
+    outlet: MinAndel
+    source_url: https://minandel.se/
+    notes: Named spelläggare andelsspel
+    publishes_full_system: true
+    free: false
+
+  # --- Paid (tracked) ---
+  - expert_id: travtjansten
+    display_name: Travtjänsten
+    product_name: Rank och Spel / Slutspelet-V85
+    outlet: Travtjänsten
+    source_url: https://www.travtjansten.se/
+    notes: Paid tip packages with published result lists
+    publishes_full_system: true
+    free: false
+
+  # --- Synthetic ---
+  - expert_id: fixture
+    display_name: Fixture Expert
+    product_name: Test tip
+    outlet: VAI
+    notes: Synthetic tips for automated tests only
+    publishes_full_system: true
+    free: true

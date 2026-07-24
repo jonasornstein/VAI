@@ -3,13 +3,14 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-12 |
-| **Status** | REVIEW |
+| **Status** | AWAITING_OPERATOR |
 | **Version** | 1.1 |
+| **AIRUP phase** | R |
 | **Reviewer** | Nisse (roster/fidelity), ornstein (operator UX) |
 | **Last updated** | 2026-07-15 |
 | **Primary actor** | Operator |
 | **Implements** | F-040–F-043 (betslip catalog) |
-| **Spec** | [expert-v1.md](../../../outbox/specs/expert-v1.md) |
+| **Spec** | [expert-v1.md](../../specs/expert-v1.md) |
 | **Supersedes** | v1.0 pattern-template narrative (spik/halvleg/öppen generator) |
 
 ## Brief description
@@ -21,7 +22,7 @@ This is **curated tip selection**, not algorithmic pattern generation.
 ## Preconditions
 
 - UC-09 complete (date/track/game context) preferred for filtering and validation.
-- Tips may exist under `inbox/expert-tips/` (empty catalog → empty state).
+- At least one tip file may exist under `inbox/expert-tips/` (empty catalog is allowed — empty state).
 
 ## Main success scenario
 
@@ -49,8 +50,8 @@ F-040, F-041, F-042, F-043, F-060, F-061 (optional F-052 basic when distribution
 
 ## Special requirements
 
-- [expert.md](../../strategies/expert.md) — roster, tip format, attribution
-- [expert-v1.md](../../../outbox/specs/expert-v1.md) — implementation
+- [expert.md](../../../docs/strategies/expert.md) — roster, tip format, attribution
+- [expert-v1.md](../../specs/expert-v1.md) — implementation
 - Tips are for **private operator use**; always attribute source; no automated republication
 - Operator pools (F-026) are **not** required for Expert load
 
@@ -67,5 +68,5 @@ F-040, F-041, F-042, F-043, F-060, F-061 (optional F-052 basic when distribution
 
 | Version | Date | Change |
 |---------|------|--------|
-| 1.1 | 2026-07-15 | Redefined as expert betslip list/select; implementation shipped v1.3 |
+| 1.1 | 2026-07-15 | Redefined as expert betslip list/select; pending operator review |
 | 1.0 | 2026-07-07 | APPROVED — pattern templates (superseded by 1.1 product intent) |

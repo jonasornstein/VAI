@@ -6,11 +6,11 @@
 | **Status** | APPROVED |
 | **Reviewer** | ornstein (operator) |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-07-07 |
+| **Last updated** | 2026-07-15 |
 | **Owner** | ornstein (M-004) |
 | **Use cases** | UC-09, UC-10, UC-11–13, UC-14 |
-| **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` (v1.1) |
-| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md) |
+| **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` (v1.3) |
+| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [expert-v1](../../outbox/specs/expert-v1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
 
 End-to-end operator flow for race-day proposal generation.
 
@@ -25,8 +25,8 @@ flowchart TD
   card --> showLegs[Display 8 legs and horses]
   showLegs --> pickHorses[Operator marks horses optional]
   pickHorses --> stake[Operator enters SYSTEMKOSTNAD]
-  stake --> mode[Mode: Hari default]
-  mode --> runModel[UC-11 exact-budget fill]
+  stake --> mode[Mode: Hari or Expert]
+  mode --> runModel[Hari UC-11 or Expert UC-12]
   runModel --> slip[Betting slip plus cost]
   slip --> review[UC-20 Review checklist]
   review --> atg[Manual entry at atg.se]
@@ -48,31 +48,43 @@ flowchart TD
 2. UX shows all 8 legs with race info header (UC-15: name, distance, start method, class) and eligible start numbers (scratches disabled).
 3. Operator **may mark** horses to lock before generate (F-026). Empty leg = slumpen väljer.
 4. **Frys avd.** fixes leg to marked horses only.
-5. **Läge:** **Hari** active; Expert and Kvantitativ disabled (*Kommer senare*).
+5. **Läge:** **Hari** (default) or **Expert**; Kvantitativ disabled (*Kommer senare*).
 
 ---
 
 ## Step 3 — Stake budget and model run
 
+### Hari
+
 1. Operator enters **SYSTEMKOSTNAD** — default **500 SEK** (F-025).
 2. Optional **seed** for reproducibility.
 3. **Generera system** → UC-11 fills to **exact** budget when possible.
 4. On `BUDGET_NOT_MET`: confirm dialog offers **nearest achievable** stake.
-5. Outputs: betting slip, cost (F-061), breakdown, optional hit bars (F-052 when ATG distributions exist).
+
+### Expert
+
+1. Operator opens **Expert** tab.
+2. UX lists tips for date/track from `GET /api/v1/expert-tips` (`inbox/expert-tips/`).
+3. Select a tip → `POST /api/v1/generate/expert` loads horses + tip cost.
+4. Optional manual horse edits after load.
+5. No SYSTEMKOSTNAD fill; cost is the tip’s ATG combination cost.
+
+Outputs (both modes): betting slip, cost (F-061), breakdown, optional hit bars (F-052 when ATG distributions exist).
 
 ---
 
 ## UX field mapping
 
-| UX label (mockup) | Requirement | Default (v1.1) |
+| UX label (mockup) | Requirement | Default (v1.3) |
 |-------------------|-------------|----------------|
 | DATUM | ISO date | ATG `default_date` |
 | BANA | Track / game_id | From schedule |
 | SPELFORM | Game dropdown | V85 only (V75 discontinued at ATG) |
-| Läge | Hari / Expert / Kvantitativ | **Hari** |
-| Avdelningar | Leg grid; horse toggles | From race card |
-| SYSTEMKOSTNAD | Operator budget SEK | **500** |
-| Systemkostnad (computed) | Exact match when OK | After UC-11 |
+| Läge | Hari / Expert / Kvantitativ | **Hari**; Expert enabled; Kvant disabled |
+| Experttips | UC-12 tip list | From inbox when Expert active |
+| Avdelningar | Leg grid; horse toggles | From race card / tip |
+| SYSTEMKOSTNAD | Operator budget SEK (Hari) | **500** |
+| Systemkostnad (computed) | Tip cost or exact Hari match | After generate/load |
 | Träffsannolikhet | F-052 basic | When ATG bet % present |
 | Innan spel | UC-20 checklist | Wired to slip + card |
 
@@ -82,6 +94,7 @@ flowchart TD
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.1 | 2026-07-15 | Expert tab + tip list/select (UC-12 betslips) |
 | 1.0 | 2026-07-07 | APPROVED — v1.1 operator flow; matches shipped mockup and local UI |
 | 0.3 | 2026-07-07 | v1.1: ATG schedule/cards, Hari, exact budget, nearest stake, F-052 |
 | 0.2 | 2026-07-07 | v1: manual YAML, Random default; ATG fetch deferred |

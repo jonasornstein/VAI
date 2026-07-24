@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.1.4</title>
+  <title>VAI V85 — Local UI v1.3.0</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -255,6 +255,157 @@
       color: var(--atg-text);
       border-color: var(--atg-border);
       position: relative;
+    }
+    .expert-tips-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .expert-tip-btn {
+      text-align: left;
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 6px;
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      cursor: pointer;
+      font: inherit;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+    .expert-tip-btn:hover {
+      border-color: var(--v85-light);
+      background: var(--atg-horse-pool);
+    }
+    .expert-tip-btn.active {
+      border-color: var(--atg-horse-pool-border);
+      background: var(--atg-horse-pool);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--v85-light) 35%, transparent);
+    }
+    .expert-tip-btn .tip-meta {
+      display: block;
+      font-size: 0.85em;
+      opacity: 0.9;
+      margin-top: 0.2rem;
+      color: var(--horse-meta);
+    }
+    .expert-tip-btn strong {
+      color: var(--atg-text);
+    }
+    .expert-roster-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      align-items: center;
+      margin: 0.35rem 0 0.5rem;
+      font-size: 0.9rem;
+      color: var(--atg-text);
+    }
+    .expert-roster-toolbar label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      color: var(--atg-text);
+    }
+    .expert-roster-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      max-height: 22rem;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+      scrollbar-color: var(--atg-border) var(--atg-muted-bg);
+    }
+    .expert-roster-card {
+      text-align: left;
+      border: 1px solid var(--atg-border);
+      border-radius: 6px;
+      padding: 0.55rem 0.65rem;
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      font: inherit;
+    }
+    .expert-roster-card.has-tip {
+      border-color: var(--atg-horse-pool-border);
+      background: var(--atg-horse-pool);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--v85-light) 25%, transparent);
+    }
+    .expert-roster-card .tip-meta {
+      display: block;
+      font-size: 0.82em;
+      opacity: 0.92;
+      margin-top: 0.2rem;
+      line-height: 1.35;
+      color: var(--horse-meta);
+    }
+    .expert-roster-card strong {
+      color: var(--atg-text);
+    }
+    .expert-roster-card a {
+      color: var(--atg-link);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .expert-roster-card a:hover {
+      color: var(--v85-light);
+    }
+    .expert-roster-card code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      background: var(--atg-surface);
+      color: var(--v85-headline);
+      border: 1px solid var(--atg-border);
+      padding: 0.05em 0.3em;
+      border-radius: 3px;
+    }
+    .expert-badge {
+      display: inline-block;
+      font-size: 0.72em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 0.12em 0.45em;
+      border-radius: 3px;
+      margin-right: 0.25rem;
+      margin-bottom: 0.2rem;
+      vertical-align: middle;
+      border: 1px solid transparent;
+    }
+    .expert-badge.free {
+      background: var(--atg-approved-bg);
+      color: var(--atg-approved-text);
+      border-color: var(--atg-step-done-border);
+    }
+    .expert-badge.paid {
+      background: var(--atg-banner-bg);
+      color: var(--atg-text);
+      border-color: var(--atg-banner-border);
+    }
+    .expert-badge.ready {
+      background: var(--atg-horse-pool);
+      color: var(--v85-headline);
+      border-color: var(--atg-horse-pool-border);
+    }
+    #expert-tips-panel .stake-hint {
+      color: var(--horse-meta);
+    }
+    #expert-tips-panel h3 {
+      color: var(--atg-text);
+    }
+    #expert-tips-panel code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      background: var(--atg-muted-bg);
+      color: var(--v85-headline);
+      border: 1px solid var(--atg-border);
+      padding: 0.05em 0.3em;
+      border-radius: 3px;
+    }
+    #expert-generate-hint {
+      color: var(--horse-meta);
     }
     .mode-tabs .button.button--toggle:disabled::after {
       content: "Kommer senare";
@@ -684,6 +835,10 @@
       margin-bottom: 4px;
     }
     .cost-big span { font-family: Roboto, sans-serif; font-size: 14px; font-weight: 700; }
+    .slip-empty {
+      opacity: 0.55;
+      font-style: italic;
+    }
     .cost-ok {
       display: inline-block;
       font-size: 10px;
@@ -814,7 +969,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.1.4 Local UI · Random · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.0 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -854,7 +1009,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.1.4</span>
+        <span class="game-header__pill">v1.3.0</span>
       </div>
     </header>
 
@@ -885,14 +1040,32 @@
 
     <div class="mode-tabs" role="tablist" aria-label="Läge">
       <button class="button button--toggle active" type="button" role="tab" aria-selected="true" data-mode="random">Hari</button>
-      <button class="button button--toggle" type="button" role="tab" aria-selected="false" aria-disabled="true" disabled title="Kommer senare">Expert</button>
+      <button class="button button--toggle" type="button" role="tab" aria-selected="false" data-mode="expert">Expert</button>
       <button class="button button--toggle" type="button" role="tab" aria-selected="false" aria-disabled="true" disabled title="Kommer senare">Kvantitativ</button>
     </div>
 
     <div class="content">
       <section class="legs-panel">
-        <h2 class="section-title">Välj hästar för modellen</h2>
-        <p class="section-hint">Klicka för att markera hästar du vill låsa. Tomt val = slumpen väljer på öppna avdelningar. <strong>Frys avd.</strong> blockerar slumpen — markera minst en häst på frysta avdelningar.</p>
+        <h2 class="section-title" id="legs-section-title">Välj hästar för modellen</h2>
+        <p class="section-hint" id="legs-section-hint">Klicka för att markera hästar du vill låsa. Tomt val = slumpen väljer på öppna avdelningar. <strong>Frys avd.</strong> blockerar slumpen — markera minst en häst på frysta avdelningar.</p>
+        <div class="summary-card" id="expert-tips-panel" hidden>
+          <h3>Experter</h3>
+          <p class="stake-hint">
+            Roster från Travet-research. <strong>Redo</strong> = tip finns för valt datum.
+            Transkribera fulla system till <code>inbox/expert-tips/</code>.
+          </p>
+          <div class="expert-roster-toolbar">
+            <label>
+              <input type="checkbox" id="expert-free-only" />
+              Visa bara gratis
+            </label>
+            <span class="stake-hint" id="expert-roster-count" style="margin:0"></span>
+          </div>
+          <div id="expert-roster-list" class="expert-roster-list" aria-label="Experter"></div>
+          <h3 style="margin-top:1rem">Tips för omgången</h3>
+          <p class="stake-hint" id="expert-tips-empty">Inga tips för valt datum — lägg till YAML under <code>inbox/expert-tips/</code>.</p>
+          <div id="expert-tips-list" class="expert-tips-list" role="listbox" aria-label="Experttips"></div>
+        </div>
         <div class="selection-legend" aria-label="Förklaring av markeringar">
           <span><i class="legend-swatch operator" aria-hidden="true"></i> Operatörens val</span>
           <span><i class="legend-swatch random" aria-hidden="true"></i> Slumpens hästar</span>
@@ -915,7 +1088,7 @@
       </section>
 
       <aside class="sidebar">
-        <div class="summary-card">
+        <div class="summary-card" id="hari-budget-card">
           <h3>Systemkostnad (budget)</h3>
           <div class="stake-input-wrap">
             <input class="stake-input" id="stake-input" type="number" value="500" min="1" step="50" aria-label="Systemkostnad i SEK" />
@@ -923,7 +1096,7 @@
           </div>
           <p class="stake-hint">Standardvärde 500 SEK. Markera valfria hästar — slumpen fyller på till exakt budget.</p>
         </div>
-        <div class="summary-card">
+        <div class="summary-card" id="hari-seed-card">
           <h3>Seed (valfritt)</h3>
           <input class="seed-input" id="seed-input" type="number" step="1" placeholder="t.ex. 42" aria-label="RNG seed för reproducerbart system" aria-describedby="seed-help" />
           <p class="stake-hint" id="seed-help">
@@ -961,6 +1134,11 @@
           <div class="hit-bars" id="hit-bars" hidden aria-describedby="hit-summary-help-text"></div>
         </div>
         <button class="button button--blue btn-action btn-generate" id="btn-generate" type="button">Generera system</button>
+        <button class="button button--blue btn-action" id="btn-update-slip" type="button" hidden disabled>Uppdatera spelkvitto</button>
+        <p class="stake-hint" id="expert-generate-hint" hidden>
+          Välj ett tip i listan. Klicka sedan hästar för att lägga till/ta bort — spelkvitto och kostnad uppdateras.
+          Använd <strong>Uppdatera spelkvitto</strong> om du vill tvinga omräkning.
+        </p>
         <div class="summary-card">
           <h3>Innan spel på atg.se</h3>
           <ul class="checklist" id="operator-checklist">
@@ -976,12 +1154,12 @@
     </div>
 
     <div class="rationale">
-      <h2>Rationale — Hari</h2>
+      <h2 id="rationale-heading">Rationale — Hari</h2>
       <p id="rationale-text">Slumpmässigt urval ur operatörens kandidatpool per avdelning.</p>
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.1.4 Local UI · Random · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.0 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -997,6 +1175,12 @@
       var datumListenerBound = false;
       var frozenLegs = {};
       var slipReady = false;
+      var activeMode = "random";
+      var selectedTipId = null;
+      var expertTipsCache = [];
+      var expertsRosterCache = [];
+      var expertTipMeta = null;
+      var expertBaseSelections = null;
       var RATIONALE_DEFAULT =
         "Slumpmässigt urval ur operatörens kandidatpool per avdelning.";
       function applyTheme(theme) {
@@ -1098,12 +1282,14 @@
         btn.classList.remove("pool-selected", "random-selected");
       }
 
-      function deselectLeg(leg) {
+      function deselectLeg(leg, opts) {
         document.querySelectorAll('.horse[data-leg="' + leg + '"]').forEach(clearHorseSelection);
+        if (!opts || !opts.silent) onHorseGridChanged();
       }
 
-      function deselectAllLegs() {
+      function deselectAllLegs(opts) {
         document.querySelectorAll(".horse").forEach(clearHorseSelection);
+        if (!opts || !opts.silent) onHorseGridChanged();
       }
 
       function collectFrozenLegs() {
@@ -1142,8 +1328,159 @@
         return pools;
       }
 
+      /** All marked horses on the grid (operator + system / expert). */
+      function collectGridSelections() {
+        var selections = {};
+        for (var i = 1; i <= 8; i++) selections[String(i)] = [];
+        document.querySelectorAll(".horse.pool-selected, .horse.random-selected").forEach(function (btn) {
+          if (btn.classList.contains("scratched")) return;
+          var leg = btn.getAttribute("data-leg");
+          var num = horseNumFromBtn(btn);
+          if (leg && !isNaN(num) && selections[leg].indexOf(num) === -1) {
+            selections[leg].push(num);
+          }
+        });
+        for (var leg = 1; leg <= 8; leg++) {
+          selections[String(leg)].sort(function (a, b) { return a - b; });
+        }
+        return selections;
+      }
+
+      function computeSystemCost(selections) {
+        var counts = [];
+        var combinations = 1;
+        var complete = true;
+        for (var leg = 1; leg <= 8; leg++) {
+          var n = (selections[String(leg)] || []).length;
+          counts.push(n);
+          if (n < 1) complete = false;
+          else combinations *= n;
+        }
+        if (!complete) {
+          return {
+            complete: false,
+            combinations: 0,
+            cost_sek: 0,
+            cost_breakdown: counts.join("×"),
+            selections: selections
+          };
+        }
+        return {
+          complete: true,
+          combinations: combinations,
+          cost_sek: combinations * 0.5,
+          cost_breakdown: counts.join("×"),
+          selections: selections
+        };
+      }
+
+      function selectionsEqual(a, b) {
+        if (!a || !b) return false;
+        for (var leg = 1; leg <= 8; leg++) {
+          var aa = (a[String(leg)] || a[leg] || []).slice().sort(function (x, y) { return x - y; });
+          var bb = (b[String(leg)] || b[leg] || []).slice().sort(function (x, y) { return x - y; });
+          if (aa.length !== bb.length) return false;
+          for (var i = 0; i < aa.length; i++) {
+            if (aa[i] !== bb[i]) return false;
+          }
+        }
+        return true;
+      }
+
+      function setUpdateSlipEnabled(enabled) {
+        var btn = document.getElementById("btn-update-slip");
+        if (btn) btn.disabled = !enabled;
+      }
+
+      /**
+       * Rebuild slip + cost from current grid marks (Expert mode edits).
+       */
+      function refreshSlipFromGrid(opts) {
+        opts = opts || {};
+        var selections = collectGridSelections();
+        var cost = computeSystemCost(selections);
+        var updateBtn = document.getElementById("btn-update-slip");
+        if (!cost.complete) {
+          slipReady = false;
+          document.getElementById("cost-big").innerHTML = "— <span>SEK</span>";
+          document.getElementById("stat-rows-count").textContent = "—";
+          document.getElementById("stat-breakdown").textContent = cost.cost_breakdown;
+          var shrinkEl = document.getElementById("stat-shrink");
+          if (shrinkEl) shrinkEl.textContent = "—";
+          updateSlipFooter(0, 0);
+          updateOperatorChecklist(selections, 0, 0);
+          resetHitSummary();
+          var grid = document.getElementById("slip-grid");
+          if (grid) {
+            grid.innerHTML = "";
+            for (var i = 1; i <= 8; i++) {
+              var horses = selections[String(i)] || [];
+              var row = document.createElement("div");
+              row.className = "slip-row";
+              var text = horses.length
+                ? formatSlipLegHorses(i, horses, new Set(horses))
+                : '<span class="slip-empty">—</span>';
+              row.innerHTML =
+                '<div class="slip-row-leg">' + i + '</div>' +
+                '<div class="slip-row-horses"><div class="slip-horses-inner">' + text + "</div></div>";
+              grid.appendChild(row);
+            }
+          }
+          updateSlipPrintMeta();
+          updateSlipActions();
+          if (updateBtn && activeMode === "expert") updateBtn.disabled = !selectedTipId;
+          if (opts.alertIncomplete) {
+            alert("Varje avdelning måste ha minst en häst.");
+          }
+          return false;
+        }
+        renderSlip(selections, null, selections);
+        var label = "expert tip";
+        if (expertBaseSelections && !selectionsEqual(selections, expertBaseSelections)) {
+          label = "justerad";
+        }
+        updateCost(
+          {
+            selections: selections,
+            combinations: cost.combinations,
+            cost_sek: cost.cost_sek,
+            cost_breakdown: cost.cost_breakdown,
+            shrink_steps_used: null,
+            hit_summary: null
+          },
+          cost.cost_sek,
+          label
+        );
+        if (expertTipMeta) {
+          var product = expertTipMeta.product_name ? " (" + expertTipMeta.product_name + ")" : "";
+          var edited =
+            expertBaseSelections && !selectionsEqual(selections, expertBaseSelections)
+              ? " · justerad i UI"
+              : "";
+          var rationaleT = document.getElementById("rationale-text");
+          if (rationaleT) {
+            rationaleT.textContent =
+              "Expert: " +
+              expertTipMeta.expert_name +
+              product +
+              " · tip_id " +
+              expertTipMeta.tip_id +
+              edited +
+              (expertTipMeta.rationale ? " — " + expertTipMeta.rationale : "");
+          }
+        }
+        if (updateBtn && activeMode === "expert") updateBtn.disabled = false;
+        return true;
+      }
+
+      function onHorseGridChanged() {
+        if (activeMode === "expert" && selectedTipId) {
+          refreshSlipFromGrid();
+        }
+      }
+
       function applyGeneratedSelections(operatorPools, selections) {
-        deselectAllLegs();
+        deselectAllLegs({ silent: true });
         for (var leg = 1; leg <= 8; leg++) {
           var legKey = String(leg);
           var operatorSet = new Set(operatorPools[legKey] || []);
@@ -1234,6 +1571,7 @@
           btn.addEventListener("click", function () {
             btn.classList.remove("random-selected");
             btn.classList.toggle("pool-selected");
+            onHorseGridChanged();
           });
         });
         grid.querySelectorAll(".leg-clear-btn").forEach(function (btn) {
@@ -1242,6 +1580,7 @@
           });
         });
         grid.querySelectorAll(".leg-freeze-btn").forEach(function (btn) {
+          btn.hidden = activeMode === "expert";
           btn.addEventListener("click", function () {
             toggleFreezeLeg(btn.getAttribute("data-leg"));
           });
@@ -1265,7 +1604,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.1.4";
+        document.title = title + " — Local UI v1.3.0";
         var logo = document.getElementById("app-logo");
         if (logo) logo.setAttribute("title", title);
         updateOpenAtgButton();
@@ -1278,7 +1617,281 @@
         if (banaSel && banaSel.selectedOptions.length) {
           track = banaSel.selectedOptions[0].textContent.trim();
         }
-        return { date: date, track: track, game: selectedGameType(), mode: "Hari" };
+        var modeLabel = activeMode === "expert" ? "Expert" : "Hari";
+        return { date: date, track: track, game: selectedGameType(), mode: modeLabel };
+      }
+
+      function setActiveMode(mode) {
+        activeMode = mode === "expert" ? "expert" : "random";
+        document.querySelectorAll(".mode-tabs [data-mode]").forEach(function (btn) {
+          var on = btn.getAttribute("data-mode") === activeMode;
+          btn.classList.toggle("active", on);
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        var expertPanel = document.getElementById("expert-tips-panel");
+        var hariBudget = document.getElementById("hari-budget-card");
+        var hariSeed = document.getElementById("hari-seed-card");
+        var genBtn = document.getElementById("btn-generate");
+        var updateSlipBtn = document.getElementById("btn-update-slip");
+        var expertHint = document.getElementById("expert-generate-hint");
+        var title = document.getElementById("legs-section-title");
+        var hint = document.getElementById("legs-section-hint");
+        var rationaleH = document.getElementById("rationale-heading");
+        var rationaleT = document.getElementById("rationale-text");
+        var isExpert = activeMode === "expert";
+        if (expertPanel) expertPanel.hidden = !isExpert;
+        if (hariBudget) hariBudget.hidden = isExpert;
+        if (hariSeed) hariSeed.hidden = isExpert;
+        if (genBtn) {
+          genBtn.hidden = isExpert;
+          genBtn.disabled = isExpert;
+        }
+        if (updateSlipBtn) {
+          updateSlipBtn.hidden = !isExpert;
+          updateSlipBtn.disabled = !isExpert || !selectedTipId;
+        }
+        if (expertHint) expertHint.hidden = !isExpert;
+        document.querySelectorAll(".leg-freeze-btn").forEach(function (btn) {
+          btn.hidden = isExpert;
+        });
+        if (title) {
+          title.textContent = isExpert
+            ? "Experttips och hästar"
+            : "Välj hästar för modellen";
+        }
+        if (hint) {
+          hint.textContent = isExpert
+            ? "Välj ett tip, sedan klicka hästar för att lägga till eller ta bort. Spelkvitto och kostnad uppdateras automatiskt."
+            : "Klicka för att markera hästar du vill låsa. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar.";
+        }
+        if (rationaleH) {
+          rationaleH.textContent = isExpert ? "Rationale — Expert" : "Rationale — Hari";
+        }
+        if (rationaleT && isExpert && !selectedTipId) {
+          rationaleT.textContent =
+            "Välj ett experttips (t.ex. Björn Goop / Björnkollen) för att ladda spelsystemet.";
+        }
+        if (rationaleT && !isExpert) {
+          rationaleT.textContent =
+            "Slumpmässigt urval ur operatörens kandidatpool per avdelning.";
+        }
+        updateSlipPrintMeta();
+        if (isExpert) {
+          loadExpertsRoster();
+          loadExpertTips();
+        }
+      }
+
+      function currentTrackName() {
+        var banaSel = document.getElementById("bana");
+        if (banaSel && banaSel.selectedOptions.length) {
+          return banaSel.selectedOptions[0].textContent.trim();
+        }
+        return "";
+      }
+
+      function expertDateTrackQuery() {
+        var date = document.getElementById("datum").value || "";
+        var track = currentTrackName();
+        var qs = [];
+        if (date) qs.push("date=" + encodeURIComponent(date));
+        if (track) qs.push("track=" + encodeURIComponent(track));
+        return qs;
+      }
+
+      function loadExpertsRoster() {
+        var qs = expertDateTrackQuery();
+        var freeOnly = document.getElementById("expert-free-only");
+        if (freeOnly && freeOnly.checked) qs.push("free=1");
+        var url = API + "/api/v1/experts" + (qs.length ? "?" + qs.join("&") : "");
+        fetch(url)
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            if (!res.ok) {
+              expertsRosterCache = [];
+              renderExpertsRoster([]);
+              return;
+            }
+            expertsRosterCache = res.j.experts || [];
+            renderExpertsRoster(expertsRosterCache);
+          })
+          .catch(function (e) {
+            console.error(e);
+            expertsRosterCache = [];
+            renderExpertsRoster([]);
+          });
+      }
+
+      function renderExpertsRoster(experts) {
+        var list = document.getElementById("expert-roster-list");
+        var countEl = document.getElementById("expert-roster-count");
+        if (!list) return;
+        list.innerHTML = "";
+        if (countEl) {
+          var ready = experts.filter(function (e) { return e.has_tip; }).length;
+          countEl.textContent = experts.length
+            ? experts.length + " experter" + (ready ? " · " + ready + " med tip för omgången" : "")
+            : "Inga experter i roster";
+        }
+        experts.forEach(function (ex) {
+          var card = document.createElement("div");
+          card.className = "expert-roster-card" + (ex.has_tip ? " has-tip" : "");
+          var badges = "";
+          if (ex.free === true) badges += '<span class="expert-badge free">Gratis</span>';
+          else if (ex.free === false) badges += '<span class="expert-badge paid">Andel/betald</span>';
+          if (ex.has_tip) badges += '<span class="expert-badge ready">Redo</span>';
+          var product = ex.product_name ? " · " + ex.product_name : "";
+          var outlet = ex.outlet ? escapeHtml(ex.outlet) : "";
+          var link = "";
+          if (ex.source_url) {
+            link =
+              ' <a href="' +
+              escapeHtml(ex.source_url) +
+              '" target="_blank" rel="noopener noreferrer">källa</a>';
+          }
+          var notes = ex.notes
+            ? '<span class="tip-meta">' + escapeHtml(ex.notes) + "</span>"
+            : "";
+          card.innerHTML =
+            badges +
+            "<strong>" +
+            escapeHtml(ex.display_name) +
+            escapeHtml(product) +
+            "</strong>" +
+            '<span class="tip-meta"><code>' +
+            escapeHtml(ex.expert_id) +
+            "</code>" +
+            (outlet ? " · " + outlet : "") +
+            link +
+            "</span>" +
+            notes;
+          list.appendChild(card);
+        });
+      }
+
+      function loadExpertTips() {
+        var qs = expertDateTrackQuery();
+        var url = API + "/api/v1/expert-tips" + (qs.length ? "?" + qs.join("&") : "");
+        fetch(url)
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            if (!res.ok) {
+              expertTipsCache = [];
+              renderExpertTipsList([]);
+              return;
+            }
+            expertTipsCache = res.j.tips || [];
+            renderExpertTipsList(expertTipsCache);
+          })
+          .catch(function (e) {
+            console.error(e);
+            expertTipsCache = [];
+            renderExpertTipsList([]);
+          });
+      }
+
+      function renderExpertTipsList(tips) {
+        var list = document.getElementById("expert-tips-list");
+        var empty = document.getElementById("expert-tips-empty");
+        if (!list) return;
+        list.innerHTML = "";
+        if (!tips.length) {
+          if (empty) empty.hidden = false;
+          return;
+        }
+        if (empty) empty.hidden = true;
+        tips.forEach(function (tip) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "expert-tip-btn" + (tip.tip_id === selectedTipId ? " active" : "");
+          btn.setAttribute("role", "option");
+          btn.setAttribute("aria-selected", tip.tip_id === selectedTipId ? "true" : "false");
+          var product = tip.product_name ? " · " + tip.product_name : "";
+          btn.innerHTML =
+            "<strong>" +
+            escapeHtml(tip.expert_name) +
+            escapeHtml(product) +
+            "</strong>" +
+            '<span class="tip-meta">' +
+            escapeHtml(tip.tip_id) +
+            " · " +
+            fmtSek(tip.cost_sek) +
+            " SEK · " +
+            fmtNum(tip.combinations) +
+            " rader · " +
+            escapeHtml(tip.cost_breakdown || "") +
+            "</span>";
+          btn.addEventListener("click", function () {
+            applyExpertTip(tip.tip_id);
+          });
+          list.appendChild(btn);
+        });
+      }
+
+      function escapeHtml(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function applyExpertTip(tipId) {
+        if (!currentCard) {
+          alert("Ladda startlista först (välj datum och bana).");
+          return;
+        }
+        selectedTipId = tipId;
+        setUpdateSlipEnabled(false);
+        fetch(API + "/api/v1/generate/expert", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            race_card_id: currentCard.id,
+            tip_id: tipId
+          })
+        })
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            if (!res.ok) {
+              var err = res.j.error;
+              alert((err && err.message) || "Kunde inte ladda experttips");
+              return;
+            }
+            // Mark all tip horses as operator-style (bold) — intentional picks
+            applyGeneratedSelections(res.j.selections, res.j.selections);
+            expertBaseSelections = {};
+            for (var leg = 1; leg <= 8; leg++) {
+              expertBaseSelections[String(leg)] = (res.j.selections[String(leg)] || res.j.selections[leg] || []).slice();
+            }
+            expertTipMeta = {
+              tip_id: res.j.tip_id,
+              expert_name: res.j.expert_name,
+              product_name: res.j.product_name,
+              rationale: res.j.rationale
+            };
+            renderSlip(res.j.selections, null, res.j.selections);
+            updateCost(res.j, res.j.cost_sek, "expert tip");
+            if (res.j.hit_summary) renderHitSummary(res.j.hit_summary);
+            renderExpertTipsList(expertTipsCache);
+            setUpdateSlipEnabled(true);
+            var product = res.j.product_name ? " (" + res.j.product_name + ")" : "";
+            var rationaleT = document.getElementById("rationale-text");
+            if (rationaleT) {
+              rationaleT.textContent =
+                "Expert: " +
+                res.j.expert_name +
+                product +
+                " · tip_id " +
+                res.j.tip_id +
+                (res.j.rationale ? " — " + res.j.rationale : "") +
+                " Klicka hästar för att justera.";
+            }
+          })
+          .catch(function (e) {
+            alert("API fel — kör python -m vai serve");
+            console.error(e);
+          });
       }
 
       function updateSlipPrintMeta() {
@@ -1516,24 +2129,39 @@
           fmtNum(combinations) + ' rader x 0,50 kr = <strong>' + fmtSek(costSek) + " kr</strong>";
       }
 
-      function updateCost(data, budget) {
+      function updateCost(data, budget, expertLabel) {
         var exact = Math.abs(data.cost_sek - budget) < 0.001;
         var ok = data.cost_sek <= budget + 0.001;
         var budgetLabel = exact ? "= budget" : (ok ? "≤ budget" : "");
+        if (activeMode === "expert") {
+          budgetLabel = expertLabel || "expert tip";
+        }
         document.getElementById("cost-big").innerHTML =
           fmtSek(data.cost_sek) + ' <span>SEK</span>' + (budgetLabel ? '<span class="cost-ok">' + budgetLabel + "</span>" : "");
         document.getElementById("stat-rows-count").textContent = fmtNum(data.combinations);
         document.getElementById("stat-breakdown").textContent = data.cost_breakdown;
-        document.getElementById("stat-shrink").textContent = String(data.shrink_steps_used);
+        var shrinkEl = document.getElementById("stat-shrink");
+        if (shrinkEl) {
+          shrinkEl.textContent =
+            data.shrink_steps_used != null ? String(data.shrink_steps_used) : "—";
+        }
         updateSlipFooter(data.combinations, data.cost_sek);
         updateOperatorChecklist(data.selections, data.cost_sek, budget);
-        renderHitSummary(data.hit_summary || null);
-        document.getElementById("rationale-text").textContent =
-          RATIONALE_DEFAULT +
-          " Markerade hästar låses. Slumpen fyller på med " +
-          data.shrink_steps_used +
-          " hästar till budget." +
-          (data.seed != null ? " Seed " + data.seed + "." : "");
+        if (data.hit_summary) {
+          renderHitSummary(data.hit_summary);
+        } else if (activeMode === "expert") {
+          resetHitSummary();
+        } else {
+          renderHitSummary(null);
+        }
+        if (activeMode === "random") {
+          document.getElementById("rationale-text").textContent =
+            RATIONALE_DEFAULT +
+            " Markerade hästar låses. Slumpen fyller på med " +
+            data.shrink_steps_used +
+            " hästar till budget." +
+            (data.seed != null ? " Seed " + data.seed + "." : "");
+        }
       }
 
       function populateDropdowns(data) {
@@ -1565,6 +2193,10 @@
           return '<option value="' + r.game_id + '">' + r.track + "</option>";
         }).join("");
         loadSelectedCard();
+        if (activeMode === "expert") {
+          loadExpertsRoster();
+          loadExpertTips();
+        }
       }
 
       function loadSelectedCard() {
@@ -1649,16 +2281,46 @@
         generateWithBudget(budget);
       }
 
-      document.getElementById("bana").addEventListener("change", loadSelectedCard);
+      document.getElementById("bana").addEventListener("change", function () {
+        loadSelectedCard();
+        if (activeMode === "expert") {
+          loadExpertsRoster();
+          loadExpertTips();
+        }
+      });
       document.getElementById("btn-generate").addEventListener("click", generate);
+      var btnUpdateSlip = document.getElementById("btn-update-slip");
+      if (btnUpdateSlip) {
+        btnUpdateSlip.addEventListener("click", function () {
+          if (activeMode !== "expert") return;
+          if (!selectedTipId) {
+            alert("Välj ett experttips först.");
+            return;
+          }
+          refreshSlipFromGrid({ alertIncomplete: true });
+        });
+      }
       document.getElementById("btn-deselect-all").addEventListener("click", deselectAllLegs);
       document.getElementById("btn-print-slip").addEventListener("click", printSlip);
       document.getElementById("btn-open-atg").addEventListener("click", openAtg);
       document.getElementById("spelform").addEventListener("change", updateAppTitle);
+      document.querySelectorAll(".mode-tabs [data-mode]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          if (btn.disabled) return;
+          setActiveMode(btn.getAttribute("data-mode"));
+        });
+      });
+      var freeOnlyCb = document.getElementById("expert-free-only");
+      if (freeOnlyCb) {
+        freeOnlyCb.addEventListener("change", function () {
+          if (activeMode === "expert") loadExpertsRoster();
+        });
+      }
       updateAppTitle();
       updateOpenAtgButton();
       resetHitSummary();
       resetOperatorChecklist();
+      setActiveMode("random");
 
       fetch(API + "/api/v1/schedule/v85")
         .then(function (r) {

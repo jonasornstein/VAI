@@ -1,0 +1,21 @@
+# Synthetic fixture for Expert mode tests and UI demo — NOT a real published tip.
+tip_id: fixture-axevalla-2026-07-18
+expert_id: fixture
+expert_name: Fixture Expert
+product_name: Test tip
+game: v85
+date: "2026-07-18"
+track: Axevalla
+source_note: "Synthetic golden fixture aligned with inbox/race-cards/2026-07-18-axevalla.yaml"
+fetched_at: "2026-07-15T20:00:00Z"
+status: READY
+legs:
+  1: [1]
+  2: [5, 12]
+  3: [1, 2, 3]
+  4: [2, 9, 10]
+  5: [1, 4, 7]
+  6: [12]
+  7: [9, 11]
+  8: [7]
+rationale: "Fixture system for Expert list/select (cost 1×2×3×3×3×1×2×1 × 0.50 SEK)."

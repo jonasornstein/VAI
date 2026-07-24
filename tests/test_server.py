@@ -32,6 +32,7 @@ def _start_test_server() -> tuple[ThreadingHTTPServer, str]:
     VaiRequestHandler.repo_root = root
     VaiRequestHandler.mockup_dir = root / "outbox" / "mockups"
     VaiRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
+    VaiRequestHandler.expert_tips_dir = root / "inbox" / "expert-tips"
     server = ThreadingHTTPServer(("127.0.0.1", 0), VaiRequestHandler)
     port = server.server_address[1]
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -99,6 +100,63 @@ def test_api_race_cards_and_generate() -> None:
         assert status == 200
         assert result["combinations"] == 1000
         assert result["cost_sek"] == 500.0
+    finally:
+        server.shutdown()
+        server.server_close()
+
+def test_api_experts_roster() -> None:
+    server, base = _start_test_server()
+    try:
+        data = _get(f"{base}/api/v1/experts")
+        assert data["experts"]
+        ids = {e["expert_id"] for e in data["experts"]}
+        assert "bjorn-goop" in ids
+        assert "referenten" in ids
+        assert "fixture" not in ids
+        goop = next(e for e in data["experts"] if e["expert_id"] == "bjorn-goop")
+        assert goop["display_name"] == "Björn Goop"
+        assert "product_name" in goop
+
+        free = _get(f"{base}/api/v1/experts?free=1")
+        assert free["experts"]
+        assert all(e.get("free") is True for e in free["experts"])
+
+        with_day = _get(f"{base}/api/v1/experts?date=2026-07-18&track=Axevalla&include_fixture=1")
+        # fixture tip exists for that day but fixture excluded unless include_fixture
+        fixture_listed = [e for e in with_day["experts"] if e["expert_id"] == "fixture"]
+        assert len(fixture_listed) == 1
+        assert fixture_listed[0]["has_tip"] is True
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_api_expert_tips_list_and_generate() -> None:
+    server, base = _start_test_server()
+    try:
+        tips = _get(f"{base}/api/v1/expert-tips?date=2026-07-18&track=Axevalla")
+        assert tips["tips"]
+        tip_id = tips["tips"][0]["tip_id"]
+        assert tip_id == "fixture-axevalla-2026-07-18"
+        assert tips["tips"][0]["cost_sek"] == 54.0
+
+        listing = _get(f"{base}/api/v1/race-cards")
+        card_ids = [c["id"] for c in listing["race_cards"]]
+        card_id = (
+            "2026-07-18-axevalla"
+            if "2026-07-18-axevalla" in card_ids
+            else listing["race_cards"][0]["id"]
+        )
+
+        status, result = _post(
+            f"{base}/api/v1/generate/expert",
+            {"race_card_id": card_id, "tip_id": tip_id},
+        )
+        assert status == 200
+        assert result["combinations"] == 108
+        assert result["cost_sek"] == 54.0
+        assert result["expert_name"] == "Fixture Expert"
+        assert len(result["selections"]) == 8
     finally:
         server.shutdown()
         server.server_close()

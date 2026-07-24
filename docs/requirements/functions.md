@@ -76,14 +76,14 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 ---
 
-## 6. Expert mode
+## 6. Expert mode (betslips)
 
 | ID | Name | Description | Inputs | Outputs | Use cases |
 |----|------|-------------|--------|---------|-----------|
-| F-040 | `load_expert_template` | Load named template from catalog | Template ID | Template definition | UC-12 |
-| F-041 | `classify_legs` | Label legs spik / halvleg / öppen | `RaceCard`, template | Leg classifications | UC-12 |
-| F-042 | `apply_expert_pattern` | Map classification to horse counts/picks | Classifications, `RaceCard` | Leg selections | UC-12 |
-| F-043 | `apply_manual_override` | Replace leg selection with operator picks | Leg, horses[] | Updated selection | UC-12 |
+| F-040 | `list_expert_tips` | List tip YAML from inbox catalog | date, track, tips dir | Tip summaries + cost | UC-12 |
+| F-041 | `select_expert_tip` | Operator chooses tip_id | tip_id | Selected tip ref | UC-12 |
+| F-042 | `load_expert_betslip` | Load leg→horses from tip; cost via F-060/061 | tip, optional RaceCard | Selections + cost | UC-12 |
+| F-043 | `apply_manual_override` | Replace leg selection after load | Leg, horses[] | Updated selection | UC-12 |
 
 ---
 
@@ -153,7 +153,8 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | **Partial** | F-009 | V85 `betDistribution` only; no `inbox/odds/` archive |
 | **UX / mockup only** | F-070, F-090, F-092 | Print slip (not PDF export); theme toggle in mockup variants |
 | **Agent / manual (AIRUP)** | F-002–003, F-010–014, F-072–073, F-080–081 | Skills and operator workflow; not automated in `src/` |
-| **Deferred** | F-008, F-040–043, F-050–051, F-053–054 | Scrape fallback; expert; full quant model |
+| **Shipped (v1.3 — Expert betslips)** | F-040–043 | Tip catalog YAML; list/select/load; no scraper |
+| **Deferred** | F-008, F-050–051, F-053–054 | Scrape fallback; full quant model |
 | **Could (v1.2+)** | Reduced-stake cost variants (UC-14 §3a), F-054, F-090 (PDF) | α ∈ {0.30, 0.50, 0.70} |
 
 ### Module map (shipped)
@@ -167,9 +168,11 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | `schedule.py` | F-006, F-027, F-028 |
 | `atg_race_card.py` | F-007, F-009 (partial), F-029 |
 | `strategies/random.py` | F-030–032, F-031 |
+| `strategies/expert.py` | F-041–043 (load/select/override) |
+| `io/expert_tips.py` | F-040 list/load tip YAML |
 | `cost.py` | F-060–062 |
 | `hit_summary.py` | F-052 (basic) |
-| `server.py` | Local UI API routes |
+| `server.py` | Local UI API routes (random + expert) |
 
 ---
 
@@ -177,6 +180,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.2 | 2026-07-15 | F-040–043 Expert betslips (list/select/load); not pattern templates |
 | 1.1 | 2026-07-08 | F-029 race info shipped (UC-15) |
 | 1.0 | 2026-07-07 | APPROVED — canonical F-* catalog; shipped vs deferred aligned with v1.1 |
 | 0.4 | 2026-07-07 | v1.1 shipped set: ATG fetch, schedule UX, F-052 basic, F-071; module map |

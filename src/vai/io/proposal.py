@@ -6,7 +6,8 @@ from datetime import datetime, timezone
 
 import yaml
 
-from vai.models.proposal import RandomManifest, RandomResult
+from vai.models.expert_tip import ExpertResult
+from vai.models.proposal import RandomResult
 from vai.models.race_card import RaceCard
 
 
@@ -18,12 +19,8 @@ def format_proposal_markdown(
 ) -> str:
     manifest = result.manifest
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    legs_rows = "\n".join(
-        f"| {leg} | {race_card.leg_by_number(leg).race_label} | "
-        f"{_format_horses(result.selections[leg])} | {_leg_note(race_card, leg, result.selections[leg])} |"
-        for leg in range(1, 9)
-    )
-    checklist = _operator_checklist(race_card, result)
+    legs_rows = _legs_table(race_card, result.selections)
+    checklist = _operator_checklist(race_card, result.selections, budget_sek=stake_budget_sek)
     manifest_yaml = yaml.safe_dump(
         {
             "mode": manifest.mode,
@@ -74,6 +71,83 @@ Hari (random): operator marks locked; slumpen fyller på till exakt SYSTEMKOSTNA
 """
 
 
+def format_expert_proposal_markdown(
+    race_card: RaceCard,
+    result: ExpertResult,
+) -> str:
+    manifest = result.manifest
+    tip = result.tip
+    generated = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    legs_rows = _legs_table(race_card, result.selections)
+    checklist = _operator_checklist(race_card, result.selections)
+    product = manifest.product_name or tip.product_name or "—"
+    source = manifest.source_url or tip.source_url or tip.source_note or "—"
+    rationale = tip.rationale or (
+        f"Expert betslip: {manifest.expert_name}"
+        + (f" ({product})" if product != "—" else "")
+        + f" · tip_id `{manifest.tip_id}`."
+    )
+    if manifest.overridden_legs:
+        rationale += f" Overrides on legs: {', '.join(str(l) for l in manifest.overridden_legs)}."
+    manifest_yaml = yaml.safe_dump(
+        {
+            "mode": manifest.mode,
+            "tip_id": manifest.tip_id,
+            "expert_id": manifest.expert_id,
+            "expert_name": manifest.expert_name,
+            "product_name": manifest.product_name,
+            "source_url": manifest.source_url,
+            "source_note": manifest.source_note,
+            "overridden_legs": list(manifest.overridden_legs),
+        },
+        sort_keys=False,
+    ).strip()
+
+    return f"""# V85 Proposal — {race_card.track} — {race_card.date}
+
+| Field | Value |
+|-------|-------|
+| Mode | expert |
+| Expert | {manifest.expert_name} |
+| Product | {product} |
+| Tip ID | {manifest.tip_id} |
+| Source | {source} |
+| AIRUP status | AWAITING_OPERATOR |
+| Generated | {generated} |
+| Total cost | {result.cost_sek:.2f} SEK |
+| Combinations | {result.combinations} |
+| Cost breakdown | {result.cost_breakdown} |
+
+## Legs
+
+| Leg | Race | Horses | Notes |
+|-----|------|--------|-------|
+{legs_rows}
+
+## Operator checklist (UC-20)
+
+{checklist}
+
+## Rationale
+
+{rationale}
+
+## Manifest
+
+```yaml
+{manifest_yaml}
+```
+"""
+
+
+def _legs_table(race_card: RaceCard, selections: dict[int, list[int]]) -> str:
+    return "\n".join(
+        f"| {leg} | {race_card.leg_by_number(leg).race_label} | "
+        f"{_format_horses(selections[leg])} | {_leg_note(race_card, leg, selections[leg])} |"
+        for leg in range(1, 9)
+    )
+
+
 def _format_horses(horses: list[int]) -> str:
     return ", ".join(str(h) for h in horses)
 
@@ -92,15 +166,31 @@ def _leg_note(race_card: RaceCard, leg: int, horses: list[int]) -> str:
     return "; ".join(parts)
 
 
-def _operator_checklist(race_card: RaceCard, result: RandomResult) -> str:
-    legs_ok = all(result.selections.get(leg) for leg in range(1, 9))
-    cost_ok = result.cost_sek <= result.manifest.stake_budget_sek + 0.001
+def _operator_checklist(
+    race_card: RaceCard,
+    selections: dict[int, list[int]],
+    *,
+    budget_sek: float | None = None,
+) -> str:
+    from vai.cost import compute_cost_sek
+
+    legs_ok = all(selections.get(leg) for leg in range(1, 9))
+    try:
+        _, recomputed = compute_cost_sek(selections)
+        formula_ok = True
+    except ValueError:
+        recomputed = 0.0
+        formula_ok = False
+    if budget_sek is not None:
+        cost_ok = formula_ok and recomputed <= budget_sek + 0.001
+    else:
+        cost_ok = formula_ok
     horses_ok = all(
-        set(result.selections[leg]).issubset(race_card.horses_for_leg(leg))
+        set(selections[leg]).issubset(race_card.horses_for_leg(leg))
         for leg in range(1, 9)
     )
     scratch_ok = all(
-        not (set(result.selections[leg]) & set(race_card.leg_by_number(leg).scratches))
+        not (set(selections[leg]) & set(race_card.leg_by_number(leg).scratches))
         for leg in range(1, 9)
     )
     rows = [
