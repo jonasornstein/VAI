@@ -1,0 +1,22 @@
+# Transcribed Björnkollen (Björn Goop) — private operator use.
+tip_id: bjorn-goop-2026-07-25
+expert_id: bjorn-goop
+expert_name: Björn Goop
+product_name: Björnkollen
+game: v85
+date: "2026-07-25"
+track: Bollnäs
+source_url: "https://www.atg.se/V85/tips/bjornkollen-v85-lordag"
+source_note: "Transcribed by ornstein from Björnkollen"
+fetched_at: "2026-07-24T18:54:18Z"
+status: DRAFT
+legs:
+  1: [2, 3, 5, 6, 7]
+  2: [2]
+  3: [1, 4, 9, 12, 15]
+  4: [1]
+  5: [2, 6, 8, 11]
+  6: [4, 5, 6, 9]
+  7: [1, 6, 8, 12]
+  8: [3]
+rationale: "Björnkollen V85 Bollnäs 2026-07-25 (5×1×5×1×4×4×4×1 = 1600 rader × 0.50 SEK)."
