@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-24 |
+| **Last updated** | 2026-07-25 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-25 | I | ornstein | **Expert tips Bollnäs 2026-07-25** — five real betslips transcribed to inbox (Goop, Travstugan, Referenten, Leboff, Uhrberg) | See [§ Expert tips — Bollnäs 2026-07-25](#expert-tips--bollnäs-2026-07-25) |
 | 2026-07-24 | P | ornstein | **End of session** — Expert v1.3.0 live on production; TRACE-LOG closed | See [§ End of session — 2026-07-24](#end-of-session--2026-07-24) |
 | 2026-07-24 | P | ornstein | **Production deploy v1.3.0** — Expert mode on https://vai.ornstein.work/ (`update-server.sh` as root) | `fa09597`, See [§ Release v1.3.0](#release-v130--2026-07-24) |
 | 2026-07-24 | P | Assistant | **Release commit + push** — `fa09597` Expert betslip catalog (UC-12) on `origin/master` | https://github.com/jonasornstein/VAI |
@@ -253,7 +254,7 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 | Item | Owner |
 |------|--------|
 | Next Saturday V85 — Hari and/or Expert; UC-22 entry | Kricke / ornstein |
-| Transcribe **real** expert tips into `inbox/expert-tips/` (fixture only today) | ornstein |
+| ~~Transcribe real expert tips~~ → **done 2026-07-25** (Bollnäs five tips) | ornstein |
 | Optional: commit this TRACE-LOG close-out + redeploy if needed | ornstein |
 | **v1.2** — reduced-stake (UC-14 §3a); ATG disk cache | Povl |
 | Housekeeping — archive duplicate `pending/` copies of published artifacts | Assistant |
@@ -264,6 +265,38 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 - **Ingestion remains manual** (YAML transcription); no ATG tip scrape in v1.3.
 - Daily work as **`ornstein`**; deploy as root/`sudo` only when shipping.
 - Tunnel for unreleased dev: `ssh -L 8766:127.0.0.1:8766 ornstein@168.119.155.11` then http://127.0.0.1:8766/
+
+---
+
+## Expert tips — Bollnäs 2026-07-25
+
+**AIRUP:** I (Inbox) · **Mode:** Expert (UC-12) · **Game:** V85  
+**Path:** `inbox/expert-tips/2026-07-25-bollnas/`  
+**Operator:** ornstein (manual transcription) · **Status:** all `DRAFT` until double-checked against sources
+
+| tip_id | Expert | Product / source | Combos | Cost (SEK) | Commit |
+|--------|--------|------------------|--------|------------|--------|
+| `bjorn-goop-2026-07-25` | Björn Goop | Björnkollen / ATG | 1600 (`5×1×5×1×4×4×4×1`) | 800 | `225ce90` |
+| `travstugan-2026-07-25` | Travstugan | travstugan.se | 640 (`2×4×1×1×4×5×4×1`) | 320 | `dfe646c` |
+| `referenten-2026-07-25` | Albin "Referenten" Engdahl | Travcash / ATG butik | 9216 (`8×1×8×1×6×3×8×1`) | 4608 | `32d8cbc` |
+| `leboff-2026-07-25` | Leboff | Rekatochklart | 3024 (`2×3×7×2×3×4×1×3`) | 1512 | `32d8cbc` |
+| `thomas-uhrberg-2026-07-25` | Thomas Uhrberg | thomasuhrberg.se | 2430 (`3×1×9×1×6×5×3×1`) | 1215 | `32d8cbc` |
+
+### Source URLs
+
+| tip_id | source_url |
+|--------|------------|
+| bjorn-goop | https://www.atg.se/V85/tips/bjornkollen-v85-lordag |
+| travstugan | https://travstugan.se/tidiga-v85-bra-dag-for-djuse |
+| referenten | https://www.atg.se/butik/icatierp/spel/208992_V85_2026-07-25_12_5 |
+| leboff | https://www.rekatochklart.com/trav/v85-tips/v85-tips-bollnas-25-7/ |
+| thomas-uhrberg | https://thomasuhrberg.se/v85-bollnas-25-juli/ |
+
+### Ops
+
+- Tips listed by Expert mode via `GET /api/v1/expert-tips?date=2026-07-25&track=Bollnäs`.
+- Production: ship with `sudo bash /opt/vai/deploy/update-server.sh` after each push (Björnkollen verified live earlier; remaining tips on `master` @ `32d8cbc`).
+- No code change — inbox YAML only. Cost formula: ∏(horses per leg) × 0.50 SEK.
 
 ---
 
