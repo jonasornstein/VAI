@@ -1,0 +1,22 @@
+# Transcribed Referenten (Travcash) V85 system — private operator use.
+tip_id: referenten-2026-07-25
+expert_id: referenten
+expert_name: Albin "Referenten" Engdahl
+product_name: Travcash / Travcashpodden
+game: v85
+date: "2026-07-25"
+track: Bollnäs
+source_url: "https://www.atg.se/butik/icatierp/spel/208992_V85_2026-07-25_12_5"
+source_note: "Transcribed by ornstein from Referenten / ATG butik system"
+fetched_at: "2026-07-25T08:00:00Z"
+status: DRAFT
+legs:
+  1: [1, 2, 3, 4, 5, 6, 7, 8]
+  2: [2]
+  3: [1, 4, 9, 10, 12, 13, 14, 15]
+  4: [1]
+  5: [1, 2, 4, 6, 8, 11]
+  6: [4, 5, 6]
+  7: [1, 2, 3, 6, 8, 10, 12, 14]
+  8: [3]
+rationale: "Referenten V85 Bollnäs 2026-07-25 (8×1×8×1×6×3×8×1 = 9216 rader × 0.50 SEK)."
