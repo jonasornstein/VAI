@@ -289,6 +289,68 @@ def save_expert_tip(
     )
 
 
+def delete_expert_tip(
+    tips_dir: str | Path,
+    *,
+    tip_id: str | None = None,
+    expert_id: str | None = None,
+    date: str | None = None,
+    track: str | None = None,
+) -> ExpertTip:
+    """Delete a tip YAML file. Resolve by tip_id or expert_id+date+track."""
+    root = Path(tips_dir)
+    tip: ExpertTip | None = None
+
+    if tip_id and tip_id.strip():
+        tip = find_expert_tip(root, tip_id.strip())
+    elif expert_id and date and track:
+        tip = find_expert_tip_for(
+            root,
+            expert_id=expert_id.strip(),
+            date=date.strip(),
+            track=track.strip(),
+        )
+        if tip is None:
+            raise ExpertTipValidationError(
+                f"No tip for expert_id={expert_id!r} date={date!r} track={track!r}",
+                code="TIP_NOT_FOUND",
+            )
+    else:
+        raise ExpertTipValidationError(
+            "Provide tip_id or expert_id+date+track",
+            code="MISSING_FIELD",
+        )
+
+    if not tip.path:
+        raise ExpertTipValidationError(
+            f"Tip has no path: {tip.tip_id}",
+            code="TIP_NOT_FOUND",
+        )
+    path = Path(tip.path)
+    # Safety: only delete files under tips_dir
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError as exc:
+        raise ExpertTipValidationError(
+            f"Tip path outside tips directory: {path}",
+            code="FORBIDDEN",
+        ) from exc
+    if not path.is_file():
+        raise ExpertTipValidationError(
+            f"Tip file not found: {path}",
+            code="TIP_NOT_FOUND",
+        )
+    path.unlink()
+    # Remove empty parent folder under tips_dir (not the tips root itself)
+    parent = path.parent
+    if parent != root.resolve() and parent.is_dir() and not any(parent.iterdir()):
+        try:
+            parent.rmdir()
+        except OSError:
+            pass
+    return tip
+
+
 def _tip_yaml_payload(tip: ExpertTip) -> dict[str, Any]:
     """Ordered dict for human-readable YAML."""
     payload: dict[str, Any] = {

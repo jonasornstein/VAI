@@ -66,6 +66,15 @@ def _put(url: str, payload: dict) -> tuple[int, dict]:
         return exc.code, json.loads(exc.read().decode("utf-8"))
 
 
+def _delete(url: str) -> tuple[int, dict]:
+    request = Request(url, method="DELETE")
+    try:
+        with urlopen(request) as response:
+            return response.status, json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        return exc.code, json.loads(exc.read().decode("utf-8"))
+
+
 def test_head_index_returns_200_without_body() -> None:
     server, base = _start_test_server()
     try:
@@ -246,6 +255,22 @@ def test_api_expert_tips_save_and_lookup(tmp_path: Path) -> None:
         )
         assert bad_status == 400
         assert bad["error"]["code"] == "INVALID_TIP"
+
+        del_status, deleted = _delete(
+            f"{base}/api/v1/expert-tips/bjorn-goop-2026-08-01"
+        )
+        assert del_status == 200
+        assert deleted["ok"] is True
+        assert deleted["tip_id"] == "bjorn-goop-2026-08-01"
+        assert not (tmp_path / "2026-08-01-solvalla" / "bjorn-goop-2026-08-01.yaml").is_file()
+        listed_after = _get(
+            f"{base}/api/v1/expert-tips?date=2026-08-01&track=Solvalla&expert_id=bjorn-goop"
+        )
+        assert listed_after["tips"] == []
+
+        missing_status, missing = _delete(f"{base}/api/v1/expert-tips/no-such-tip")
+        assert missing_status == 404
+        assert missing["error"]["code"] == "TIP_NOT_FOUND"
     finally:
         VaiRequestHandler.expert_tips_dir = original_dir
         server.shutdown()

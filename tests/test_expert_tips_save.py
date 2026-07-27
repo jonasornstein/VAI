@@ -10,6 +10,7 @@ import yaml
 from vai.io.expert_tips import (
     ExpertTipValidationError,
     default_tip_id,
+    delete_expert_tip,
     find_expert_tip_for,
     load_expert_tip,
     save_expert_tip,
@@ -127,3 +128,36 @@ def test_find_missing_returns_none(tmp_path: Path) -> None:
         find_expert_tip_for(tmp_path, expert_id="nope", date="2026-01-01", track="X")
         is None
     )
+
+
+def test_delete_expert_tip_removes_yaml(tmp_path: Path) -> None:
+    saved = save_expert_tip(
+        tmp_path,
+        {
+            "expert_id": "referenten",
+            "expert_name": "Referenten",
+            "game": "v85",
+            "date": "2026-08-02",
+            "track": "Jägersro",
+            "legs": _minimal_legs(),
+        },
+        fetched_at="2026-08-02T10:00:00Z",
+    )
+    path = Path(saved.path)  # type: ignore[arg-type]
+    assert path.is_file()
+
+    deleted = delete_expert_tip(tmp_path, tip_id=saved.tip_id)
+    assert deleted.tip_id == saved.tip_id
+    assert not path.is_file()
+    assert (
+        find_expert_tip_for(
+            tmp_path, expert_id="referenten", date="2026-08-02", track="Jägersro"
+        )
+        is None
+    )
+
+
+def test_delete_missing_raises(tmp_path: Path) -> None:
+    with pytest.raises(ExpertTipValidationError) as exc:
+        delete_expert_tip(tmp_path, tip_id="no-such-tip")
+    assert exc.value.code == "TIP_NOT_FOUND"

@@ -549,6 +549,16 @@
       border-color: var(--v85-light);
       color: #fff;
     }
+    .expert-tip-modal__actions .button--danger {
+      margin-right: auto;
+      background: #f8e8e8;
+      border-color: #c45c5c;
+      color: #8a1f1f;
+    }
+    .expert-tip-modal__actions .button--danger:hover:not(:disabled) {
+      background: #f0d0d0;
+      border-color: #a03030;
+    }
     .expert-tip-modal__actions .button:disabled {
       opacity: 0.55;
       cursor: not-allowed;
@@ -1275,6 +1285,7 @@
               </div>
               <p class="expert-tip-modal__error" id="expert-tip-form-error" aria-live="polite"></p>
               <div class="expert-tip-modal__actions">
+                <button type="button" class="button button--danger" id="expert-tip-delete" disabled title="Radera sparat tips">Radera</button>
                 <button type="button" class="button" id="expert-tip-cancel">Avbryt</button>
                 <button type="submit" class="button button--primary" id="expert-tip-save">Spara</button>
               </div>
@@ -2065,6 +2076,15 @@
         if (el) el.textContent = msg || "";
       }
 
+      function setExpertTipDeleteEnabled(enabled) {
+        var btn = document.getElementById("expert-tip-delete");
+        if (!btn) return;
+        btn.disabled = !enabled;
+        btn.title = enabled
+          ? "Radera sparat tips (YAML)"
+          : "Ingen sparad fil — radera ej tillgänglig";
+      }
+
       function clearExpertTipForm() {
         document.getElementById("et-tip-id").value = "";
         for (var leg = 1; leg <= 8; leg++) {
@@ -2075,6 +2095,7 @@
         document.getElementById("et-source-note").value = "";
         document.getElementById("et-rationale").value = "";
         setExpertTipFormError("");
+        setExpertTipDeleteEnabled(false);
       }
 
       function fillExpertTipForm(tip) {
@@ -2088,6 +2109,7 @@
         document.getElementById("et-source-url").value = tip.source_url || "";
         document.getElementById("et-source-note").value = tip.source_note || "";
         document.getElementById("et-rationale").value = tip.rationale || "";
+        setExpertTipDeleteEnabled(!!(tip && tip.tip_id));
       }
 
       function parseLegHorses(text, leg) {
@@ -2153,6 +2175,7 @@
           escapeHtml(ex.expert_id) +
           "</code>";
         clearExpertTipForm();
+        setExpertTipDeleteEnabled(false);
         if (ex.source_url) {
           document.getElementById("et-source-url").value = ex.source_url;
         }
@@ -2165,7 +2188,7 @@
           encodeURIComponent(date) +
           "&track=" +
           encodeURIComponent(track);
-        fetch(API + "/api/v1/expert-tips/lookup?" + qs)
+        fetch(API + "/api/v1/expert-tips/lookup?" + qs, { cache: "no-store" })
           .then(function (r) {
             return r.json().then(function (j) {
               return { ok: r.ok, status: r.status, j: j };
@@ -2179,12 +2202,88 @@
                 (res.j.error && res.j.error.message) ||
                 "Kunde inte hämta sparat tips";
               setExpertTipFormError(msg);
+            } else {
+              setExpertTipDeleteEnabled(false);
             }
             var first = document.getElementById("et-leg-1");
             if (first) first.focus();
           })
           .catch(function (e) {
             console.error(e);
+            setExpertTipFormError("API fel — kör python -m vai serve");
+            setExpertTipDeleteEnabled(false);
+          });
+      }
+
+      function removeExpertTipFromList(tipId, expertId) {
+        expertTipsCache = expertTipsCache.filter(function (t) {
+          if (tipId && t.tip_id === tipId) return false;
+          if (!tipId && expertId && t.expert_id === expertId) return false;
+          return true;
+        });
+        renderExpertTipsList(expertTipsCache);
+      }
+
+      function deleteExpertTipForm() {
+        if (!expertTipFormContext) return;
+        var tipId = document.getElementById("et-tip-id").value.trim();
+        if (!tipId) {
+          setExpertTipFormError("Inget sparat tips att radera");
+          setExpertTipDeleteEnabled(false);
+          return;
+        }
+        var label =
+          expertTipFormContext.expert_name +
+          " · " +
+          expertTipFormContext.date +
+          " · " +
+          expertTipFormContext.track;
+        if (
+          !confirm(
+            "Radera sparat experttips?\n\n" +
+              label +
+              "\n(" +
+              tipId +
+              ")\n\nYAML-filen tas bort."
+          )
+        ) {
+          return;
+        }
+        setExpertTipFormError("");
+        var delBtn = document.getElementById("expert-tip-delete");
+        if (delBtn) delBtn.disabled = true;
+        var savedDate = expertTipFormContext.date;
+        var savedTrack = expertTipFormContext.track;
+        var savedExpertId = expertTipFormContext.expert_id;
+        fetch(API + "/api/v1/expert-tips/" + encodeURIComponent(tipId), {
+          method: "DELETE",
+          cache: "no-store"
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) {
+              if (delBtn) delBtn.disabled = false;
+              setExpertTipFormError(
+                (res.j.error && res.j.error.message) || "Kunde inte radera"
+              );
+              return;
+            }
+            if (selectedTipId === tipId) {
+              selectedTipId = null;
+              setUpdateSlipEnabled(false);
+            }
+            closeExpertTipForm();
+            removeExpertTipFromList(tipId, savedExpertId);
+            loadExpertsRoster();
+            loadExpertTips({ date: savedDate, track: savedTrack, cacheBust: true });
+          })
+          .catch(function (e) {
+            console.error(e);
+            if (delBtn) delBtn.disabled = false;
             setExpertTipFormError("API fel — kör python -m vai serve");
           });
       }
@@ -2808,6 +2907,10 @@
       var expertTipCancel = document.getElementById("expert-tip-cancel");
       if (expertTipCancel) {
         expertTipCancel.addEventListener("click", closeExpertTipForm);
+      }
+      var expertTipDelete = document.getElementById("expert-tip-delete");
+      if (expertTipDelete) {
+        expertTipDelete.addEventListener("click", deleteExpertTipForm);
       }
       var expertTipModal = document.getElementById("expert-tip-modal");
       if (expertTipModal) {

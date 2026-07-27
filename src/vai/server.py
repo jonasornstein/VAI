@@ -18,6 +18,7 @@ from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
 from vai.hit_summary import compute_hit_summary
 from vai.io.expert_tips import (
     ExpertTipValidationError,
+    delete_expert_tip,
     find_expert_tip,
     find_expert_tip_for,
     list_expert_tips,
@@ -121,6 +122,18 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         if path == "/api/v1/expert-tips":
             self._handle_save_expert_tip()
+            return
+        self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
+
+    def do_DELETE(self) -> None:
+        parsed = urlparse(self.path)
+        path = parsed.path
+        if path.startswith("/api/v1/expert-tips/"):
+            tip_id = path.removeprefix("/api/v1/expert-tips/").strip("/")
+            self._handle_delete_expert_tip(tip_id, parsed.query)
+            return
+        if path == "/api/v1/expert-tips":
+            self._handle_delete_expert_tip(None, parsed.query)
             return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
@@ -367,6 +380,45 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             },
         )
 
+    def _handle_delete_expert_tip(self, tip_id: str | None, query: str) -> None:
+        params = parse_qs(query)
+        expert_id = (params.get("expert_id") or [None])[0]
+        date = (params.get("date") or [None])[0]
+        track = (params.get("track") or [None])[0]
+        # Path segment may be a real tip_id, or empty when using query only
+        if tip_id in ("", "lookup", "_lookup"):
+            tip_id = None
+        try:
+            deleted = delete_expert_tip(
+                self.expert_tips_dir,
+                tip_id=tip_id,
+                expert_id=expert_id,
+                date=date,
+                track=track,
+            )
+        except ExpertTipValidationError as exc:
+            status = HTTPStatus.NOT_FOUND if exc.code == "TIP_NOT_FOUND" else HTTPStatus.BAD_REQUEST
+            if exc.code == "FORBIDDEN":
+                status = HTTPStatus.FORBIDDEN
+            self._send_json(status, {"error": {"code": exc.code, "message": str(exc)}})
+            return
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "DELETE_FAILED", "message": str(exc)}},
+            )
+            return
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "ok": True,
+                "tip_id": deleted.tip_id,
+                "expert_id": deleted.expert_id,
+                "date": deleted.date,
+                "track": deleted.track,
+            },
+        )
+
     def _handle_generate_expert(self) -> None:
         try:
             body = self._read_json_body()
@@ -587,7 +639,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
 
     def _set_cors_headers(self) -> None:
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
 
