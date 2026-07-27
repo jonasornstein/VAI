@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-25 |
+| **Last updated** | 2026-07-27 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-27 | P | ornstein | **End of session (O&O)** — Experttips form shipped; session closed | See [§ End of session — 2026-07-27](#end-of-session--2026-07-27) |
+| 2026-07-27 | U | Assistant | **Experttips form** — enter/edit/delete tip YAML from Expert roster (form icon left of Gratis/Andel/betald); PUT/lookup/DELETE API; list refresh after save/delete | `79b640d`, `b4ceaf9`, `70e64ba`; [inbox/expert-tips/](../../inbox/expert-tips/) |
 | 2026-07-25 | P | ornstein | **End of session** — Mac SSH + tunnel OK; session closed | See [§ End of session — 2026-07-25](#end-of-session--2026-07-25) |
 | 2026-07-25 | U | ornstein | **Mac verified** — SSH + port tunnel from Mac Terminal works well; browser to dev UI OK (same flow as PC) | [deploy-hetzner.md](./deploy-hetzner.md#browse-dev-ui-from-your-pc-ssh-tunnel) |
 | 2026-07-25 | I | ornstein | **Expert tips Bollnäs 2026-07-25** — five real betslips transcribed to inbox (Goop, Travstugan, Referenten, Leboff, Uhrberg) | See [§ Expert tips — Bollnäs 2026-07-25](#expert-tips--bollnäs-2026-07-25) |
@@ -221,6 +223,39 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-27
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Git:** `origin/master` @ `70e64ba` (Experttips form + refresh + delete)  
+**Production YAML path:** `/opt/vai/inbox/expert-tips/<YYYY-MM-DD>-<track-slug>/<tip_id>.yaml`  
+**Dev:** `/home/ornstein/grok/vai` · serve **8766**
+
+### Completed this session
+
+| Item | Status | Commits |
+|------|--------|---------|
+| Experttips form UI — form icon left of Gratis / Andel/betald | Done | `79b640d` |
+| Empty form when no YAML; prefill when tip exists; Avbryt / Spara | Done | `79b640d` |
+| Save → `inbox/expert-tips/` (PUT API + IO helpers) | Done | `79b640d` |
+| Refresh **Tips för omgången** after save (optimistic + cache-bust) | Done | `b4ceaf9` |
+| **Radera** — only enabled when tip YAML already saved; DELETE API | Done | `70e64ba` |
+| Push to GitHub | Done | `79b640d`…`70e64ba` |
+| Production deploy | Operator: `sudo bash /opt/vai/deploy/update-server.sh` (sudo TTY) | — |
+
+### Operator notes
+
+- Form writes/reads production tips under **`/opt/vai/inbox/expert-tips/`** when serving prod (`vai.service`).
+- Dev clone uses **`~/grok/vai/inbox/expert-tips/`**.
+- Hard-refresh Expert tab after deploy to pick up mockup HTML.
+
+### Carry-over
+
+- Run prod deploy if not yet applied: `sudo bash /opt/vai/deploy/update-server.sh`
+- Next race-day: V85 Hari/Expert entry (UC-22)
 
 ---
 
