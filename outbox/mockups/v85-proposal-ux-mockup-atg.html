@@ -2009,10 +2009,16 @@
         });
       }
 
-      function loadExpertTips() {
-        var qs = expertDateTrackQuery();
+      function loadExpertTips(opts) {
+        opts = opts || {};
+        var qs = [];
+        var date = opts.date != null ? opts.date : document.getElementById("datum").value || "";
+        var track = opts.track != null ? opts.track : currentTrackName();
+        if (date) qs.push("date=" + encodeURIComponent(date));
+        if (track) qs.push("track=" + encodeURIComponent(track));
+        if (opts.cacheBust) qs.push("_=" + Date.now());
         var url = API + "/api/v1/expert-tips" + (qs.length ? "?" + qs.join("&") : "");
-        fetch(url)
+        return fetch(url, { cache: "no-store" })
           .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
           .then(function (res) {
             if (!res.ok) {
@@ -2028,6 +2034,28 @@
             expertTipsCache = [];
             renderExpertTipsList([]);
           });
+      }
+
+      /** Merge a saved tip summary into the omgång list immediately (then re-fetch). */
+      function upsertExpertTipInList(summary) {
+        if (!summary || !summary.tip_id) return;
+        var next = expertTipsCache.slice();
+        var idx = -1;
+        for (var i = 0; i < next.length; i++) {
+          if (next[i].tip_id === summary.tip_id || next[i].expert_id === summary.expert_id) {
+            idx = i;
+            break;
+          }
+        }
+        if (idx >= 0) next[idx] = Object.assign({}, next[idx], summary);
+        else next.push(summary);
+        next.sort(function (a, b) {
+          var an = (a.expert_name || "") + (a.tip_id || "");
+          var bn = (b.expert_name || "") + (b.tip_id || "");
+          return an < bn ? -1 : an > bn ? 1 : 0;
+        });
+        expertTipsCache = next;
+        renderExpertTipsList(expertTipsCache);
       }
 
       var expertTipFormContext = null;
@@ -2216,9 +2244,29 @@
               );
               return;
             }
+            var savedDate = expertTipFormContext.date;
+            var savedTrack = expertTipFormContext.track;
+            var summary = res.j.summary || null;
+            if (!summary && res.j.tip) {
+              summary = {
+                tip_id: res.j.tip.tip_id || res.j.tip_id,
+                expert_id: res.j.tip.expert_id,
+                expert_name: res.j.tip.expert_name,
+                product_name: res.j.tip.product_name || null,
+                date: res.j.tip.date,
+                track: res.j.tip.track,
+                combinations: res.j.combinations,
+                cost_sek: res.j.cost_sek,
+                cost_breakdown: res.j.cost_breakdown || "",
+                source_url: res.j.tip.source_url || null,
+                status: res.j.tip.status || "DRAFT"
+              };
+            }
             closeExpertTipForm();
+            // Instant update of "Tips för omgången", then authoritative re-fetch.
+            if (summary && summary.tip_id) upsertExpertTipInList(summary);
             loadExpertsRoster();
-            loadExpertTips();
+            loadExpertTips({ date: savedDate, track: savedTrack, cacheBust: true });
           })
           .catch(function (e) {
             if (saveBtn) saveBtn.disabled = false;

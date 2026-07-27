@@ -199,6 +199,10 @@ def test_api_expert_tips_save_and_lookup(tmp_path: Path) -> None:
         assert status == 200
         assert created["ok"] is True
         assert created["tip_id"] == "bjorn-goop-2026-08-01"
+        assert created["combinations"] == 1
+        assert created["cost_sek"] == 0.5
+        assert created["summary"]["tip_id"] == "bjorn-goop-2026-08-01"
+        assert created["summary"]["cost_breakdown"] == "1×1×1×1×1×1×1×1"
         assert (tmp_path / "2026-08-01-solvalla" / "bjorn-goop-2026-08-01.yaml").is_file()
 
         listed = _get(

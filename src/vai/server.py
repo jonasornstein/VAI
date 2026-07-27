@@ -23,6 +23,7 @@ from vai.io.expert_tips import (
     list_expert_tips,
     save_expert_tip,
     tip_to_dict,
+    tip_to_summary,
 )
 from vai.io.experts_roster import list_experts
 from vai.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
@@ -339,6 +340,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             except ValueError:
                 rel_path = tip.path
 
+        summary = tip_to_summary(tip)
         self._send_json(
             HTTPStatus.OK,
             {
@@ -346,6 +348,22 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 "tip_id": tip.tip_id,
                 "path": rel_path,
                 "tip": tip_to_dict(tip),
+                "combinations": summary.combinations,
+                "cost_sek": summary.cost_sek,
+                "cost_breakdown": summary.cost_breakdown,
+                "summary": {
+                    "tip_id": summary.tip_id,
+                    "expert_id": summary.expert_id,
+                    "expert_name": summary.expert_name,
+                    "product_name": summary.product_name,
+                    "date": summary.date,
+                    "track": summary.track,
+                    "combinations": summary.combinations,
+                    "cost_sek": summary.cost_sek,
+                    "cost_breakdown": summary.cost_breakdown,
+                    "source_url": summary.source_url,
+                    "status": summary.status,
+                },
             },
         )
 
