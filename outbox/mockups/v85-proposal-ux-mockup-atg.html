@@ -389,6 +389,176 @@
       color: var(--v85-headline);
       border-color: var(--atg-horse-pool-border);
     }
+    .expert-tip-form-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.55rem;
+      height: 1.55rem;
+      padding: 0;
+      margin-right: 0.35rem;
+      margin-bottom: 0.2rem;
+      vertical-align: middle;
+      border: 1px solid var(--atg-border);
+      border-radius: 4px;
+      background: var(--atg-muted-bg);
+      color: var(--v85-headline);
+      cursor: pointer;
+      line-height: 1;
+      font-size: 0.95rem;
+    }
+    .expert-tip-form-btn:hover {
+      border-color: var(--v85-light);
+      background: var(--atg-surface);
+    }
+    .expert-tip-form-btn.has-tip {
+      background: var(--atg-approved-bg);
+      border-color: var(--atg-step-done-border);
+      color: var(--atg-approved-text);
+    }
+    .expert-tip-form-btn svg {
+      width: 0.95rem;
+      height: 0.95rem;
+      display: block;
+    }
+    .expert-tip-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(0, 20, 40, 0.55);
+    }
+    .expert-tip-modal[hidden] {
+      display: none;
+    }
+    .expert-tip-modal__panel {
+      width: min(520px, 100%);
+      max-height: min(90vh, 720px);
+      overflow: auto;
+      background: var(--atg-surface);
+      color: var(--atg-text);
+      border: 1px solid var(--atg-border);
+      border-radius: 8px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      padding: 1rem 1.15rem 1.1rem;
+    }
+    .expert-tip-modal__panel h3 {
+      margin: 0 0 0.35rem;
+      font-family: ATGRubrik, sans-serif;
+      color: var(--v85-headline);
+      font-size: 1.15rem;
+    }
+    .expert-tip-modal__meta {
+      font-size: 0.85rem;
+      color: var(--horse-meta);
+      margin-bottom: 0.85rem;
+      line-height: 1.4;
+    }
+    .expert-tip-modal__meta code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9em;
+      background: var(--atg-muted-bg);
+      border: 1px solid var(--atg-border);
+      padding: 0.05em 0.3em;
+      border-radius: 3px;
+    }
+    .expert-tip-form-grid {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: 0.35rem 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .expert-tip-form-grid label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--horse-meta);
+    }
+    .expert-tip-form-grid input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 4px;
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      font-size: 0.95rem;
+    }
+    .expert-tip-form-fields {
+      display: grid;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+    }
+    .expert-tip-form-fields label {
+      display: grid;
+      gap: 0.2rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--horse-meta);
+    }
+    .expert-tip-form-fields input[type="text"],
+    .expert-tip-form-fields input[type="url"],
+    .expert-tip-form-fields textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 4px;
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      font-size: 0.95rem;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .expert-tip-form-fields textarea {
+      min-height: 2.6rem;
+      resize: vertical;
+    }
+    .expert-tip-modal__actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .expert-tip-modal__actions .button {
+      font-family: Roboto, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 4px;
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      cursor: pointer;
+    }
+    .expert-tip-modal__actions .button:hover {
+      border-color: var(--v85-light);
+    }
+    .expert-tip-modal__actions .button--primary {
+      background-image: var(--v85-gradient);
+      border-color: var(--v85-light);
+      color: #fff;
+    }
+    .expert-tip-modal__actions .button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .expert-tip-modal__error {
+      color: #b00020;
+      font-size: 0.85rem;
+      margin: 0 0 0.5rem;
+      min-height: 1.1em;
+    }
     #expert-tips-panel .stake-hint {
       color: var(--horse-meta);
     }
@@ -1066,6 +1236,52 @@
           <p class="stake-hint" id="expert-tips-empty">Inga tips för valt datum — lägg till YAML under <code>inbox/expert-tips/</code>.</p>
           <div id="expert-tips-list" class="expert-tips-list" role="listbox" aria-label="Experttips"></div>
         </div>
+
+        <div id="expert-tip-modal" class="expert-tip-modal" hidden role="dialog" aria-modal="true" aria-labelledby="expert-tip-modal-title">
+          <div class="expert-tip-modal__panel">
+            <h3 id="expert-tip-modal-title">Experttips</h3>
+            <p class="expert-tip-modal__meta" id="expert-tip-modal-meta"></p>
+            <form id="expert-tip-form" autocomplete="off">
+              <input type="hidden" id="et-expert-id" />
+              <input type="hidden" id="et-tip-id" />
+              <div class="expert-tip-form-grid" aria-label="Hästar per avdelning">
+                <label for="et-leg-1">Avd 1</label>
+                <input type="text" id="et-leg-1" inputmode="numeric" placeholder="t.ex. 2, 3, 5" />
+                <label for="et-leg-2">Avd 2</label>
+                <input type="text" id="et-leg-2" inputmode="numeric" placeholder="t.ex. 1" />
+                <label for="et-leg-3">Avd 3</label>
+                <input type="text" id="et-leg-3" inputmode="numeric" />
+                <label for="et-leg-4">Avd 4</label>
+                <input type="text" id="et-leg-4" inputmode="numeric" />
+                <label for="et-leg-5">Avd 5</label>
+                <input type="text" id="et-leg-5" inputmode="numeric" />
+                <label for="et-leg-6">Avd 6</label>
+                <input type="text" id="et-leg-6" inputmode="numeric" />
+                <label for="et-leg-7">Avd 7</label>
+                <input type="text" id="et-leg-7" inputmode="numeric" />
+                <label for="et-leg-8">Avd 8</label>
+                <input type="text" id="et-leg-8" inputmode="numeric" />
+              </div>
+              <div class="expert-tip-form-fields">
+                <label>Källa (URL)
+                  <input type="url" id="et-source-url" placeholder="https://…" />
+                </label>
+                <label>Anteckning
+                  <input type="text" id="et-source-note" placeholder="Transcribed by …" />
+                </label>
+                <label>Rationale
+                  <textarea id="et-rationale" rows="2"></textarea>
+                </label>
+              </div>
+              <p class="expert-tip-modal__error" id="expert-tip-form-error" aria-live="polite"></p>
+              <div class="expert-tip-modal__actions">
+                <button type="button" class="button" id="expert-tip-cancel">Avbryt</button>
+                <button type="submit" class="button button--primary" id="expert-tip-save">Spara</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <div class="selection-legend" aria-label="Förklaring av markeringar">
           <span><i class="legend-swatch operator" aria-hidden="true"></i> Operatörens val</span>
           <span><i class="legend-swatch random" aria-hidden="true"></i> Slumpens hästar</span>
@@ -1639,6 +1855,7 @@
         var rationaleH = document.getElementById("rationale-heading");
         var rationaleT = document.getElementById("rationale-text");
         var isExpert = activeMode === "expert";
+        if (!isExpert) closeExpertTipForm();
         if (expertPanel) expertPanel.hidden = !isExpert;
         if (hariBudget) hariBudget.hidden = isExpert;
         if (hariSeed) hariSeed.hidden = isExpert;
@@ -1736,7 +1953,22 @@
         experts.forEach(function (ex) {
           var card = document.createElement("div");
           card.className = "expert-roster-card" + (ex.has_tip ? " has-tip" : "");
-          var badges = "";
+          var formLabel = ex.has_tip ? "Redigera experttips" : "Ange experttips";
+          var formBtn =
+            '<button type="button" class="expert-tip-form-btn' +
+            (ex.has_tip ? " has-tip" : "") +
+            '" data-expert-id="' +
+            escapeHtml(ex.expert_id) +
+            '" title="' +
+            formLabel +
+            '" aria-label="' +
+            formLabel +
+            '">' +
+            '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">' +
+            '<rect x="3" y="1.5" width="10" height="13" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
+            '<path d="M5.5 5h5M5.5 7.5h5M5.5 10h3.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' +
+            "</svg></button>";
+          var badges = formBtn;
           if (ex.free === true) badges += '<span class="expert-badge free">Gratis</span>';
           else if (ex.free === false) badges += '<span class="expert-badge paid">Andel/betald</span>';
           if (ex.has_tip) badges += '<span class="expert-badge ready">Redo</span>';
@@ -1765,6 +1997,14 @@
             link +
             "</span>" +
             notes;
+          var formBtnEl = card.querySelector(".expert-tip-form-btn");
+          if (formBtnEl) {
+            formBtnEl.addEventListener("click", function (ev) {
+              ev.preventDefault();
+              ev.stopPropagation();
+              openExpertTipForm(ex);
+            });
+          }
           list.appendChild(card);
         });
       }
@@ -1787,6 +2027,203 @@
             console.error(e);
             expertTipsCache = [];
             renderExpertTipsList([]);
+          });
+      }
+
+      var expertTipFormContext = null;
+
+      function setExpertTipFormError(msg) {
+        var el = document.getElementById("expert-tip-form-error");
+        if (el) el.textContent = msg || "";
+      }
+
+      function clearExpertTipForm() {
+        document.getElementById("et-tip-id").value = "";
+        for (var leg = 1; leg <= 8; leg++) {
+          var input = document.getElementById("et-leg-" + leg);
+          if (input) input.value = "";
+        }
+        document.getElementById("et-source-url").value = "";
+        document.getElementById("et-source-note").value = "";
+        document.getElementById("et-rationale").value = "";
+        setExpertTipFormError("");
+      }
+
+      function fillExpertTipForm(tip) {
+        document.getElementById("et-tip-id").value = tip.tip_id || "";
+        var legs = tip.legs || {};
+        for (var leg = 1; leg <= 8; leg++) {
+          var horses = legs[String(leg)] || legs[leg] || [];
+          var input = document.getElementById("et-leg-" + leg);
+          if (input) input.value = Array.isArray(horses) ? horses.join(", ") : "";
+        }
+        document.getElementById("et-source-url").value = tip.source_url || "";
+        document.getElementById("et-source-note").value = tip.source_note || "";
+        document.getElementById("et-rationale").value = tip.rationale || "";
+      }
+
+      function parseLegHorses(text, leg) {
+        var raw = String(text || "").trim();
+        if (!raw) {
+          return { error: "Avd " + leg + ": ange minst en häst" };
+        }
+        var parts = raw.split(/[\s,;]+/).filter(Boolean);
+        var horses = [];
+        for (var i = 0; i < parts.length; i++) {
+          if (!/^\d+$/.test(parts[i])) {
+            return { error: "Avd " + leg + ": ogiltigt nummer \"" + parts[i] + "\"" };
+          }
+          var n = parseInt(parts[i], 10);
+          if (n < 1) {
+            return { error: "Avd " + leg + ": hästnummer måste vara ≥ 1" };
+          }
+          horses.push(n);
+        }
+        var seen = {};
+        for (var j = 0; j < horses.length; j++) {
+          if (seen[horses[j]]) {
+            return { error: "Avd " + leg + ": dubblett " + horses[j] };
+          }
+          seen[horses[j]] = true;
+        }
+        return { horses: horses };
+      }
+
+      function closeExpertTipForm() {
+        var modal = document.getElementById("expert-tip-modal");
+        if (modal) modal.hidden = true;
+        expertTipFormContext = null;
+        setExpertTipFormError("");
+      }
+
+      function openExpertTipForm(ex) {
+        var date = document.getElementById("datum").value || "";
+        var track = currentTrackName();
+        if (!date || !track) {
+          alert("Välj datum och bana först.");
+          return;
+        }
+        expertTipFormContext = {
+          expert_id: ex.expert_id,
+          expert_name: ex.display_name || ex.expert_name || ex.expert_id,
+          product_name: ex.product_name || null,
+          source_url_default: ex.source_url || null,
+          date: date,
+          track: track
+        };
+        document.getElementById("et-expert-id").value = ex.expert_id;
+        var product = ex.product_name ? " · " + ex.product_name : "";
+        document.getElementById("expert-tip-modal-meta").innerHTML =
+          "<strong>" +
+          escapeHtml(expertTipFormContext.expert_name) +
+          escapeHtml(product) +
+          "</strong><br>" +
+          escapeHtml(date) +
+          " · " +
+          escapeHtml(track) +
+          " · <code>" +
+          escapeHtml(ex.expert_id) +
+          "</code>";
+        clearExpertTipForm();
+        if (ex.source_url) {
+          document.getElementById("et-source-url").value = ex.source_url;
+        }
+        var modal = document.getElementById("expert-tip-modal");
+        if (modal) modal.hidden = false;
+        var qs =
+          "expert_id=" +
+          encodeURIComponent(ex.expert_id) +
+          "&date=" +
+          encodeURIComponent(date) +
+          "&track=" +
+          encodeURIComponent(track);
+        fetch(API + "/api/v1/expert-tips/lookup?" + qs)
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, status: r.status, j: j };
+            });
+          })
+          .then(function (res) {
+            if (res.ok && res.j.tip) {
+              fillExpertTipForm(res.j.tip);
+            } else if (res.status !== 404) {
+              var msg =
+                (res.j.error && res.j.error.message) ||
+                "Kunde inte hämta sparat tips";
+              setExpertTipFormError(msg);
+            }
+            var first = document.getElementById("et-leg-1");
+            if (first) first.focus();
+          })
+          .catch(function (e) {
+            console.error(e);
+            setExpertTipFormError("API fel — kör python -m vai serve");
+          });
+      }
+
+      function saveExpertTipForm(ev) {
+        if (ev) ev.preventDefault();
+        if (!expertTipFormContext) return;
+        setExpertTipFormError("");
+        var legs = {};
+        for (var leg = 1; leg <= 8; leg++) {
+          var input = document.getElementById("et-leg-" + leg);
+          var parsed = parseLegHorses(input ? input.value : "", leg);
+          if (parsed.error) {
+            setExpertTipFormError(parsed.error);
+            if (input) input.focus();
+            return;
+          }
+          legs[String(leg)] = parsed.horses;
+        }
+        var body = {
+          expert_id: expertTipFormContext.expert_id,
+          expert_name: expertTipFormContext.expert_name,
+          game: "v85",
+          date: expertTipFormContext.date,
+          track: expertTipFormContext.track,
+          legs: legs
+        };
+        var tipId = document.getElementById("et-tip-id").value.trim();
+        if (tipId) body.tip_id = tipId;
+        if (expertTipFormContext.product_name) {
+          body.product_name = expertTipFormContext.product_name;
+        }
+        var sourceUrl = document.getElementById("et-source-url").value.trim();
+        var sourceNote = document.getElementById("et-source-note").value.trim();
+        var rationale = document.getElementById("et-rationale").value.trim();
+        if (sourceUrl) body.source_url = sourceUrl;
+        if (sourceNote) body.source_note = sourceNote;
+        if (rationale) body.rationale = rationale;
+
+        var saveBtn = document.getElementById("expert-tip-save");
+        if (saveBtn) saveBtn.disabled = true;
+        fetch(API + "/api/v1/expert-tips", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (saveBtn) saveBtn.disabled = false;
+            if (!res.ok) {
+              setExpertTipFormError(
+                (res.j.error && res.j.error.message) || "Kunde inte spara"
+              );
+              return;
+            }
+            closeExpertTipForm();
+            loadExpertsRoster();
+            loadExpertTips();
+          })
+          .catch(function (e) {
+            if (saveBtn) saveBtn.disabled = false;
+            console.error(e);
+            setExpertTipFormError("API fel — kör python -m vai serve");
           });
       }
 
@@ -2316,6 +2753,26 @@
           if (activeMode === "expert") loadExpertsRoster();
         });
       }
+      var expertTipForm = document.getElementById("expert-tip-form");
+      if (expertTipForm) {
+        expertTipForm.addEventListener("submit", saveExpertTipForm);
+      }
+      var expertTipCancel = document.getElementById("expert-tip-cancel");
+      if (expertTipCancel) {
+        expertTipCancel.addEventListener("click", closeExpertTipForm);
+      }
+      var expertTipModal = document.getElementById("expert-tip-modal");
+      if (expertTipModal) {
+        expertTipModal.addEventListener("click", function (ev) {
+          if (ev.target === expertTipModal) closeExpertTipForm();
+        });
+      }
+      document.addEventListener("keydown", function (ev) {
+        if (ev.key === "Escape") {
+          var modal = document.getElementById("expert-tip-modal");
+          if (modal && !modal.hidden) closeExpertTipForm();
+        }
+      });
       updateAppTitle();
       updateOpenAtgButton();
       resetHitSummary();

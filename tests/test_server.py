@@ -1,6 +1,7 @@
 import json
 import threading
 from http.server import ThreadingHTTPServer
+from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -48,6 +49,16 @@ def _get(url: str) -> dict:
 def _post(url: str, payload: dict) -> tuple[int, dict]:
     body = json.dumps(payload).encode("utf-8")
     request = Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        with urlopen(request) as response:
+            return response.status, json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        return exc.code, json.loads(exc.read().decode("utf-8"))
+
+
+def _put(url: str, payload: dict) -> tuple[int, dict]:
+    body = json.dumps(payload).encode("utf-8")
+    request = Request(url, data=body, headers={"Content-Type": "application/json"}, method="PUT")
     try:
         with urlopen(request) as response:
             return response.status, json.loads(response.read().decode("utf-8"))
@@ -157,6 +168,81 @@ def test_api_expert_tips_list_and_generate() -> None:
         assert result["cost_sek"] == 54.0
         assert result["expert_name"] == "Fixture Expert"
         assert len(result["selections"]) == 8
+
+        detail = _get(f"{base}/api/v1/expert-tips/{tip_id}")
+        assert detail["tip"]["tip_id"] == tip_id
+        assert detail["tip"]["legs"]["1"] == [1]
     finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_api_expert_tips_save_and_lookup(tmp_path: Path) -> None:
+    server, base = _start_test_server()
+    original_dir = VaiRequestHandler.expert_tips_dir
+    VaiRequestHandler.expert_tips_dir = tmp_path
+    try:
+        legs = {str(leg): [1] for leg in range(1, 9)}
+        status, created = _put(
+            f"{base}/api/v1/expert-tips",
+            {
+                "expert_id": "bjorn-goop",
+                "expert_name": "Björn Goop",
+                "product_name": "Björnkollen",
+                "game": "v85",
+                "date": "2026-08-01",
+                "track": "Solvalla",
+                "legs": legs,
+                "source_note": "via UI test",
+            },
+        )
+        assert status == 200
+        assert created["ok"] is True
+        assert created["tip_id"] == "bjorn-goop-2026-08-01"
+        assert (tmp_path / "2026-08-01-solvalla" / "bjorn-goop-2026-08-01.yaml").is_file()
+
+        listed = _get(
+            f"{base}/api/v1/expert-tips?date=2026-08-01&track=Solvalla&expert_id=bjorn-goop"
+        )
+        assert len(listed["tips"]) == 1
+
+        lookup = _get(
+            f"{base}/api/v1/expert-tips/lookup"
+            "?expert_id=bjorn-goop&date=2026-08-01&track=Solvalla"
+        )
+        assert lookup["tip"]["legs"]["1"] == [1]
+        assert lookup["tip"]["source_note"] == "via UI test"
+
+        legs2 = {str(leg): [2] for leg in range(1, 9)}
+        status2, updated = _put(
+            f"{base}/api/v1/expert-tips",
+            {
+                "expert_id": "bjorn-goop",
+                "expert_name": "Björn Goop",
+                "game": "v85",
+                "date": "2026-08-01",
+                "track": "Solvalla",
+                "legs": legs2,
+            },
+        )
+        assert status2 == 200
+        assert updated["tip"]["legs"]["1"] == [2]
+        assert len(list(tmp_path.rglob("*.yaml"))) == 1
+
+        bad_status, bad = _put(
+            f"{base}/api/v1/expert-tips",
+            {
+                "expert_id": "x",
+                "expert_name": "X",
+                "game": "v85",
+                "date": "2026-08-01",
+                "track": "Solvalla",
+                "legs": {str(leg): [1] for leg in range(1, 8)},
+            },
+        )
+        assert bad_status == 400
+        assert bad["error"]["code"] == "INVALID_TIP"
+    finally:
+        VaiRequestHandler.expert_tips_dir = original_dir
         server.shutdown()
         server.server_close()

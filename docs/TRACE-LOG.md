@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-25 | P | ornstein | **End of session** — Mac SSH + tunnel OK; session closed | See [§ End of session — 2026-07-25](#end-of-session--2026-07-25) |
+| 2026-07-25 | U | ornstein | **Mac verified** — SSH + port tunnel from Mac Terminal works well; browser to dev UI OK (same flow as PC) | [deploy-hetzner.md](./deploy-hetzner.md#browse-dev-ui-from-your-pc-ssh-tunnel) |
 | 2026-07-25 | I | ornstein | **Expert tips Bollnäs 2026-07-25** — five real betslips transcribed to inbox (Goop, Travstugan, Referenten, Leboff, Uhrberg) | See [§ Expert tips — Bollnäs 2026-07-25](#expert-tips--bollnäs-2026-07-25) |
 | 2026-07-24 | P | ornstein | **End of session** — Expert v1.3.0 live on production; TRACE-LOG closed | See [§ End of session — 2026-07-24](#end-of-session--2026-07-24) |
 | 2026-07-24 | P | ornstein | **Production deploy v1.3.0** — Expert mode on https://vai.ornstein.work/ (`update-server.sh` as root) | `fa09597`, See [§ Release v1.3.0](#release-v130--2026-07-24) |
@@ -219,6 +221,28 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-25
+
+**Session owner:** ornstein  
+**Status:** **Closed** — Mac access verified; operator signed off.
+
+### Completed
+
+| Item | Status |
+|------|--------|
+| Mac Terminal SSH as `ornstein@168.119.155.11` | OK |
+| Port tunnel `-L 8766:127.0.0.1:8766` + browser on Mac | OK |
+| Same tunnel flow as Windows PC | Confirmed |
+| Operator note | “Mac works good” → close session |
+
+### Carry-over (unchanged)
+
+- Production: https://vai.ornstein.work/ (Expert v1.3.0+ as last deployed)
+- Dev: `~/grok/vai`, serve on **8766**; tunnel docs in [deploy-hetzner.md](./deploy-hetzner.md#browse-dev-ui-from-your-pc-ssh-tunnel)
+- Next race-day: V85 Hari/Expert entry (UC-22)
 
 ---
 

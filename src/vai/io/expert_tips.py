@@ -1,7 +1,9 @@
-"""F-040 — load and list expert tip YAML from inbox/expert-tips/."""
+"""F-040 — load, list, and save expert tip YAML from inbox/expert-tips/."""
 
 from __future__ import annotations
 
+import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -30,12 +32,31 @@ def default_tips_dir(repo_root: Path | None = None) -> Path:
     return repo_root / "inbox" / "expert-tips"
 
 
+def track_slug(track: str) -> str:
+    """Folder slug: Bollnäs → bollnas, Årjäng → arjang."""
+    nfkd = unicodedata.normalize("NFKD", track.strip())
+    asciiish = "".join(ch for ch in nfkd if not unicodedata.combining(ch))
+    return "".join(ch for ch in asciiish.casefold() if ch.isalnum())
+
+
+def default_tip_id(expert_id: str, date: str) -> str:
+    return f"{expert_id.strip()}-{date.strip()}"
+
+
+def tip_dir(tips_dir: str | Path, date: str, track: str) -> Path:
+    return Path(tips_dir) / f"{date.strip()}-{track_slug(track)}"
+
+
+def tip_path(tips_dir: str | Path, date: str, track: str, tip_id: str) -> Path:
+    return tip_dir(tips_dir, date, track) / f"{tip_id.strip()}.yaml"
+
+
 def load_expert_tip(path: str | Path) -> ExpertTip:
-    tip_path = Path(path)
-    data = yaml.safe_load(tip_path.read_text(encoding="utf-8"))
+    tip_path_obj = Path(path)
+    data = yaml.safe_load(tip_path_obj.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ExpertTipValidationError("Tip root must be a mapping")
-    return parse_expert_tip(data, path=str(tip_path))
+    return parse_expert_tip(data, path=str(tip_path_obj))
 
 
 def parse_expert_tip(data: dict[str, Any], *, path: str | None = None) -> ExpertTip:
@@ -75,6 +96,7 @@ def list_expert_tips(
     *,
     date: str | None = None,
     track: str | None = None,
+    expert_id: str | None = None,
 ) -> list[ExpertTipSummary]:
     root = Path(tips_dir)
     if not root.is_dir():
@@ -91,6 +113,8 @@ def list_expert_tips(
         if date is not None and tip.date != date:
             continue
         if track is not None and not _tracks_match(tip.track, track):
+            continue
+        if expert_id is not None and tip.expert_id != expert_id:
             continue
         combinations, cost_sek = compute_cost_sek(tip.legs)
         summaries.append(
@@ -126,6 +150,34 @@ def find_expert_tip(tips_dir: str | Path, tip_id: str) -> ExpertTip:
     raise ExpertTipValidationError(f"Unknown tip_id: {tip_id}", code="TIP_NOT_FOUND")
 
 
+def find_expert_tip_for(
+    tips_dir: str | Path,
+    *,
+    expert_id: str,
+    date: str,
+    track: str,
+) -> ExpertTip | None:
+    """Return the tip for expert+date+track, or None if missing."""
+    root = Path(tips_dir)
+    if not root.is_dir():
+        return None
+    for path in sorted(root.rglob("*.yaml")):
+        if path.name.startswith("."):
+            continue
+        try:
+            tip = load_expert_tip(path)
+        except (ExpertTipValidationError, OSError, yaml.YAMLError):
+            continue
+        if tip.expert_id != expert_id:
+            continue
+        if tip.date != date:
+            continue
+        if not _tracks_match(tip.track, track):
+            continue
+        return tip
+    return None
+
+
 def tip_to_summary(tip: ExpertTip) -> ExpertTipSummary:
     combinations, cost_sek = compute_cost_sek(tip.legs)
     return ExpertTipSummary(
@@ -141,6 +193,125 @@ def tip_to_summary(tip: ExpertTip) -> ExpertTipSummary:
         source_url=tip.source_url,
         status=tip.status,
     )
+
+
+def tip_to_dict(tip: ExpertTip, *, include_path: bool = False) -> dict[str, Any]:
+    """Full tip payload for API / form prefill (includes legs)."""
+    payload: dict[str, Any] = {
+        "tip_id": tip.tip_id,
+        "expert_id": tip.expert_id,
+        "expert_name": tip.expert_name,
+        "game": tip.game,
+        "date": tip.date,
+        "track": tip.track,
+        "legs": {str(k): v for k, v in sorted(tip.legs.items())},
+        "status": tip.status,
+    }
+    if tip.product_name is not None:
+        payload["product_name"] = tip.product_name
+    if tip.source_url is not None:
+        payload["source_url"] = tip.source_url
+    if tip.source_note is not None:
+        payload["source_note"] = tip.source_note
+    if tip.fetched_at is not None:
+        payload["fetched_at"] = tip.fetched_at
+    if tip.rationale is not None:
+        payload["rationale"] = tip.rationale
+    if include_path and tip.path is not None:
+        payload["path"] = tip.path
+    return payload
+
+
+def save_expert_tip(
+    tips_dir: str | Path,
+    data: dict[str, Any] | ExpertTip,
+    *,
+    fetched_at: str | None = None,
+) -> ExpertTip:
+    """Validate and write tip YAML. Overwrites existing tip for same expert/date/track."""
+    root = Path(tips_dir)
+    if isinstance(data, ExpertTip):
+        raw: dict[str, Any] = tip_to_dict(data)
+    else:
+        raw = dict(data)
+
+    expert_id = _optional_str(raw.get("expert_id")) or ""
+    date = _optional_str(raw.get("date")) or ""
+    track = _optional_str(raw.get("track")) or ""
+
+    existing: ExpertTip | None = None
+    if expert_id and date and track:
+        existing = find_expert_tip_for(root, expert_id=expert_id, date=date, track=track)
+
+    if not _optional_str(raw.get("tip_id")):
+        if existing is not None:
+            raw["tip_id"] = existing.tip_id
+        elif expert_id and date:
+            raw["tip_id"] = default_tip_id(expert_id, date)
+
+    if not _optional_str(raw.get("status")):
+        raw["status"] = existing.status if existing is not None else "DRAFT"
+
+    if fetched_at is not None:
+        raw["fetched_at"] = fetched_at
+    elif not _optional_str(raw.get("fetched_at")):
+        raw["fetched_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # Validate before choosing path so missing fields raise cleanly.
+    tip = parse_expert_tip(raw)
+
+    if existing is not None and existing.path:
+        out_path = Path(existing.path)
+    else:
+        out_path = tip_path(root, tip.date, tip.track, tip.tip_id)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = _tip_yaml_payload(tip)
+    out_path.write_text(
+        yaml.safe_dump(payload, allow_unicode=True, sort_keys=False, default_flow_style=None),
+        encoding="utf-8",
+    )
+    return ExpertTip(
+        tip_id=tip.tip_id,
+        expert_id=tip.expert_id,
+        expert_name=tip.expert_name,
+        game=tip.game,
+        date=tip.date,
+        track=tip.track,
+        legs=tip.legs,
+        product_name=tip.product_name,
+        source_url=tip.source_url,
+        source_note=tip.source_note,
+        fetched_at=tip.fetched_at,
+        status=tip.status,
+        rationale=tip.rationale,
+        path=str(out_path),
+    )
+
+
+def _tip_yaml_payload(tip: ExpertTip) -> dict[str, Any]:
+    """Ordered dict for human-readable YAML."""
+    payload: dict[str, Any] = {
+        "tip_id": tip.tip_id,
+        "expert_id": tip.expert_id,
+        "expert_name": tip.expert_name,
+    }
+    if tip.product_name is not None:
+        payload["product_name"] = tip.product_name
+    payload["game"] = tip.game
+    payload["date"] = tip.date
+    payload["track"] = tip.track
+    if tip.source_url is not None:
+        payload["source_url"] = tip.source_url
+    if tip.source_note is not None:
+        payload["source_note"] = tip.source_note
+    if tip.fetched_at is not None:
+        payload["fetched_at"] = tip.fetched_at
+    payload["status"] = tip.status
+    payload["legs"] = {leg: tip.legs[leg] for leg in range(1, NUM_LEGS + 1)}
+    if tip.rationale is not None:
+        payload["rationale"] = tip.rationale
+    return payload
 
 
 def _parse_legs(raw: Any) -> dict[int, list[int]]:

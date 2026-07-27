@@ -16,7 +16,14 @@ from urllib.parse import parse_qs, urlparse
 from vai.atg_fetch import AtgFetchError
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
 from vai.hit_summary import compute_hit_summary
-from vai.io.expert_tips import list_expert_tips
+from vai.io.expert_tips import (
+    ExpertTipValidationError,
+    find_expert_tip,
+    find_expert_tip_for,
+    list_expert_tips,
+    save_expert_tip,
+    tip_to_dict,
+)
 from vai.io.experts_roster import list_experts
 from vai.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
 from vai.models.expert_tip import ExpertError, ExpertResult
@@ -78,6 +85,10 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path == "/api/v1/expert-tips":
             self._handle_list_expert_tips(parsed.query)
             return
+        if path.startswith("/api/v1/expert-tips/"):
+            tip_id = path.removeprefix("/api/v1/expert-tips/").strip("/")
+            self._handle_get_expert_tip(tip_id, parsed.query)
+            return
         if path == "/api/v1/experts":
             self._handle_list_experts(parsed.query)
             return
@@ -99,6 +110,16 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/v1/generate/expert":
             self._handle_generate_expert()
+            return
+        if path == "/api/v1/expert-tips":
+            self._handle_save_expert_tip()
+            return
+        self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
+
+    def do_PUT(self) -> None:
+        path = urlparse(self.path).path
+        if path == "/api/v1/expert-tips":
+            self._handle_save_expert_tip()
             return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
@@ -197,7 +218,13 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         params = parse_qs(query)
         date = (params.get("date") or [None])[0]
         track = (params.get("track") or [None])[0]
-        tips = list_expert_tips(self.expert_tips_dir, date=date, track=track)
+        expert_id = (params.get("expert_id") or [None])[0]
+        tips = list_expert_tips(
+            self.expert_tips_dir,
+            date=date,
+            track=track,
+            expert_id=expert_id,
+        )
         payload = {
             "tips": [
                 {
@@ -217,6 +244,110 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             ]
         }
         self._send_json(HTTPStatus.OK, payload)
+
+    def _handle_get_expert_tip(self, tip_id: str, query: str) -> None:
+        """Full tip with legs. tip_id may be literal id, or use query expert_id+date+track via tip_id='lookup'."""
+        params = parse_qs(query)
+        if tip_id == "lookup" or tip_id == "_lookup":
+            expert_id = (params.get("expert_id") or [None])[0]
+            date = (params.get("date") or [None])[0]
+            track = (params.get("track") or [None])[0]
+            if not expert_id or not date or not track:
+                self._send_json(
+                    HTTPStatus.BAD_REQUEST,
+                    {
+                        "error": {
+                            "code": "MISSING_FIELD",
+                            "message": "expert_id, date, and track required for lookup",
+                        }
+                    },
+                )
+                return
+            tip = find_expert_tip_for(
+                self.expert_tips_dir,
+                expert_id=expert_id,
+                date=date,
+                track=track,
+            )
+            if tip is None:
+                self._send_json(
+                    HTTPStatus.NOT_FOUND,
+                    {"error": {"code": "TIP_NOT_FOUND", "message": "No tip for expert/date/track"}},
+                )
+                return
+            self._send_json(HTTPStatus.OK, {"tip": tip_to_dict(tip)})
+            return
+
+        if not tip_id or not CARD_ID_PATTERN.match(tip_id):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_ID", "message": tip_id}},
+            )
+            return
+        try:
+            tip = find_expert_tip(self.expert_tips_dir, tip_id)
+        except ExpertTipValidationError as exc:
+            status = HTTPStatus.NOT_FOUND if exc.code == "TIP_NOT_FOUND" else HTTPStatus.BAD_REQUEST
+            self._send_json(status, {"error": {"code": exc.code, "message": str(exc)}})
+            return
+        self._send_json(HTTPStatus.OK, {"tip": tip_to_dict(tip)})
+
+    def _handle_save_expert_tip(self) -> None:
+        try:
+            body = self._read_json_body()
+        except json.JSONDecodeError:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_JSON", "message": "Bad JSON body"}},
+            )
+            return
+
+        # Normalize legs keys to int-friendly form for parser
+        legs_raw = body.get("legs")
+        if isinstance(legs_raw, dict):
+            try:
+                body = {
+                    **body,
+                    "legs": {int(k): [int(h) for h in v] for k, v in legs_raw.items()},
+                }
+            except (TypeError, ValueError):
+                self._send_json(
+                    HTTPStatus.BAD_REQUEST,
+                    {"error": {"code": "INVALID_TIP", "message": "legs format invalid"}},
+                )
+                return
+
+        try:
+            tip = save_expert_tip(self.expert_tips_dir, body)
+        except ExpertTipValidationError as exc:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": exc.code, "message": str(exc)}},
+            )
+            return
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "WRITE_FAILED", "message": str(exc)}},
+            )
+            return
+
+        rel_path = None
+        if tip.path:
+            try:
+                rel_path = str(Path(tip.path).resolve().relative_to(self.repo_root.resolve()))
+            except ValueError:
+                rel_path = tip.path
+
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "ok": True,
+                "tip_id": tip.tip_id,
+                "path": rel_path,
+                "tip": tip_to_dict(tip),
+            },
+        )
 
     def _handle_generate_expert(self) -> None:
         try:
@@ -438,7 +569,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
 
     def _set_cors_headers(self) -> None:
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, HEAD, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
 

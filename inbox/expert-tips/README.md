@@ -14,6 +14,18 @@ Example: `2026-07-18-axevalla/fixture-axevalla-2026-07-18.yaml`
 
 ## How to add a tip
 
+### UI (preferred for race day)
+
+1. Open the local UI (`python -m vai serve`) → **Expert** tab.
+2. Choose **Datum** and **Bana**.
+3. Click the small form icon to the left of **Gratis** / **Andel/betald** on the expert’s roster card.
+4. Enter horse numbers per avdelning (e.g. `2, 3, 5`), optional source URL / note, then **Spara**.
+5. The tip is written under this directory; the card shows **Redo** when a tip exists for the omgång.
+
+First open for that expert + date + track is empty; later opens prefill the saved tip. **Avbryt** discards changes.
+
+### Manual YAML
+
 1. Open the expert’s published system (e.g. Björnkollen on atg.se).
 2. Copy horse numbers per V85 leg into a new YAML file (schema below).
 3. Set `source_url` and `source_note` for attribution.
