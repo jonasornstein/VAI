@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-27 | P | ornstein | **End of session (O&O)** — screen-scrape deep research logged; session closed | See [§ End of session — 2026-07-27](#end-of-session--2026-07-27) |
+| 2026-07-27 | I | Assistant | **Deep research: screen-scrape expert tip** — no scraper in v1; manual YAML only; ATG ToS + outlet constraints | [2026-07-27-deep-research-screen-scrape.md](../../inbox/research/2026-07-27-deep-research-screen-scrape.md) |
 | 2026-07-27 | P | ornstein | **End of session (O&O)** — Experttips form shipped; session closed | See [§ End of session — 2026-07-27](#end-of-session--2026-07-27) |
 | 2026-07-27 | U | Assistant | **Experttips form** — enter/edit/delete tip YAML from Expert roster (form icon left of Gratis/Andel/betald); PUT/lookup/DELETE API; list refresh after save/delete | `79b640d`, `b4ceaf9`, `70e64ba`; [inbox/expert-tips/](../../inbox/expert-tips/) |
 | 2026-07-25 | P | ornstein | **End of session** — Mac SSH + tunnel OK; session closed | See [§ End of session — 2026-07-25](#end-of-session--2026-07-25) |
@@ -230,21 +232,27 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 **Session owner:** ornstein  
 **Status:** **Closed (O&O)**  
-**Git:** `origin/master` @ `70e64ba` (Experttips form + refresh + delete)  
-**Production YAML path:** `/opt/vai/inbox/expert-tips/<YYYY-MM-DD>-<track-slug>/<tip_id>.yaml`  
-**Dev:** `/home/ornstein/grok/vai` · serve **8766**
+**Dev:** `/home/ornstein/grok/vai` · serve **8766**  
+**Production YAML path:** `/opt/vai/inbox/expert-tips/<YYYY-MM-DD>-<track-slug>/<tip_id>.yaml`
 
 ### Completed this session
 
-| Item | Status | Commits |
-|------|--------|---------|
+| Item | Status | Commits / artifact |
+|------|--------|--------------------|
 | Experttips form UI — form icon left of Gratis / Andel/betald | Done | `79b640d` |
 | Empty form when no YAML; prefill when tip exists; Avbryt / Spara | Done | `79b640d` |
 | Save → `inbox/expert-tips/` (PUT API + IO helpers) | Done | `79b640d` |
 | Refresh **Tips för omgången** after save (optimistic + cache-bust) | Done | `b4ceaf9` |
 | **Radera** — only enabled when tip YAML already saved; DELETE API | Done | `70e64ba` |
-| Push to GitHub | Done | `79b640d`…`70e64ba` |
-| Production deploy | Operator: `sudo bash /opt/vai/deploy/update-server.sh` (sudo TTY) | — |
+| **/deep-research screen-scrape expert tip** — logged to inbox research | Done | [2026-07-27-deep-research-screen-scrape.md](../../inbox/research/2026-07-27-deep-research-screen-scrape.md) |
+| Decision: **no tip scraper in v1**; manual YAML only; ATG ToS gate | Logged | same research note |
+| Push to GitHub | Done | `79b640d`…this close-out |
+
+### Research takeaway (screen-scrape)
+
+- Expert tips stay **manual transcription** → `inbox/expert-tips/`.
+- ATG terms (from 2026-01-01) forbid automated extraction; several tip outlets also restrict bots/redistribution.
+- Free full systems are HTML (Travcash, Trav.se, Rekatochklart, …) — no public tips JSON API found.
 
 ### Operator notes
 
@@ -256,6 +264,7 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 - Run prod deploy if not yet applied: `sudo bash /opt/vai/deploy/update-server.sh`
 - Next race-day: V85 Hari/Expert entry (UC-22)
+- Optional: Nisse/Povl review of screen-scrape research if policy text should land in `docs/strategies/expert.md`
 
 ---
 
