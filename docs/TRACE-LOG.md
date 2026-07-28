@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-27 |
+| **Last updated** | 2026-07-28 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-28 | P | ornstein | **End of session (O&O)** — expert roster add/delete/reset shipped; session closed | See [§ End of session — 2026-07-28](#end-of-session--2026-07-28) |
+| 2026-07-28 | U | Assistant | **Expert roster manage** — add / delete / full reset to defaults; working copy `inbox/experts/roster.yaml`; API + Expert tab UI; tips not cascade-deleted (F-044–048) | `585af6d`; [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md), [inbox/experts/](../../inbox/experts/) |
 | 2026-07-27 | P | ornstein | **End of session (O&O)** — V85 experts deep research logged & compared to roster; session closed | See [§ End of session — 2026-07-27 (experts research)](#end-of-session--2026-07-27-experts-research) |
 | 2026-07-27 | I | Assistant | **Deep research: V85 experts / full systems** — free outlets re-validated vs VAI roster; Eddie Östlund candidate; comparison scorecard | [2026-07-27-deep-research-v85-experts.md](../../inbox/research/2026-07-27-deep-research-v85-experts.md) |
 | 2026-07-27 | P | ornstein | **End of session (O&O)** — screen-scrape deep research logged; session closed | See [§ End of session — 2026-07-27](#end-of-session--2026-07-27) |
@@ -230,6 +232,43 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 ---
 
+## End of session — 2026-07-28
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` · serve **8766**  
+**Production:** https://vai.ornstein.work/ (deploy: `sudo bash /opt/vai/deploy/update-server.sh` if not yet applied)
+
+### Completed this session
+
+| Item | Status | Commits / artifact |
+|------|--------|--------------------|
+| Plan + ship **add / delete experts** + **restore default set** | Done | `585af6d` |
+| Working roster full copy | Done | `inbox/experts/roster.yaml` (after first edit); defaults stay `src/vai/strategies/experts.yaml` |
+| API: POST/PUT/DELETE `/api/v1/experts`, POST `/api/v1/experts/reset` | Done | `src/vai/server.py`, `io/experts_roster.py` |
+| Expert tab: Lägg till expert, trash on card, Återställ roster | Done | `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
+| Delete = roster only (tips YAML kept) | Done | product decision ER-004 |
+| Full reset = overwrite working with shipped defaults | Done | product decision ER-005 |
+| Spec F-044–048, UC-12 alternate, tests | Done | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md); 73 tests green |
+| Commit + push `master` | Done | `585af6d` → origin |
+| Prod deploy this session | Blocked (sudo password) | run `sudo bash /opt/vai/deploy/update-server.sh` when ready |
+
+### Operator notes
+
+- **Lägg till expert** → working roster under `inbox/experts/` (prod: `/opt/vai/inbox/experts/`).
+- **Ta bort** removes from list only; tip files under `inbox/expert-tips/` remain.
+- **Återställ roster** restores the shipped default set (customs gone; tips still kept).
+- Hard-refresh Expert tab after deploy to pick up mockup HTML.
+
+### Carry-over
+
+- Prod deploy if not applied: `sudo bash /opt/vai/deploy/update-server.sh`
+- Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
+- Optional: add Eddie Östlund via UI (or defaults) when transcribed regularly
+- Next race-day: V85 Hari/Expert entry (UC-22)
+
+---
+
 ## End of session — 2026-07-27 (experts research)
 
 **Session owner:** ornstein  
@@ -255,7 +294,7 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 ### Carry-over
 
-- Optional: add `eddie-ostlund` to `experts.yaml` when/if transcribed regularly
+- Optional: add `eddie-ostlund` via Expert roster UI when/if transcribed regularly
 - Optional: Nisse review if roster notes should land in `docs/strategies/expert.md`
 - Next race-day: V85 Hari/Expert entry (UC-22)
 
