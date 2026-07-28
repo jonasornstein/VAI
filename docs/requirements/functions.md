@@ -84,6 +84,11 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | F-041 | `select_expert_tip` | Operator chooses tip_id | tip_id | Selected tip ref | UC-12 |
 | F-042 | `load_expert_betslip` | Load leg→horses from tip; cost via F-060/061 | tip, optional RaceCard | Selections + cost | UC-12 |
 | F-043 | `apply_manual_override` | Replace leg selection after load | Leg, horses[] | Updated selection | UC-12 |
+| F-044 | `list_experts_roster` | Effective roster (working copy or shipped defaults) | repo root | Expert entries | UC-12 |
+| F-045 | `add_expert` | Append expert to working roster | entry fields | Expert entry | UC-12 |
+| F-046 | `delete_expert` | Remove from working roster (tips kept) | expert_id | Deleted entry | UC-12 |
+| F-047 | `reset_experts_roster` | Overwrite working roster with shipped defaults | repo root | Default entries | UC-12 |
+| F-048 | `update_expert` | Edit metadata on working roster | expert_id, fields | Updated entry | UC-12 |
 
 ---
 
@@ -154,6 +159,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | **UX / mockup only** | F-070, F-090, F-092 | Print slip (not PDF export); theme toggle in mockup variants |
 | **Agent / manual (AIRUP)** | F-002–003, F-010–014, F-072–073, F-080–081 | Skills and operator workflow; not automated in `src/` |
 | **Shipped (v1.3 — Expert betslips)** | F-040–043 | Tip catalog YAML; list/select/load; no scraper |
+| **Shipped (v1.3.x — Expert roster manage)** | F-044–048 | Add/update/delete/reset working roster (`inbox/experts/roster.yaml`) |
 | **Deferred** | F-008, F-050–051, F-053–054 | Scrape fallback; full quant model |
 | **Could (v1.2+)** | Reduced-stake cost variants (UC-14 §3a), F-054, F-090 (PDF) | α ∈ {0.30, 0.50, 0.70} |
 
@@ -170,6 +176,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | `strategies/random.py` | F-030–032, F-031 |
 | `strategies/expert.py` | F-041–043 (load/select/override) |
 | `io/expert_tips.py` | F-040 list/load tip YAML |
+| `io/experts_roster.py` | F-044–048 effective roster load/add/update/delete/reset |
 | `cost.py` | F-060–062 |
 | `hit_summary.py` | F-052 (basic) |
 | `server.py` | Local UI API routes (random + expert) |
@@ -180,6 +187,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.3 | 2026-07-28 | F-044–048 expert roster manage (working copy + reset) |
 | 1.2 | 2026-07-15 | F-040–043 Expert betslips (list/select/load); not pattern templates |
 | 1.1 | 2026-07-08 | F-029 race info shipped (UC-15) |
 | 1.0 | 2026-07-07 | APPROVED — canonical F-* catalog; shipped vs deferred aligned with v1.1 |

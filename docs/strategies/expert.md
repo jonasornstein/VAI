@@ -5,12 +5,14 @@
 | **Mode** | `expert` |
 | **Owner** | Nisse (roster / tip fidelity), ornstein (operator UX), Povl (cost) |
 | **Status** | APPROVED |
-| **Version** | 0.3 |
-| **Last updated** | 2026-07-15 |
+| **Version** | 0.4 |
+| **Last updated** | 2026-07-28 |
 | **Spec** | [expert-v1.md](../../outbox/specs/expert-v1.md) |
 | **Use case** | [UC-12](../requirements/use-cases/UC-12-expert-mode.md) |
 | **Research** | [2026-07-15-experts-travet.md](../../inbox/research/2026-07-15-experts-travet.md) |
-| **Machine roster** | [experts.yaml](../../src/vai/strategies/experts.yaml) |
+| **Machine roster (defaults)** | [experts.yaml](../../src/vai/strategies/experts.yaml) |
+| **Working roster (operator)** | [inbox/experts/roster.yaml](../../inbox/experts/) — full editable copy; reset restores defaults |
+| **Roster manage spec** | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
 
 ---
 
@@ -57,7 +59,13 @@ Use `expert_id` from the roster when writing tip YAML.
 
 ## 4. Expert roster (v0.3)
 
-Canonical IDs for tip files (`expert_id`). Full metadata: `src/vai/strategies/experts.yaml`.
+Canonical IDs for tip files (`expert_id`).
+
+- **Shipped defaults:** `src/vai/strategies/experts.yaml` (research snapshot; Nisse).
+- **Operator working copy:** `inbox/experts/roster.yaml` after first add/delete; missing file → defaults.
+- **Manage in UI:** Expert tab — lägg till, ta bort, återställ standard. Tips under `inbox/expert-tips/` are separate (delete expert does not delete tips).
+
+Full default metadata: `src/vai/strategies/experts.yaml`.
 
 ### 4.1 Priority for free full-system transcription
 

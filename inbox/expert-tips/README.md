@@ -59,10 +59,12 @@ rationale: "Optional note"
 
 ## Expert roster
 
-Use `expert_id` from:
+Use `expert_id` from the **effective roster** (UI Expert tab, or API `GET /api/v1/experts`):
 
-- [docs/strategies/expert.md](../../docs/strategies/expert.md) §4
-- [src/vai/strategies/experts.yaml](../../src/vai/strategies/experts.yaml)
+- Working copy (if customized): [inbox/experts/roster.yaml](../experts/roster.yaml)
+- Shipped defaults: [src/vai/strategies/experts.yaml](../../src/vai/strategies/experts.yaml)
+- Human catalog: [docs/strategies/expert.md](../../docs/strategies/expert.md) §4
+- Add/remove experts in UI: [inbox/experts/README.md](../experts/README.md)
 
 Research directory of outlets/experts:
 

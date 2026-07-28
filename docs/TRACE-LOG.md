@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-27 | P | ornstein | **End of session (O&O)** — V85 experts deep research logged & compared to roster; session closed | See [§ End of session — 2026-07-27 (experts research)](#end-of-session--2026-07-27-experts-research) |
+| 2026-07-27 | I | Assistant | **Deep research: V85 experts / full systems** — free outlets re-validated vs VAI roster; Eddie Östlund candidate; comparison scorecard | [2026-07-27-deep-research-v85-experts.md](../../inbox/research/2026-07-27-deep-research-v85-experts.md) |
 | 2026-07-27 | P | ornstein | **End of session (O&O)** — screen-scrape deep research logged; session closed | See [§ End of session — 2026-07-27](#end-of-session--2026-07-27) |
 | 2026-07-27 | I | Assistant | **Deep research: screen-scrape expert tip** — no scraper in v1; manual YAML only; ATG ToS + outlet constraints | [2026-07-27-deep-research-screen-scrape.md](../../inbox/research/2026-07-27-deep-research-screen-scrape.md) |
 | 2026-07-27 | P | ornstein | **End of session (O&O)** — Experttips form shipped; session closed | See [§ End of session — 2026-07-27](#end-of-session--2026-07-27) |
@@ -225,6 +227,37 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-27 (experts research)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai`
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| `/deep-research` V85 experts sharing full 8-leg systems | Done (Partial) | workflow deep-research |
+| Inbox research note + comparison vs roster | Done | [2026-07-27-deep-research-v85-experts.md](../../inbox/research/2026-07-27-deep-research-v85-experts.md) |
+| Free full-system outlets re-validated (5 + 2 hubs) | Match VAI | Travcash, Rekatochklart, Trav.se, Travstugan, Travmaskinen; Trava På!, Gratistravtips.se |
+| Scorecard: net-new vs enrich vs flag review | Logged | same research note |
+
+### Research takeaway (experts / full systems)
+
+- VAI free-priority list and hubs **already correct** — research is validation, not overhaul.
+- **Only clear roster candidate:** Eddie Östlund (Travcash free tipster).
+- Enrich later if useful: Trav.se writers (BelminK, Kåvestam, Lönnaeus); Trav365 Nicklasson/Carlsson.
+- Optional flag review: `thomas-uhrberg` (full system on Bollnäs 25/7 vs `partial`); Travmaskinen builder vs fixed free matrix.
+- Manual tip transcription remains the path (see screen-scrape research).
+
+### Carry-over
+
+- Optional: add `eddie-ostlund` to `experts.yaml` when/if transcribed regularly
+- Optional: Nisse review if roster notes should land in `docs/strategies/expert.md`
+- Next race-day: V85 Hari/Expert entry (UC-22)
 
 ---
 

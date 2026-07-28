@@ -275,3 +275,76 @@ def test_api_expert_tips_save_and_lookup(tmp_path: Path) -> None:
         VaiRequestHandler.expert_tips_dir = original_dir
         server.shutdown()
         server.server_close()
+
+
+def test_api_experts_add_delete_reset(tmp_path: Path) -> None:
+    """Mutations use an isolated repo_root so inbox/experts is not polluted."""
+    # Point working roster under tmp; keep tips/mockup from real repo for GET annotations
+    isolated = tmp_path / "repo"
+    (isolated / "inbox" / "experts").mkdir(parents=True)
+    (isolated / "pyproject.toml").write_text("[project]\nname='vai-test'\n", encoding="utf-8")
+
+    server, base = _start_test_server()
+    original_root = VaiRequestHandler.repo_root
+    try:
+        VaiRequestHandler.repo_root = isolated
+
+        status, created = _post(
+            f"{base}/api/v1/experts",
+            {
+                "expert_id": "eddie-ostlund",
+                "display_name": "Eddie Östlund",
+                "outlet": "Travcash",
+                "free": True,
+            },
+        )
+        assert status == 201, created
+        assert created["ok"] is True
+        assert created["expert"]["expert_id"] == "eddie-ostlund"
+        assert (isolated / "inbox" / "experts" / "roster.yaml").is_file()
+
+        listed = _get(f"{base}/api/v1/experts")
+        ids = {e["expert_id"] for e in listed["experts"]}
+        assert "eddie-ostlund" in ids
+        assert "bjorn-goop" in ids
+
+        conflict_status, conflict = _post(
+            f"{base}/api/v1/experts",
+            {"expert_id": "eddie-ostlund", "display_name": "Dup"},
+        )
+        assert conflict_status == 409
+        assert conflict["error"]["code"] == "EXPERT_EXISTS"
+
+        put_status, put_body = _put(
+            f"{base}/api/v1/experts/eddie-ostlund",
+            {"notes": "Travcash free tipster", "free": True},
+        )
+        assert put_status == 200
+        assert put_body["expert"]["notes"] == "Travcash free tipster"
+
+        del_status, deleted = _delete(f"{base}/api/v1/experts/eddie-ostlund")
+        assert del_status == 200
+        assert deleted["expert_id"] == "eddie-ostlund"
+        listed2 = _get(f"{base}/api/v1/experts")
+        assert all(e["expert_id"] != "eddie-ostlund" for e in listed2["experts"])
+
+        # Delete a default expert then reset
+        del2_status, _ = _delete(f"{base}/api/v1/experts/leboff")
+        assert del2_status == 200
+        assert all(e["expert_id"] != "leboff" for e in _get(f"{base}/api/v1/experts")["experts"])
+
+        reset_status, reset_body = _post(f"{base}/api/v1/experts/reset", {})
+        assert reset_status == 200
+        assert reset_body["restored"] is True
+        reset_ids = {e["expert_id"] for e in reset_body["experts"]}
+        assert "leboff" in reset_ids
+        assert "eddie-ostlund" not in reset_ids
+        assert "fixture" not in reset_ids
+
+        fixture_status, fixture_err = _delete(f"{base}/api/v1/experts/fixture")
+        assert fixture_status == 400
+        assert fixture_err["error"]["code"] == "FORBIDDEN_ID"
+    finally:
+        VaiRequestHandler.repo_root = original_root
+        server.shutdown()
+        server.server_close()

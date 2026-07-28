@@ -4,11 +4,11 @@
 |-------|-------|
 | **ID** | UC-12 |
 | **Status** | REVIEW |
-| **Version** | 1.1 |
+| **Version** | 1.2 |
 | **Reviewer** | Nisse (roster/fidelity), ornstein (operator UX) |
-| **Last updated** | 2026-07-15 |
+| **Last updated** | 2026-07-28 |
 | **Primary actor** | Operator |
-| **Implements** | F-040–F-043 (betslip catalog) |
+| **Implements** | F-040–F-048 (betslip catalog + roster manage) |
 | **Spec** | [expert-v1.md](../../../outbox/specs/expert-v1.md) |
 | **Supersedes** | v1.0 pattern-template narrative (spik/halvleg/öppen generator) |
 
@@ -43,9 +43,16 @@ This is **curated tip selection**, not algorithmic pattern generation.
 | 4b | Tip includes scratched horse | Abort `SCRATCHED_HORSE` |
 | 5a | Override empty leg | Abort `EMPTY_LEG` |
 
+## Alternate: manage roster (F-044–F-048)
+
+1. Operator opens Expert tab; **F-044** shows effective roster (working copy or shipped defaults).
+2. **Add** expert (**F-045**) or **edit** metadata (**F-048**) → working `inbox/experts/roster.yaml`.
+3. **Delete** expert (**F-046**) removes from roster only; tip YAML under `inbox/expert-tips/` is kept.
+4. **Reset** (**F-047**) overwrites working roster with shipped defaults (full restore).
+
 ## Functions invoked
 
-F-040, F-041, F-042, F-043, F-060, F-061 (optional F-052 basic when distributions present)
+F-040–F-048, F-060, F-061 (optional F-052 basic when distributions present)
 
 ## Special requirements
 
@@ -67,5 +74,6 @@ F-040, F-041, F-042, F-043, F-060, F-061 (optional F-052 basic when distribution
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.2 | 2026-07-28 | Roster manage: add/delete/reset (F-044–048); tips still separate |
 | 1.1 | 2026-07-15 | Redefined as expert betslip list/select; implementation shipped v1.3 |
 | 1.0 | 2026-07-07 | APPROVED — pattern templates (superseded by 1.1 product intent) |

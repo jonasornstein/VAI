@@ -26,7 +26,14 @@ from vai.io.expert_tips import (
     tip_to_dict,
     tip_to_summary,
 )
-from vai.io.experts_roster import list_experts
+from vai.io.experts_roster import (
+    ExpertRosterError,
+    add_expert,
+    delete_expert,
+    list_experts,
+    reset_experts_roster,
+    update_expert,
+)
 from vai.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
 from vai.models.expert_tip import ExpertError, ExpertResult
 from vai.models.proposal import RandomError, RandomResult
@@ -94,6 +101,11 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path == "/api/v1/experts":
             self._handle_list_experts(parsed.query)
             return
+        if path.startswith("/api/v1/experts/"):
+            expert_id = path.removeprefix("/api/v1/experts/").strip("/")
+            if expert_id and expert_id != "reset":
+                self._handle_get_expert(expert_id)
+                return
         if path.startswith("/mockup/"):
             rel = path.removeprefix("/mockup/").lstrip("/")
             target = (self.mockup_dir / rel).resolve()
@@ -116,6 +128,12 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path == "/api/v1/expert-tips":
             self._handle_save_expert_tip()
             return
+        if path == "/api/v1/experts/reset":
+            self._handle_reset_experts()
+            return
+        if path == "/api/v1/experts":
+            self._handle_add_expert()
+            return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
     def do_PUT(self) -> None:
@@ -123,6 +141,11 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path == "/api/v1/expert-tips":
             self._handle_save_expert_tip()
             return
+        if path.startswith("/api/v1/experts/"):
+            expert_id = path.removeprefix("/api/v1/experts/").strip("/")
+            if expert_id and expert_id != "reset":
+                self._handle_update_expert(expert_id)
+                return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
     def do_DELETE(self) -> None:
@@ -135,6 +158,11 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path == "/api/v1/expert-tips":
             self._handle_delete_expert_tip(None, parsed.query)
             return
+        if path.startswith("/api/v1/experts/"):
+            expert_id = path.removeprefix("/api/v1/experts/").strip("/")
+            if expert_id and expert_id != "reset":
+                self._handle_delete_expert(expert_id)
+                return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
     def do_OPTIONS(self) -> None:
@@ -208,7 +236,11 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         params = parse_qs(query)
         free_only = (params.get("free") or ["0"])[0] in ("1", "true", "yes")
         include_fixture = (params.get("include_fixture") or ["0"])[0] in ("1", "true", "yes")
-        experts = list_experts(free_only=free_only, exclude_fixture=not include_fixture)
+        experts = list_experts(
+            repo_root=self.repo_root,
+            free_only=free_only,
+            exclude_fixture=not include_fixture,
+        )
         # Annotate how many tips exist for optional date/track filter
         date = (params.get("date") or [None])[0]
         track = (params.get("track") or [None])[0]
@@ -227,6 +259,126 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             ]
         }
         self._send_json(HTTPStatus.OK, payload)
+
+    def _handle_get_expert(self, expert_id: str) -> None:
+        if not CARD_ID_PATTERN.match(expert_id):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_ID", "message": expert_id}},
+            )
+            return
+        experts = list_experts(repo_root=self.repo_root, exclude_fixture=False)
+        found = next((e for e in experts if e.expert_id == expert_id), None)
+        if found is None:
+            self._send_json(
+                HTTPStatus.NOT_FOUND,
+                {"error": {"code": "EXPERT_NOT_FOUND", "message": expert_id}},
+            )
+            return
+        self._send_json(HTTPStatus.OK, {"expert": found.to_dict()})
+
+    def _handle_add_expert(self) -> None:
+        try:
+            body = self._read_json_body()
+        except json.JSONDecodeError:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_JSON", "message": "Bad JSON body"}},
+            )
+            return
+        try:
+            entry = add_expert(body, repo_root=self.repo_root)
+        except ExpertRosterError as exc:
+            status = HTTPStatus.BAD_REQUEST
+            if exc.code == "EXPERT_EXISTS":
+                status = HTTPStatus.CONFLICT
+            elif exc.code == "FORBIDDEN_ID":
+                status = HTTPStatus.BAD_REQUEST
+            self._send_json(status, {"error": {"code": exc.code, "message": str(exc)}})
+            return
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "WRITE_FAILED", "message": str(exc)}},
+            )
+            return
+        self._send_json(HTTPStatus.CREATED, {"ok": True, "expert": entry.to_dict()})
+
+    def _handle_update_expert(self, expert_id: str) -> None:
+        if not CARD_ID_PATTERN.match(expert_id):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_ID", "message": expert_id}},
+            )
+            return
+        try:
+            body = self._read_json_body()
+        except json.JSONDecodeError:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_JSON", "message": "Bad JSON body"}},
+            )
+            return
+        try:
+            entry = update_expert(expert_id, body, repo_root=self.repo_root)
+        except ExpertRosterError as exc:
+            status = HTTPStatus.BAD_REQUEST
+            if exc.code == "EXPERT_NOT_FOUND":
+                status = HTTPStatus.NOT_FOUND
+            self._send_json(status, {"error": {"code": exc.code, "message": str(exc)}})
+            return
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "WRITE_FAILED", "message": str(exc)}},
+            )
+            return
+        self._send_json(HTTPStatus.OK, {"ok": True, "expert": entry.to_dict()})
+
+    def _handle_delete_expert(self, expert_id: str) -> None:
+        if not CARD_ID_PATTERN.match(expert_id):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_ID", "message": expert_id}},
+            )
+            return
+        try:
+            deleted = delete_expert(expert_id, repo_root=self.repo_root)
+        except ExpertRosterError as exc:
+            status = HTTPStatus.BAD_REQUEST
+            if exc.code == "EXPERT_NOT_FOUND":
+                status = HTTPStatus.NOT_FOUND
+            self._send_json(status, {"error": {"code": exc.code, "message": str(exc)}})
+            return
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "WRITE_FAILED", "message": str(exc)}},
+            )
+            return
+        self._send_json(
+            HTTPStatus.OK,
+            {"ok": True, "expert_id": deleted.expert_id, "expert": deleted.to_dict()},
+        )
+
+    def _handle_reset_experts(self) -> None:
+        try:
+            entries = reset_experts_roster(repo_root=self.repo_root)
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "WRITE_FAILED", "message": str(exc)}},
+            )
+            return
+        # Match list shape without tip annotations
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "ok": True,
+                "restored": True,
+                "experts": [e.to_dict() for e in entries if e.expert_id != "fixture"],
+            },
+        )
 
     def _handle_list_expert_tips(self, query: str) -> None:
         params = parse_qs(query)
