@@ -2,12 +2,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.1 |
+| **Version** | 0.2 |
 | **Status** | AWAITING_OPERATOR |
-| **AIRUP phase** | R |
+| **AIRUP phase** | R / U |
 | **Reviewer** | ornstein (UX), Nisse (default roster fidelity) |
 | **Author** | Assistant |
-| **Last updated** | 2026-07-28 |
+| **Last updated** | 2026-07-29 |
 | **Implements** | F-044–F-048; UC-12 extension (manage roster) |
 | **Parent** | [expert-v1.md](../../outbox/specs/expert-v1.md) |
 
@@ -15,7 +15,9 @@
 
 ## 1. Purpose
 
-Let the operator **add**, **edit**, **delete**, and **fully restore** the expert roster used by Expert mode. Shipped defaults stay immutable; the working copy is operator-editable.
+Let the operator **add**, **edit**, **soft-hide / show**, and **fully restore** the expert roster used by Expert mode. Shipped defaults stay immutable; the working copy is operator-editable.
+
+Experts are **never hard-deleted** from the working roster. Visibility is controlled with `visible: true|false`.
 
 Tip YAML under `inbox/expert-tips/` is unchanged (enter/edit/delete tips already shipped).
 
@@ -28,10 +30,11 @@ Tip YAML under `inbox/expert-tips/` is unchanged (enter/edit/delete tips already
 | ER-001 | Storage | Editable **full copy** at `inbox/experts/roster.yaml`; defaults at `src/vai/strategies/experts.yaml` |
 | ER-002 | Cold start | Missing working file → load defaults (no write until first mutation) |
 | ER-003 | First mutation | Materialize full default copy into working path, then apply change |
-| ER-004 | Delete | Remove from roster only; **do not** delete tip YAML |
+| ER-004 | Hide | **Soft-hide only**: set `visible: false`; row stays in working YAML; tip YAML not deleted |
 | ER-005 | Reset | Full reset: overwrite working roster with shipped defaults |
-| ER-006 | Edit | PUT updates metadata; `expert_id` immutable |
-| ER-007 | Fixture | UI excludes `fixture`; cannot delete via API (`FORBIDDEN_ID`) |
+| ER-006 | Edit | PUT updates metadata (incl. `visible`); `expert_id` immutable |
+| ER-007 | Fixture | UI excludes `fixture`; cannot hide/mutate via API (`FORBIDDEN_ID`) |
+| ER-008 | Default visible | Missing `visible` in YAML → treat as **`true`** (backward compatible) |
 
 ---
 
@@ -46,7 +49,7 @@ Tip YAML under `inbox/expert-tips/` is unchanged (enter/edit/delete tips already
 
 ## 4. Schema
 
-Same fields as defaults:
+Same fields as defaults, plus soft-hide:
 
 | Field | Required |
 |-------|----------|
@@ -55,6 +58,7 @@ Same fields as defaults:
 | `product_name`, `outlet`, `source_url`, `notes` | No |
 | `publishes_full_system` | No — bool or string (`partial`, etc.) |
 | `free` | No — bool |
+| `visible` | No — bool; default **`true`** when missing |
 
 ---
 
@@ -62,10 +66,12 @@ Same fields as defaults:
 
 | Method | Path | Result |
 |--------|------|--------|
-| GET | `/api/v1/experts` | Effective roster + tip annotations (unchanged shape) |
-| POST | `/api/v1/experts` | Add → `201` + entry |
-| PUT | `/api/v1/experts/{expert_id}` | Update → `200` + entry |
-| DELETE | `/api/v1/experts/{expert_id}` | Remove → `200` + deleted entry |
+| GET | `/api/v1/experts` | Effective roster + tip annotations (includes hidden by default) |
+| GET | `/api/v1/experts?visible=1` | Only `visible: true` |
+| GET | `/api/v1/experts?visible=0` | Only `visible: false` |
+| POST | `/api/v1/experts` | Add → `201` + entry (`visible` defaults true) |
+| PUT | `/api/v1/experts/{expert_id}` | Update (incl. `visible`) → `200` + entry |
+| DELETE | `/api/v1/experts/{expert_id}` | Soft-hide → `200` + entry with `visible: false` (row retained) |
 | POST | `/api/v1/experts/reset` | Full reset → `200` + `{ experts, restored: true }` |
 
 ### Error codes
@@ -85,14 +91,21 @@ Same fields as defaults:
 Expert tab toolbar:
 
 - **Lägg till expert** — modal (name, id slug, optional metadata, free checkbox)
-- **Återställ roster** — confirm full reset (tips not deleted)
+- **Återställ roster** — confirm full reset (tips not deleted; customs removed; defaults all visible)
 
-Per card: remove control with confirm (tips kept). Tip form icon unchanged.
+Per card:
+
+- **Visa** tick-box — toggles `visible` via PUT (primary hide/show control)
+- Tip form icon unchanged
+- **No trash / hard-delete control**
+
+Hidden cards stay in the list (muted) so the operator can re-check **Visa**.
 
 ---
 
 ## 7. Non-goals
 
+- Hard remove of roster rows (except full reset overwrite)
 - Cascade-delete tips
 - Scraping / auto roster sync from research
 - Auth on write endpoints
@@ -104,4 +117,5 @@ Per card: remove control with confirm (tips kept). Tip form icon unchanged.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2 | 2026-07-29 | Soft-hide: `visible` field; DELETE hides; UI tick-box replaces trash |
 | 0.1 | 2026-07-28 | Initial spec from approved plan |

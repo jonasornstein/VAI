@@ -32,9 +32,13 @@ class ExpertRosterEntry:
     notes: str | None = None
     publishes_full_system: bool | str | None = None
     free: bool | None = None
+    visible: bool = True
 
     def to_dict(self) -> dict[str, Any]:
-        return {k: v for k, v in asdict(self).items() if v is not None}
+        # Always include visible (bool) so clients can toggle soft-hide.
+        d = {k: v for k, v in asdict(self).items() if v is not None or k == "visible"}
+        d["visible"] = bool(self.visible)
+        return d
 
 
 def default_roster_path() -> Path:
@@ -100,12 +104,15 @@ def list_experts(
     repo_root: str | Path | None = None,
     free_only: bool = False,
     exclude_fixture: bool = True,
+    visible_only: bool = False,
 ) -> list[ExpertRosterEntry]:
     entries = load_experts_roster(path, repo_root=repo_root)
     if exclude_fixture:
         entries = [e for e in entries if e.expert_id != "fixture"]
     if free_only:
         entries = [e for e in entries if e.free is True]
+    if visible_only:
+        entries = [e for e in entries if e.visible is True]
     return entries
 
 
@@ -204,6 +211,7 @@ def update_expert(
         "notes",
         "publishes_full_system",
         "free",
+        "visible",
     ):
         if key in data:
             merged[key] = data[key]
@@ -219,7 +227,7 @@ def delete_expert(
     *,
     repo_root: str | Path,
 ) -> ExpertRosterEntry:
-    """Remove expert from working roster. Does not delete tip YAML."""
+    """Hide expert (visible=false). Does not remove roster row or tip YAML."""
     eid = (expert_id or "").strip()
     if not eid:
         raise ExpertRosterError("expert_id required", code="INVALID_EXPERT")
@@ -231,13 +239,17 @@ def delete_expert(
 
     working = materialize_working_roster(repo_root)
     entries = load_experts_roster(working)
-    found = next((e for e in entries if e.expert_id == eid), None)
-    if found is None:
+    idx = next((i for i, e in enumerate(entries) if e.expert_id == eid), None)
+    if idx is None:
         raise ExpertRosterError(f"Unknown expert_id: {eid!r}", code="EXPERT_NOT_FOUND")
 
-    remaining = [e for e in entries if e.expert_id != eid]
-    save_experts_roster(remaining, working)
-    return found
+    found = entries[idx]
+    if found.visible is False:
+        return found
+    hidden = parse_expert_entry({**found.to_dict(), "expert_id": eid, "visible": False})
+    entries[idx] = hidden
+    save_experts_roster(entries, working)
+    return hidden
 
 
 def reset_experts_roster(*, repo_root: str | Path) -> list[ExpertRosterEntry]:
@@ -291,6 +303,14 @@ def _entry_from_dict(item: dict[str, Any], *, strict: bool) -> ExpertRosterEntry
     if pfs is not None and not isinstance(pfs, (bool, str)):
         pfs = str(pfs)
 
+    # Missing visible → true (backward compatible with shipped defaults).
+    if "visible" not in item or item.get("visible") is None:
+        visible = True
+    else:
+        visible = item.get("visible")
+        if not isinstance(visible, bool):
+            visible = bool(visible)
+
     return ExpertRosterEntry(
         expert_id=expert_id,
         display_name=display_name.strip(),
@@ -300,11 +320,12 @@ def _entry_from_dict(item: dict[str, Any], *, strict: bool) -> ExpertRosterEntry
         notes=_opt_str(item.get("notes")),
         publishes_full_system=pfs,
         free=free,
+        visible=visible,
     )
 
 
 def _entry_to_yaml_dict(entry: ExpertRosterEntry) -> dict[str, Any]:
-    """Preserve full field set for round-trip (include free: false)."""
+    """Preserve full field set for round-trip (include free/visible false)."""
     d: dict[str, Any] = {
         "expert_id": entry.expert_id,
         "display_name": entry.display_name,
@@ -321,6 +342,7 @@ def _entry_to_yaml_dict(entry: ExpertRosterEntry) -> dict[str, Any]:
         d["publishes_full_system"] = entry.publishes_full_system
     if entry.free is not None:
         d["free"] = entry.free
+    d["visible"] = bool(entry.visible)
     return d
 
 

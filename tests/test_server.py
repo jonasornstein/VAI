@@ -322,16 +322,32 @@ def test_api_experts_add_delete_reset(tmp_path: Path) -> None:
         assert put_status == 200
         assert put_body["expert"]["notes"] == "Travcash free tipster"
 
+        # DELETE soft-hides (visible=false); row stays on roster
         del_status, deleted = _delete(f"{base}/api/v1/experts/eddie-ostlund")
         assert del_status == 200
         assert deleted["expert_id"] == "eddie-ostlund"
+        assert deleted["expert"]["visible"] is False
         listed2 = _get(f"{base}/api/v1/experts")
-        assert all(e["expert_id"] != "eddie-ostlund" for e in listed2["experts"])
+        eddie = next(e for e in listed2["experts"] if e["expert_id"] == "eddie-ostlund")
+        assert eddie["visible"] is False
+        visible_only = _get(f"{base}/api/v1/experts?visible=1")
+        assert all(e["expert_id"] != "eddie-ostlund" for e in visible_only["experts"])
 
-        # Delete a default expert then reset
-        del2_status, _ = _delete(f"{base}/api/v1/experts/leboff")
+        put_vis, put_vis_body = _put(
+            f"{base}/api/v1/experts/eddie-ostlund",
+            {"visible": True},
+        )
+        assert put_vis == 200
+        assert put_vis_body["expert"]["visible"] is True
+
+        # Soft-hide a default expert then reset (customs dropped; defaults restored visible)
+        del2_status, del2_body = _delete(f"{base}/api/v1/experts/leboff")
         assert del2_status == 200
-        assert all(e["expert_id"] != "leboff" for e in _get(f"{base}/api/v1/experts")["experts"])
+        assert del2_body["expert"]["visible"] is False
+        leboff = next(
+            e for e in _get(f"{base}/api/v1/experts")["experts"] if e["expert_id"] == "leboff"
+        )
+        assert leboff["visible"] is False
 
         reset_status, reset_body = _post(f"{base}/api/v1/experts/reset", {})
         assert reset_status == 200
@@ -340,6 +356,10 @@ def test_api_experts_add_delete_reset(tmp_path: Path) -> None:
         assert "leboff" in reset_ids
         assert "eddie-ostlund" not in reset_ids
         assert "fixture" not in reset_ids
+        leboff_restored = next(
+            e for e in reset_body["experts"] if e["expert_id"] == "leboff"
+        )
+        assert leboff_restored.get("visible", True) is True
 
         fixture_status, fixture_err = _delete(f"{base}/api/v1/experts/fixture")
         assert fixture_status == 400

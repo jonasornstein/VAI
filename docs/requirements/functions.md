@@ -86,7 +86,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | F-043 | `apply_manual_override` | Replace leg selection after load | Leg, horses[] | Updated selection | UC-12 |
 | F-044 | `list_experts_roster` | Effective roster (working copy or shipped defaults) | repo root | Expert entries | UC-12 |
 | F-045 | `add_expert` | Append expert to working roster | entry fields | Expert entry | UC-12 |
-| F-046 | `delete_expert` | Remove from working roster (tips kept) | expert_id | Deleted entry | UC-12 |
+| F-046 | `delete_expert` | Soft-hide expert (`visible=false`); row retained; tips kept | expert_id | Updated entry | UC-12 |
 | F-047 | `reset_experts_roster` | Overwrite working roster with shipped defaults | repo root | Default entries | UC-12 |
 | F-048 | `update_expert` | Edit metadata on working roster | expert_id, fields | Updated entry | UC-12 |
 

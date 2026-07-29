@@ -37,6 +37,22 @@ def test_list_experts_free_only() -> None:
     assert all(e.free is True for e in free)
 
 
+def test_defaults_visible_true_when_missing() -> None:
+    entries = load_experts_roster()
+    assert entries
+    assert all(e.visible is True for e in entries)
+
+
+def test_list_experts_visible_only(tmp_path: Path) -> None:
+    root = tmp_path
+    update_expert("leboff", {"visible": False}, repo_root=root)
+    all_entries = list_experts(repo_root=root)
+    assert any(e.expert_id == "leboff" and e.visible is False for e in all_entries)
+    visible = list_experts(repo_root=root, visible_only=True)
+    assert all(e.visible is True for e in visible)
+    assert all(e.expert_id != "leboff" for e in visible)
+
+
 def test_cold_start_uses_defaults(tmp_path: Path) -> None:
     root = tmp_path
     assert not working_roster_path(root).is_file()
@@ -92,18 +108,25 @@ def test_add_expert_invalid_id(tmp_path: Path) -> None:
         assert exc.code == "INVALID_EXPERT"
 
 
-def test_delete_expert_leaves_tips_untouched(tmp_path: Path) -> None:
+def test_delete_expert_soft_hides_and_leaves_tips(tmp_path: Path) -> None:
     root = tmp_path
-    # Seed a tip file that should survive roster delete
+    # Seed a tip file that should survive roster soft-hide
     tip_dir = root / "inbox" / "expert-tips" / "2026-08-01-solvalla"
     tip_dir.mkdir(parents=True)
     tip_path = tip_dir / "bjorn-goop-2026-08-01.yaml"
     tip_path.write_text("tip_id: bjorn-goop-2026-08-01\nexpert_id: bjorn-goop\n", encoding="utf-8")
 
-    deleted = delete_expert("bjorn-goop", repo_root=root)
-    assert deleted.expert_id == "bjorn-goop"
+    hidden = delete_expert("bjorn-goop", repo_root=root)
+    assert hidden.expert_id == "bjorn-goop"
+    assert hidden.visible is False
     assert tip_path.is_file()
-    assert all(e.expert_id != "bjorn-goop" for e in list_experts(repo_root=root))
+    # Row retained in full list
+    still_there = next(e for e in list_experts(repo_root=root) if e.expert_id == "bjorn-goop")
+    assert still_there.visible is False
+    assert all(e.expert_id != "bjorn-goop" for e in list_experts(repo_root=root, visible_only=True))
+    # Idempotent second hide
+    again = delete_expert("bjorn-goop", repo_root=root)
+    assert again.visible is False
 
 
 def test_delete_fixture_forbidden(tmp_path: Path) -> None:
@@ -126,15 +149,24 @@ def test_update_expert(tmp_path: Path) -> None:
     root = tmp_path
     updated = update_expert(
         "leboff",
-        {"display_name": "Leboff (updated)", "notes": "test note", "free": False},
+        {
+            "display_name": "Leboff (updated)",
+            "notes": "test note",
+            "free": False,
+            "visible": False,
+        },
         repo_root=root,
     )
     assert updated.display_name == "Leboff (updated)"
     assert updated.notes == "test note"
     assert updated.free is False
+    assert updated.visible is False
     assert updated.expert_id == "leboff"
     again = next(e for e in list_experts(repo_root=root) if e.expert_id == "leboff")
     assert again.display_name == "Leboff (updated)"
+    assert again.visible is False
+    shown = update_expert("leboff", {"visible": True}, repo_root=root)
+    assert shown.visible is True
 
 
 def test_reset_restores_defaults(tmp_path: Path) -> None:
@@ -146,7 +178,9 @@ def test_reset_restores_defaults(tmp_path: Path) -> None:
     delete_expert("leboff", repo_root=root)
     ids_before = {e.expert_id for e in list_experts(repo_root=root)}
     assert "temp-custom" in ids_before
-    assert "leboff" not in ids_before
+    assert "leboff" in ids_before
+    leboff = next(e for e in list_experts(repo_root=root) if e.expert_id == "leboff")
+    assert leboff.visible is False
 
     restored = reset_experts_roster(repo_root=root)
     default_ids = {e.expert_id for e in load_experts_roster(default_roster_path())}
@@ -156,6 +190,8 @@ def test_reset_restores_defaults(tmp_path: Path) -> None:
     assert "temp-custom" not in effective
     assert "leboff" in effective
     assert "fixture" in effective
+    leboff_after = next(e for e in list_experts(repo_root=root) if e.expert_id == "leboff")
+    assert leboff_after.visible is True
 
 
 def test_suggest_expert_id() -> None:
@@ -179,3 +215,9 @@ def test_working_roster_yaml_roundtrip(tmp_path: Path) -> None:
     found = next(e for e in data["experts"] if e["expert_id"] == "round-trip")
     assert found["free"] is False
     assert found["publishes_full_system"] == "partial"
+    assert found["visible"] is True
+
+    update_expert("round-trip", {"visible": False}, repo_root=root)
+    data2 = yaml.safe_load(working_roster_path(root).read_text(encoding="utf-8"))
+    found2 = next(e for e in data2["experts"] if e["expert_id"] == "round-trip")
+    assert found2["visible"] is False

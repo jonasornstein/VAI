@@ -336,31 +336,31 @@
       border-color: var(--v85-light);
       color: #fff;
     }
-    .expert-delete-btn {
+    .expert-visible-label {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 1.55rem;
-      height: 1.55rem;
-      padding: 0;
-      margin-right: 0.25rem;
+      gap: 0.25rem;
+      margin-right: 0.35rem;
       margin-bottom: 0.2rem;
       vertical-align: middle;
-      border: 1px solid var(--atg-border);
-      border-radius: 4px;
-      background: var(--atg-muted-bg);
-      color: #8a1f1f;
+      font-size: 0.78em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--horse-meta);
       cursor: pointer;
-      line-height: 1;
+      user-select: none;
     }
-    .expert-delete-btn:hover {
-      background: #f8e8e8;
-      border-color: #c45c5c;
+    .expert-visible-label input {
+      margin: 0;
+      width: 0.95rem;
+      height: 0.95rem;
+      accent-color: var(--v85-light);
+      cursor: pointer;
     }
-    .expert-delete-btn svg {
-      width: 0.9rem;
-      height: 0.9rem;
-      display: block;
+    .expert-roster-card--hidden {
+      opacity: 0.55;
+      border-style: dashed;
     }
     .expert-roster-list {
       display: grid;
@@ -2060,13 +2060,24 @@
         list.innerHTML = "";
         if (countEl) {
           var ready = experts.filter(function (e) { return e.has_tip; }).length;
-          countEl.textContent = experts.length
-            ? experts.length + " experter" + (ready ? " · " + ready + " med tip för omgången" : "")
-            : "Inga experter i roster";
+          var hidden = experts.filter(function (e) { return e.visible === false; }).length;
+          var parts = [];
+          if (experts.length) {
+            parts.push(experts.length + " experter");
+            if (hidden) parts.push(hidden + " dolda");
+            if (ready) parts.push(ready + " med tip för omgången");
+            countEl.textContent = parts.join(" · ");
+          } else {
+            countEl.textContent = "Inga experter i roster";
+          }
         }
         experts.forEach(function (ex) {
+          var isVisible = ex.visible !== false;
           var card = document.createElement("div");
-          card.className = "expert-roster-card" + (ex.has_tip ? " has-tip" : "");
+          card.className =
+            "expert-roster-card" +
+            (ex.has_tip ? " has-tip" : "") +
+            (isVisible ? "" : " expert-roster-card--hidden");
           var formLabel = ex.has_tip ? "Redigera experttips" : "Ange experttips";
           var formBtn =
             '<button type="button" class="expert-tip-form-btn' +
@@ -2082,16 +2093,14 @@
             '<rect x="3" y="1.5" width="10" height="13" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
             '<path d="M5.5 5h5M5.5 7.5h5M5.5 10h3.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' +
             "</svg></button>";
-          var delBtn =
-            '<button type="button" class="expert-delete-btn" data-expert-id="' +
+          var visLabel =
+            '<label class="expert-visible-label" title="Visa i Expert-läge">' +
+            '<input type="checkbox" class="expert-visible-cb" data-expert-id="' +
             escapeHtml(ex.expert_id) +
-            '" title="Ta bort från roster" aria-label="Ta bort ' +
-            escapeHtml(ex.display_name || ex.expert_id) +
-            ' från roster">' +
-            '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">' +
-            '<path d="M4 4.5h8M6.5 4.5V3.5h3v1M5.5 6.5v5.5M8 6.5v5.5M10.5 6.5v5.5M5 4.5l.5 8.5h5l.5-8.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>' +
-            "</svg></button>";
-          var badges = formBtn + delBtn;
+            '"' +
+            (isVisible ? " checked" : "") +
+            " /> Visa</label>";
+          var badges = formBtn + visLabel;
           if (ex.free === true) badges += '<span class="expert-badge free">Gratis</span>';
           else if (ex.free === false) badges += '<span class="expert-badge paid">Andel/betald</span>';
           if (ex.has_tip) badges += '<span class="expert-badge ready">Redo</span>';
@@ -2128,12 +2137,14 @@
               openExpertTipForm(ex);
             });
           }
-          var delBtnEl = card.querySelector(".expert-delete-btn");
-          if (delBtnEl) {
-            delBtnEl.addEventListener("click", function (ev) {
-              ev.preventDefault();
+          var visCb = card.querySelector(".expert-visible-cb");
+          if (visCb) {
+            visCb.addEventListener("change", function (ev) {
               ev.stopPropagation();
-              deleteExpertFromRoster(ex);
+              setExpertVisible(ex, visCb.checked);
+            });
+            visCb.addEventListener("click", function (ev) {
+              ev.stopPropagation();
             });
           }
           list.appendChild(card);
@@ -2238,19 +2249,11 @@
           });
       }
 
-      function deleteExpertFromRoster(ex) {
-        var name = ex.display_name || ex.expert_id;
-        if (
-          !confirm(
-            "Ta bort \"" +
-              name +
-              "\" från roster?\n\nSparade tips-filer behålls under inbox/expert-tips/."
-          )
-        ) {
-          return;
-        }
+      function setExpertVisible(ex, visible) {
         fetch(API + "/api/v1/experts/" + encodeURIComponent(ex.expert_id), {
-          method: "DELETE",
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visible: !!visible }),
           cache: "no-store"
         })
           .then(function (r) {
@@ -2261,16 +2264,17 @@
           .then(function (res) {
             if (!res.ok) {
               alert(
-                (res.j.error && res.j.error.message) || "Kunde inte ta bort expert"
+                (res.j.error && res.j.error.message) || "Kunde inte uppdatera synlighet"
               );
+              loadExpertsRoster();
               return;
             }
             loadExpertsRoster();
-            loadExpertTips({ cacheBust: true });
           })
           .catch(function (e) {
             console.error(e);
             alert("API fel — kör python -m vai serve");
+            loadExpertsRoster();
           });
       }
 
@@ -2278,7 +2282,7 @@
         if (
           !confirm(
             "Återställ standardlistan?\n\n" +
-              "Dina tillagda experter tas bort från roster och borttagna standard-experter kommer tillbaka.\n\n" +
+              "Dina tillagda experter tas bort från roster. Dolda standard-experter blir synliga igen.\n\n" +
               "Tips-filer raderas inte."
           )
         ) {

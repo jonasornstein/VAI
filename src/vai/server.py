@@ -236,11 +236,24 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         params = parse_qs(query)
         free_only = (params.get("free") or ["0"])[0] in ("1", "true", "yes")
         include_fixture = (params.get("include_fixture") or ["0"])[0] in ("1", "true", "yes")
+        # Default: return all (manage UI needs hidden experts to re-show).
+        # visible=1 / visible_only=1 → only visible; visible=0 → only hidden.
+        visible_param = (params.get("visible") or params.get("visible_only") or [None])[0]
+        visible_filter: bool | None = None
+        if visible_param is not None:
+            v = str(visible_param).lower()
+            if v in ("1", "true", "yes"):
+                visible_filter = True
+            elif v in ("0", "false", "no"):
+                visible_filter = False
         experts = list_experts(
             repo_root=self.repo_root,
             free_only=free_only,
             exclude_fixture=not include_fixture,
+            visible_only=visible_filter is True,
         )
+        if visible_filter is False:
+            experts = [e for e in experts if e.visible is False]
         # Annotate how many tips exist for optional date/track filter
         date = (params.get("date") or [None])[0]
         track = (params.get("track") or [None])[0]
