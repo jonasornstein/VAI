@@ -353,9 +353,27 @@
       gap: 0.4rem;
       margin: 0.65rem 0 0.15rem;
     }
+    /* Match expert-roster-toolbar small buttons (theme tokens for light + dark). */
     .expert-visibility-toolbar .button--small {
-      font-size: 0.8rem;
+      font-family: Roboto, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
       padding: 0.28rem 0.55rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 4px;
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      cursor: pointer;
+    }
+    .expert-visibility-toolbar .button--small:hover:not(:disabled) {
+      border-color: var(--v85-light);
+      color: var(--v85-light);
+    }
+    .expert-visibility-toolbar .button--small:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
     }
     .expert-visibility-row {
       display: flex;
@@ -408,15 +426,18 @@
       padding: 0;
       line-height: 1;
       font-size: 0.75rem;
+      font-family: Roboto, sans-serif;
+      font-weight: 700;
       border: 1px solid var(--atg-border);
       border-radius: 4px;
-      background: var(--atg-card, #fff);
+      background: var(--atg-surface);
       color: var(--atg-text);
       cursor: pointer;
     }
     .expert-visibility-row .ev-order button:hover:not(:disabled) {
       border-color: var(--v85-light);
       color: var(--v85-light);
+      background: var(--atg-muted-bg);
     }
     .expert-visibility-row .ev-order button:disabled {
       opacity: 0.35;
