@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-29 | P | Assistant | **End of session** — Q&A **Redo** badge; master clean @ `1488e38`; prod deploy still blocked (sudo) | See [§ End of session — 2026-07-29](#end-of-session--2026-07-29) |
+| 2026-07-29 | I | Assistant | **Q: What is "REDO" in EXPERT panels?** — badge = tip exists for selected date (`has_tip`); Swedish “ready”, not undo/redo | mockup Expert panel; [inbox/expert-tips/README.md](../../inbox/expert-tips/README.md) |
 | 2026-07-29 | P | Assistant | **Commit + push VISA EXPERTER** — `76a3906` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |
 | 2026-07-29 | U | Assistant | **VISA EXPERTER popup** — main Expert panel shows only `visible` experts; Återställ roster → **VISA EXPERTER** visibility panel with tick-boxes | `76a3906`; [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) v0.3 |
 | 2026-07-29 | P | Assistant | **Commit + push soft-hide** — `df9fc83` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |
@@ -233,6 +235,36 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-29
+
+**Session owner:** ornstein  
+**Status:** **Closed**  
+**Dev:** `/home/ornstein/grok/vai` @ `1488e38`  
+**Production:** https://vai.ornstein.work/ — deploy still **blocked** (agent shell has no sudo password)
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Q&A: **Redo** on Expert roster cards | Done | badge = `has_tip` for selected datum (“ready”) |
+| Commit (feature code) | N/A — tree already clean | HEAD `1488e38` = origin/master |
+| Push | N/A — already up to date | https://github.com/jonasornstein/VAI |
+| Prod deploy | **Blocked** (sudo password) | Operator: `sudo bash /opt/vai/deploy/update-server.sh` |
+| TRACE-LOG close-out | This section | — |
+
+### Operator notes
+
+- **Redo** ≠ undo/redo; ≠ roster reset. Means a transcribed tip exists for the selected race date.
+- After deploy: hard-refresh Expert tab for **VISA EXPERTER** + soft-hide UI (`76a3906` still pending on prod if last deploy was before that).
+
+### Carry-over
+
+- Prod deploy: `sudo bash /opt/vai/deploy/update-server.sh` (ships soft-hide + VISA EXPERTER if not yet on prod)
+- Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
+- Next race-day: V85 Hari/Expert entry (UC-22)
 
 ---
 
