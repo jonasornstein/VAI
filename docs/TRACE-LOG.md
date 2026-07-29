@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-29 | U | Assistant | **VISA EXPERTER popup** — main Expert panel shows only `visible` experts; Återställ roster → **VISA EXPERTER** visibility panel with tick-boxes | `outbox/mockups/v85-proposal-ux-mockup-atg.html`; [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) v0.3 |
 | 2026-07-29 | P | Assistant | **Commit + push soft-hide** — `df9fc83` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |
 | 2026-07-29 | U | Assistant | **Expert roster soft-hide** — never hard-delete rows; `visible` bool (default true); DELETE/Visa tick-box hides; full list retains hidden for re-show; Återställ still overwrites | `df9fc83`; [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
 | 2026-07-28 | P | ornstein | **End of session (O&O)** — expert roster add/delete/reset shipped; session closed | See [§ End of session — 2026-07-28](#end-of-session--2026-07-28) |

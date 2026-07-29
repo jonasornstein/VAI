@@ -13,29 +13,28 @@ Working **expert roster** for Expert mode (UC-12). Shipped defaults live in code
 
 1. **Cold start** — if `roster.yaml` is missing, the UI/API uses shipped defaults (no file written).
 2. **First mutation** — defaults are copied into `roster.yaml`, then the change is applied.
-3. **Soft-hide** — experts are **never hard-deleted** from the working roster. Set `visible: false` (Visa tick-box off, or `DELETE` / PUT). Tip YAML under `inbox/expert-tips/` is **kept**.
-4. **Återställ roster** — overwrites `roster.yaml` with the exact shipped defaults (full reset). Tips are not deleted; custom experts are removed by overwrite.
+3. **Soft-hide** — experts are **never hard-deleted** from the working roster. Set `visible: false` (VISA EXPERTER popup, or `DELETE` / PUT). Tip YAML under `inbox/expert-tips/` is **kept**.
+4. **Main Expert panel** — shows only `visible: true` experts.
+5. **Full reset** — `POST /api/v1/experts/reset` overwrites `roster.yaml` with shipped defaults (API only; not on the toolbar). Tips are not deleted.
 
 ## UI
 
 Expert tab:
 
 - **Lägg till expert** — create a new roster entry
-- **Visa** tick-box on each card — show/hide (`visible`)
-- **Återställ roster** — restore defaults (confirm)
-
-Hidden experts stay in the list (muted) so you can re-check **Visa**.
+- **VISA EXPERTER** — popup: tick-boxes for every expert’s `visible` flag
+- Main list — **visible experts only** (tip form icon on each card)
 
 ## API
 
 ```text
-GET    /api/v1/experts              # all (incl. hidden)
-GET    /api/v1/experts?visible=1    # visible only
+GET    /api/v1/experts              # all (incl. hidden) — used by VISA EXPERTER popup
+GET    /api/v1/experts?visible=1    # visible only — main Expert panel
 GET    /api/v1/experts?visible=0    # hidden only
 POST   /api/v1/experts
 PUT    /api/v1/experts/{expert_id}  # incl. { "visible": true|false }
 DELETE /api/v1/experts/{expert_id}  # soft-hide (visible=false)
-POST   /api/v1/experts/reset
+POST   /api/v1/experts/reset        # full overwrite with defaults (API)
 ```
 
 ## Schema

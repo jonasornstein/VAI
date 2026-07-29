@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.2 |
+| **Version** | 0.3 |
 | **Status** | AWAITING_OPERATOR |
 | **AIRUP phase** | R / U |
 | **Reviewer** | ornstein (UX), Nisse (default roster fidelity) |
@@ -91,21 +91,26 @@ Same fields as defaults, plus soft-hide:
 Expert tab toolbar:
 
 - **Lägg till expert** — modal (name, id slug, optional metadata, free checkbox)
-- **Återställ roster** — confirm full reset (tips not deleted; customs removed; defaults all visible)
+- **VISA EXPERTER** — popup listing **all** roster experts with tick-boxes for `visible` (immediate PUT)
 
-Per card:
+Main Expert panel (`#expert-roster-list`):
 
-- **Visa** tick-box — toggles `visible` via PUT (primary hide/show control)
-- Tip form icon unchanged
-- **No trash / hard-delete control**
+- Loads **`GET /api/v1/experts?visible=1`** only — hidden experts are **not** shown
+- Tip form icon + free/paid/ready badges unchanged
+- **No** per-card visibility checkbox; **no** trash / hard-delete
 
-Hidden cards stay in the list (muted) so the operator can re-check **Visa**.
+Visibility popup:
+
+- Checkbox on = `visible: true` (appears in main panel)
+- Checkbox off = `visible: false` (leaves main panel; row stays in working YAML)
+
+Full reset (`POST /api/v1/experts/reset`) remains available via API; **not** bound to a toolbar button in this UX.
 
 ---
 
 ## 7. Non-goals
 
-- Hard remove of roster rows (except full reset overwrite)
+- Hard remove of roster rows (except full reset overwrite via API)
 - Cascade-delete tips
 - Scraping / auto roster sync from research
 - Auth on write endpoints
@@ -117,5 +122,6 @@ Hidden cards stay in the list (muted) so the operator can re-check **Visa**.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3 | 2026-07-29 | Main panel = visible only; **VISA EXPERTER** popup; reset button repurposed |
 | 0.2 | 2026-07-29 | Soft-hide: `visible` field; DELETE hides; UI tick-box replaces trash |
 | 0.1 | 2026-07-28 | Initial spec from approved plan |

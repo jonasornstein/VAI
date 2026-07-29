@@ -336,31 +336,52 @@
       border-color: var(--v85-light);
       color: #fff;
     }
-    .expert-visible-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      margin-right: 0.35rem;
-      margin-bottom: 0.2rem;
-      vertical-align: middle;
-      font-size: 0.78em;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: var(--horse-meta);
+    .expert-visibility-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      max-height: min(50vh, 22rem);
+      overflow-y: auto;
+      margin: 0.75rem 0 0.5rem;
+      padding-right: 0.25rem;
+      scrollbar-color: var(--atg-border) var(--atg-muted-bg);
+    }
+    .expert-visibility-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 6px;
+      background: var(--atg-muted-bg);
       cursor: pointer;
       user-select: none;
     }
-    .expert-visible-label input {
-      margin: 0;
-      width: 0.95rem;
-      height: 0.95rem;
+    .expert-visibility-row:hover {
+      border-color: var(--v85-light);
+    }
+    .expert-visibility-row input {
+      margin: 0.15rem 0 0;
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
       accent-color: var(--v85-light);
       cursor: pointer;
     }
-    .expert-roster-card--hidden {
-      opacity: 0.55;
-      border-style: dashed;
+    .expert-visibility-row .ev-name {
+      font-weight: 700;
+      color: var(--atg-text);
+      line-height: 1.3;
+    }
+    .expert-visibility-row .ev-meta {
+      display: block;
+      font-size: 0.82em;
+      opacity: 0.9;
+      margin-top: 0.15rem;
+      color: var(--horse-meta);
+    }
+    .expert-visibility-row--off {
+      opacity: 0.65;
     }
     .expert-roster-list {
       display: grid;
@@ -1295,13 +1316,27 @@
             <span class="stake-hint" id="expert-roster-count" style="margin:0"></span>
             <span class="expert-roster-actions">
               <button type="button" class="button--small button--primary" id="expert-roster-add">Lägg till expert</button>
-              <button type="button" class="button--small" id="expert-roster-reset" title="Återställ till standardlistan">Återställ roster</button>
+              <button type="button" class="button--small" id="expert-roster-visibility" title="Välj vilka experter som visas i Expert-panelen">VISA EXPERTER</button>
             </span>
           </div>
           <div id="expert-roster-list" class="expert-roster-list" aria-label="Experter"></div>
           <h3 style="margin-top:1rem">Tips för omgången</h3>
           <p class="stake-hint" id="expert-tips-empty">Inga tips för valt datum — lägg till YAML under <code>inbox/expert-tips/</code>.</p>
           <div id="expert-tips-list" class="expert-tips-list" role="listbox" aria-label="Experttips"></div>
+        </div>
+
+        <div id="expert-visibility-modal" class="expert-tip-modal" hidden role="dialog" aria-modal="true" aria-labelledby="expert-visibility-modal-title">
+          <div class="expert-tip-modal__panel">
+            <h3 id="expert-visibility-modal-title">Visa experter</h3>
+            <p class="expert-tip-modal__meta">
+              Kryssa i experter som ska visas i Expert-panelen. Omarkerade döljs men stannar i roster (soft-hide).
+            </p>
+            <div id="expert-visibility-list" class="expert-visibility-list" role="list" aria-label="Alla experter"></div>
+            <p class="expert-tip-modal__error" id="expert-visibility-error" aria-live="polite"></p>
+            <div class="expert-tip-modal__actions">
+              <button type="button" class="button button--primary" id="expert-visibility-close">Stäng</button>
+            </div>
+          </div>
         </div>
 
         <div id="expert-roster-modal" class="expert-tip-modal" hidden role="dialog" aria-modal="true" aria-labelledby="expert-roster-modal-title">
@@ -2032,6 +2067,7 @@
 
       function loadExpertsRoster() {
         var qs = expertDateTrackQuery();
+        qs.push("visible=1");
         var freeOnly = document.getElementById("expert-free-only");
         if (freeOnly && freeOnly.checked) qs.push("free=1");
         var url = API + "/api/v1/experts" + (qs.length ? "?" + qs.join("&") : "");
@@ -2060,24 +2096,18 @@
         list.innerHTML = "";
         if (countEl) {
           var ready = experts.filter(function (e) { return e.has_tip; }).length;
-          var hidden = experts.filter(function (e) { return e.visible === false; }).length;
           var parts = [];
           if (experts.length) {
-            parts.push(experts.length + " experter");
-            if (hidden) parts.push(hidden + " dolda");
+            parts.push(experts.length + " synliga");
             if (ready) parts.push(ready + " med tip för omgången");
             countEl.textContent = parts.join(" · ");
           } else {
-            countEl.textContent = "Inga experter i roster";
+            countEl.textContent = "Inga synliga experter — öppna VISA EXPERTER";
           }
         }
         experts.forEach(function (ex) {
-          var isVisible = ex.visible !== false;
           var card = document.createElement("div");
-          card.className =
-            "expert-roster-card" +
-            (ex.has_tip ? " has-tip" : "") +
-            (isVisible ? "" : " expert-roster-card--hidden");
+          card.className = "expert-roster-card" + (ex.has_tip ? " has-tip" : "");
           var formLabel = ex.has_tip ? "Redigera experttips" : "Ange experttips";
           var formBtn =
             '<button type="button" class="expert-tip-form-btn' +
@@ -2093,14 +2123,7 @@
             '<rect x="3" y="1.5" width="10" height="13" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.4"/>' +
             '<path d="M5.5 5h5M5.5 7.5h5M5.5 10h3.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' +
             "</svg></button>";
-          var visLabel =
-            '<label class="expert-visible-label" title="Visa i Expert-läge">' +
-            '<input type="checkbox" class="expert-visible-cb" data-expert-id="' +
-            escapeHtml(ex.expert_id) +
-            '"' +
-            (isVisible ? " checked" : "") +
-            " /> Visa</label>";
-          var badges = formBtn + visLabel;
+          var badges = formBtn;
           if (ex.free === true) badges += '<span class="expert-badge free">Gratis</span>';
           else if (ex.free === false) badges += '<span class="expert-badge paid">Andel/betald</span>';
           if (ex.has_tip) badges += '<span class="expert-badge ready">Redo</span>';
@@ -2135,16 +2158,6 @@
               ev.preventDefault();
               ev.stopPropagation();
               openExpertTipForm(ex);
-            });
-          }
-          var visCb = card.querySelector(".expert-visible-cb");
-          if (visCb) {
-            visCb.addEventListener("change", function (ev) {
-              ev.stopPropagation();
-              setExpertVisible(ex, visCb.checked);
-            });
-            visCb.addEventListener("click", function (ev) {
-              ev.stopPropagation();
             });
           }
           list.appendChild(card);
@@ -2249,8 +2262,13 @@
           });
       }
 
-      function setExpertVisible(ex, visible) {
-        fetch(API + "/api/v1/experts/" + encodeURIComponent(ex.expert_id), {
+      function setExpertVisibilityError(msg) {
+        var el = document.getElementById("expert-visibility-error");
+        if (el) el.textContent = msg || "";
+      }
+
+      function setExpertVisible(expertId, visible, after) {
+        fetch(API + "/api/v1/experts/" + encodeURIComponent(expertId), {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ visible: !!visible }),
@@ -2263,54 +2281,129 @@
           })
           .then(function (res) {
             if (!res.ok) {
-              alert(
+              setExpertVisibilityError(
                 (res.j.error && res.j.error.message) || "Kunde inte uppdatera synlighet"
               );
-              loadExpertsRoster();
+              if (after) after(false);
               return;
             }
+            setExpertVisibilityError("");
             loadExpertsRoster();
+            if (after) after(true);
           })
           .catch(function (e) {
             console.error(e);
-            alert("API fel — kör python -m vai serve");
-            loadExpertsRoster();
+            setExpertVisibilityError("API fel — kör python -m vai serve");
+            if (after) after(false);
           });
       }
 
-      function resetExpertsRoster() {
-        if (
-          !confirm(
-            "Återställ standardlistan?\n\n" +
-              "Dina tillagda experter tas bort från roster. Dolda standard-experter blir synliga igen.\n\n" +
-              "Tips-filer raderas inte."
-          )
-        ) {
-          return;
-        }
-        fetch(API + "/api/v1/experts/reset", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: "{}"
-        })
+      function loadAllExpertsForVisibility() {
+        var qs = expertDateTrackQuery();
+        var url = API + "/api/v1/experts" + (qs.length ? "?" + qs.join("&") : "");
+        return fetch(url, { cache: "no-store" })
           .then(function (r) {
             return r.json().then(function (j) {
               return { ok: r.ok, j: j };
             });
+          });
+      }
+
+      function renderExpertVisibilityList(experts) {
+        var list = document.getElementById("expert-visibility-list");
+        if (!list) return;
+        list.innerHTML = "";
+        if (!experts.length) {
+          list.innerHTML =
+            '<p class="stake-hint" style="margin:0">Inga experter i roster.</p>';
+          return;
+        }
+        experts
+          .slice()
+          .sort(function (a, b) {
+            return String(a.display_name || a.expert_id).localeCompare(
+              String(b.display_name || b.expert_id),
+              "sv"
+            );
           })
+          .forEach(function (ex) {
+            var isVisible = ex.visible !== false;
+            var row = document.createElement("label");
+            row.className =
+              "expert-visibility-row" + (isVisible ? "" : " expert-visibility-row--off");
+            row.setAttribute("role", "listitem");
+            var product = ex.product_name ? " · " + ex.product_name : "";
+            var freeTag =
+              ex.free === true
+                ? "Gratis"
+                : ex.free === false
+                  ? "Andel/betald"
+                  : "";
+            row.innerHTML =
+              '<input type="checkbox" class="expert-visibility-cb" data-expert-id="' +
+              escapeHtml(ex.expert_id) +
+              '"' +
+              (isVisible ? " checked" : "") +
+              " />" +
+              "<span><span class=\"ev-name\">" +
+              escapeHtml(ex.display_name || ex.expert_id) +
+              escapeHtml(product) +
+              '</span><span class="ev-meta"><code>' +
+              escapeHtml(ex.expert_id) +
+              "</code>" +
+              (ex.outlet ? " · " + escapeHtml(ex.outlet) : "") +
+              (freeTag ? " · " + freeTag : "") +
+              "</span></span>";
+            var cb = row.querySelector(".expert-visibility-cb");
+            if (cb) {
+              cb.addEventListener("change", function () {
+                cb.disabled = true;
+                setExpertVisible(ex.expert_id, cb.checked, function (ok) {
+                  cb.disabled = false;
+                  if (!ok) {
+                    cb.checked = !cb.checked;
+                    return;
+                  }
+                  ex.visible = cb.checked;
+                  row.classList.toggle("expert-visibility-row--off", !cb.checked);
+                });
+              });
+            }
+            list.appendChild(row);
+          });
+      }
+
+      function openExpertVisibilityPanel() {
+        setExpertVisibilityError("");
+        var modal = document.getElementById("expert-visibility-modal");
+        var list = document.getElementById("expert-visibility-list");
+        if (list) {
+          list.innerHTML = '<p class="stake-hint" style="margin:0">Laddar…</p>';
+        }
+        if (modal) modal.hidden = false;
+        loadAllExpertsForVisibility()
           .then(function (res) {
             if (!res.ok) {
-              alert(
-                (res.j.error && res.j.error.message) || "Kunde inte återställa roster"
+              setExpertVisibilityError(
+                (res.j.error && res.j.error.message) || "Kunde inte hämta roster"
               );
+              if (list) list.innerHTML = "";
               return;
             }
-            loadExpertsRoster();
+            renderExpertVisibilityList(res.j.experts || []);
           })
           .catch(function (e) {
             console.error(e);
-            alert("API fel — kör python -m vai serve");
+            setExpertVisibilityError("API fel — kör python -m vai serve");
+            if (list) list.innerHTML = "";
           });
+      }
+
+      function closeExpertVisibilityPanel() {
+        var modal = document.getElementById("expert-visibility-modal");
+        if (modal) modal.hidden = true;
+        setExpertVisibilityError("");
+        loadExpertsRoster();
       }
 
       function loadExpertTips(opts) {
@@ -3197,9 +3290,19 @@
       if (expertRosterAdd) {
         expertRosterAdd.addEventListener("click", openExpertRosterForm);
       }
-      var expertRosterReset = document.getElementById("expert-roster-reset");
-      if (expertRosterReset) {
-        expertRosterReset.addEventListener("click", resetExpertsRoster);
+      var expertRosterVisibility = document.getElementById("expert-roster-visibility");
+      if (expertRosterVisibility) {
+        expertRosterVisibility.addEventListener("click", openExpertVisibilityPanel);
+      }
+      var expertVisibilityClose = document.getElementById("expert-visibility-close");
+      if (expertVisibilityClose) {
+        expertVisibilityClose.addEventListener("click", closeExpertVisibilityPanel);
+      }
+      var expertVisibilityModal = document.getElementById("expert-visibility-modal");
+      if (expertVisibilityModal) {
+        expertVisibilityModal.addEventListener("click", function (ev) {
+          if (ev.target === expertVisibilityModal) closeExpertVisibilityPanel();
+        });
       }
       var expertRosterForm = document.getElementById("expert-roster-form");
       if (expertRosterForm) {
@@ -3247,6 +3350,11 @@
       }
       document.addEventListener("keydown", function (ev) {
         if (ev.key === "Escape") {
+          var visModal = document.getElementById("expert-visibility-modal");
+          if (visModal && !visModal.hidden) {
+            closeExpertVisibilityPanel();
+            return;
+          }
           var rosterModal = document.getElementById("expert-roster-modal");
           if (rosterModal && !rosterModal.hidden) {
             closeExpertRosterForm();
