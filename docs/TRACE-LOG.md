@@ -14,7 +14,10 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
-| 2026-07-29 | U | Assistant | **Expert panel UX** — count `N synliga av M`; VISA EXPERTER Markera/Avmarkera alla; ↑/↓ reorder; API visibility + reorder + list counts | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) v0.4 |
+| 2026-07-29 | P | ornstein | **End of session (O&O)** — expert panel UX (counts, select-all, reorder, dark theme) shipped; session closed | See [§ End of session — 2026-07-29 (expert panel UX)](#end-of-session--2026-07-29-expert-panel-ux) |
+| 2026-07-29 | P | Assistant | **Commit + push expert panel UX** — `879e1e6` + dark-theme `dd09fc3` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |
+| 2026-07-29 | U | Assistant | **Dark theme visibility controls** — Markera/Avmarkera alla + ↑/↓ use theme tokens (mörk mode) | `dd09fc3`; mockup Expert **VISA EXPERTER** |
+| 2026-07-29 | U | Assistant | **Expert panel UX** — count `N synliga av M`; VISA EXPERTER Markera/Avmarkera alla; ↑/↓ reorder; API visibility + reorder + list counts | `879e1e6`; [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) v0.4 |
 | 2026-07-29 | P | Assistant | **End of session** — Q&A **Redo** badge; close-out `cdca2c4` on origin; prod deploy still blocked (sudo) | See [§ End of session — 2026-07-29](#end-of-session--2026-07-29) |
 | 2026-07-29 | I | Assistant | **Q: What is "REDO" in EXPERT panels?** — badge = tip exists for selected date (`has_tip`); Swedish “ready”, not undo/redo | mockup Expert panel; [inbox/expert-tips/README.md](../../inbox/expert-tips/README.md) |
 | 2026-07-29 | P | Assistant | **Commit + push VISA EXPERTER** — `76a3906` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |
@@ -236,6 +239,69 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-29 (expert panel UX)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `dd09fc3` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — deploy still **blocked** (agent shell has no sudo password)
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Count `N synliga av M · K med tip …` | Done | `879e1e6`; list API `counts` |
+| **Markera alla** / **Avmarkera alla** | Done | `PUT /api/v1/experts/visibility` |
+| ↑/↓ display order (roster YAML order) | Done | `PUT /api/v1/experts/reorder` |
+| Dark theme for visibility controls | Done | `dd09fc3` |
+| Spec v0.4, UC-12 1.5, README | Done | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
+| Tests | Done | 26 pass (`test_experts_roster`, `test_server`) |
+| Commit + push `master` | Done | `879e1e6`, `dd09fc3` → origin |
+| Prod deploy | **Blocked** (sudo password) | Operator: `sudo bash /opt/vai/deploy/update-server.sh` |
+
+### Operator notes
+
+- Main panel shows only **visible** experts; order follows `inbox/experts/roster.yaml` (or defaults).
+- Manage visibility + order in **VISA EXPERTER**; hard-refresh after deploy.
+- Soft-hide + VISA EXPERTER (`76a3906`) and this UX ship together when prod is updated.
+
+### Carry-over
+
+- Prod deploy: `sudo bash /opt/vai/deploy/update-server.sh` (soft-hide → VISA EXPERTER → counts/select-all/reorder/dark theme)
+- Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
+- Next race-day: V85 Hari/Expert entry (UC-22)
+
+---
+
+## Ship — expert panel UX (counts, select-all, reorder) — 2026-07-29
+
+**Session owner:** ornstein  
+**Dev:** `/home/ornstein/grok/vai`  
+**Production:** https://vai.ornstein.work/
+
+### Completed
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Count + API `counts` | Done | `879e1e6` |
+| Bulk visibility + reorder API/UI | Done | `879e1e6` |
+| Dark theme Markera/Avmarkera + ↑/↓ | Done | `dd09fc3` |
+| Spec v0.4 / UC-12 1.5 | Done | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
+| Commit + push `master` | Done | `879e1e6`…`dd09fc3` → origin |
+| Prod deploy | **Blocked** (sudo password in agent shell) | Operator: `sudo bash /opt/vai/deploy/update-server.sh` |
+
+### Operator notes
+
+- After deploy: hard-refresh Expert tab — count line, **VISA EXPERTER** bulk buttons, ↑/↓ order, mörk-mode controls.
+- Reorder persists in working `inbox/experts/roster.yaml`; reset API restores default order/visibility.
+
+### Carry-over
+
+- Prod deploy when ready: `sudo bash /opt/vai/deploy/update-server.sh`
+- Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
 
 ---
 
