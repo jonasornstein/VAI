@@ -236,7 +236,7 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 ---
 
-## Ship — expert roster soft-hide — 2026-07-29
+## Ship — expert roster soft-hide + VISA EXPERTER — 2026-07-29
 
 **Session owner:** ornstein  
 **Dev:** `/home/ornstein/grok/vai`  
@@ -246,16 +246,17 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 | Item | Status | Artifact |
 |------|--------|----------|
-| Soft-hide (`visible`) + Visa tick-box | Done | `df9fc83` |
-| Spec ER-004 v0.2, F-046, UC-12 1.3 | Done | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
-| Commit + push `master` | Done | `df9fc83` → origin |
+| Soft-hide (`visible`) | Done | `df9fc83` |
+| **VISA EXPERTER** popup; main panel = visible only | Done | `76a3906` |
+| Spec v0.3, UC-12 1.4 | Done | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
+| Commit + push `master` | Done | `76a3906` → origin |
 | Prod deploy | **Blocked** (sudo password in agent shell) | Operator: `sudo bash /opt/vai/deploy/update-server.sh` |
 
 ### Operator notes
 
-- After deploy: hard-refresh Expert tab (Visa tick-box; no trash).
+- After deploy: hard-refresh Expert tab (**VISA EXPERTER**; no per-card Visa; no trash).
 - Soft-hide keeps rows in working `inbox/experts/roster.yaml`; tips under `inbox/expert-tips/` stay.
-- **Återställ roster** still full overwrite of defaults.
+- Full reset is API-only (`POST /api/v1/experts/reset`); toolbar button is **VISA EXPERTER**.
 
 ### Carry-over
 
