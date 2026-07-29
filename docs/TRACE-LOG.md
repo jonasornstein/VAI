@@ -14,7 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
-| 2026-07-29 | U | Assistant | **Expert roster soft-hide** — never hard-delete rows; `visible` bool (default true); DELETE/Visa tick-box hides; full list retains hidden for re-show; Återställ still overwrites | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
+| 2026-07-29 | P | Assistant | **Commit + push soft-hide** — `df9fc83` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |
+| 2026-07-29 | U | Assistant | **Expert roster soft-hide** — never hard-delete rows; `visible` bool (default true); DELETE/Visa tick-box hides; full list retains hidden for re-show; Återställ still overwrites | `df9fc83`; [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
 | 2026-07-28 | P | ornstein | **End of session (O&O)** — expert roster add/delete/reset shipped; session closed | See [§ End of session — 2026-07-28](#end-of-session--2026-07-28) |
 | 2026-07-28 | U | Assistant | **Expert roster manage** — add / delete / full reset to defaults; working copy `inbox/experts/roster.yaml`; API + Expert tab UI; tips not cascade-deleted (F-044–048) | `585af6d`; [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md), [inbox/experts/](../../inbox/experts/) |
 | 2026-07-27 | P | ornstein | **End of session (O&O)** — V85 experts deep research logged & compared to roster; session closed | See [§ End of session — 2026-07-27 (experts research)](#end-of-session--2026-07-27-experts-research) |
@@ -233,6 +234,34 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 ---
 
+## Ship — expert roster soft-hide — 2026-07-29
+
+**Session owner:** ornstein  
+**Dev:** `/home/ornstein/grok/vai`  
+**Production:** https://vai.ornstein.work/
+
+### Completed
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Soft-hide (`visible`) + Visa tick-box | Done | `df9fc83` |
+| Spec ER-004 v0.2, F-046, UC-12 1.3 | Done | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
+| Commit + push `master` | Done | `df9fc83` → origin |
+| Prod deploy | **Blocked** (sudo password in agent shell) | Operator: `sudo bash /opt/vai/deploy/update-server.sh` |
+
+### Operator notes
+
+- After deploy: hard-refresh Expert tab (Visa tick-box; no trash).
+- Soft-hide keeps rows in working `inbox/experts/roster.yaml`; tips under `inbox/expert-tips/` stay.
+- **Återställ roster** still full overwrite of defaults.
+
+### Carry-over
+
+- Prod deploy when ready: `sudo bash /opt/vai/deploy/update-server.sh`
+- Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
+
+---
+
 ## End of session — 2026-07-28
 
 **Session owner:** ornstein  
@@ -247,23 +276,21 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 | Plan + ship **add / delete experts** + **restore default set** | Done | `585af6d` |
 | Working roster full copy | Done | `inbox/experts/roster.yaml` (after first edit); defaults stay `src/vai/strategies/experts.yaml` |
 | API: POST/PUT/DELETE `/api/v1/experts`, POST `/api/v1/experts/reset` | Done | `src/vai/server.py`, `io/experts_roster.py` |
-| Expert tab: Lägg till expert, Visa tick-box, Återställ roster | Done | soft-hide 2026-07-29 |
-| Soft-hide = `visible: false` (tips YAML kept; row retained) | Done | product decision ER-004 v0.2 |
+| Expert tab: Lägg till expert, trash → later Visa soft-hide | Done | `585af6d`; soft-hide `df9fc83` |
 | Full reset = overwrite working with shipped defaults | Done | product decision ER-005 |
 | Spec F-044–048, UC-12 alternate, tests | Done | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
-| Commit + push `master` | Done | `585af6d` → origin (pre soft-hide) |
-| Prod deploy this session | Blocked (sudo password) | run `sudo bash /opt/vai/deploy/update-server.sh` when ready |
+| Commit + push `master` | Done | `585af6d` → origin |
 
 ### Operator notes
 
 - **Lägg till expert** → working roster under `inbox/experts/` (prod: `/opt/vai/inbox/experts/`).
-- **Visa** tick-box soft-hides (`visible: false`); expert stays on roster (muted); tip files under `inbox/expert-tips/` remain.
+- Soft-hide (2026-07-29): **Visa** tick-box; tip files under `inbox/expert-tips/` remain.
 - **Återställ roster** restores the shipped default set (customs gone; tips still kept).
 - Hard-refresh Expert tab after deploy to pick up mockup HTML.
 
 ### Carry-over
 
-- Prod deploy if not applied: `sudo bash /opt/vai/deploy/update-server.sh`
+- Prod deploy: `sudo bash /opt/vai/deploy/update-server.sh`
 - Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
 - Optional: add Eddie Östlund via UI (or defaults) when transcribed regularly
 - Next race-day: V85 Hari/Expert entry (UC-22)
