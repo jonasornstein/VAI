@@ -346,26 +346,41 @@
       padding-right: 0.25rem;
       scrollbar-color: var(--atg-border) var(--atg-muted-bg);
     }
+    .expert-visibility-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0.65rem 0 0.15rem;
+    }
+    .expert-visibility-toolbar .button--small {
+      font-size: 0.8rem;
+      padding: 0.28rem 0.55rem;
+    }
     .expert-visibility-row {
       display: flex;
       align-items: flex-start;
-      gap: 0.55rem;
+      gap: 0.45rem;
       padding: 0.45rem 0.55rem;
       border: 1px solid var(--atg-border);
       border-radius: 6px;
       background: var(--atg-muted-bg);
-      cursor: pointer;
       user-select: none;
     }
     .expert-visibility-row:hover {
       border-color: var(--v85-light);
     }
-    .expert-visibility-row input {
-      margin: 0.15rem 0 0;
+    .expert-visibility-row input[type="checkbox"] {
+      margin: 0.2rem 0 0;
       width: 1rem;
       height: 1rem;
       flex-shrink: 0;
       accent-color: var(--v85-light);
+      cursor: pointer;
+    }
+    .expert-visibility-row .ev-body {
+      flex: 1;
+      min-width: 0;
       cursor: pointer;
     }
     .expert-visibility-row .ev-name {
@@ -379,6 +394,33 @@
       opacity: 0.9;
       margin-top: 0.15rem;
       color: var(--horse-meta);
+    }
+    .expert-visibility-row .ev-order {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+    .expert-visibility-row .ev-order button {
+      width: 1.55rem;
+      height: 1.35rem;
+      padding: 0;
+      line-height: 1;
+      font-size: 0.75rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 4px;
+      background: var(--atg-card, #fff);
+      color: var(--atg-text);
+      cursor: pointer;
+    }
+    .expert-visibility-row .ev-order button:hover:not(:disabled) {
+      border-color: var(--v85-light);
+      color: var(--v85-light);
+    }
+    .expert-visibility-row .ev-order button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
     }
     .expert-visibility-row--off {
       opacity: 0.65;
@@ -1330,7 +1372,12 @@
             <h3 id="expert-visibility-modal-title">Visa experter</h3>
             <p class="expert-tip-modal__meta">
               Kryssa i experter som ska visas i Expert-panelen. Omarkerade döljs men stannar i roster (soft-hide).
+              Använd ↑/↓ för att ändra visningsordning.
             </p>
+            <div class="expert-visibility-toolbar">
+              <button type="button" class="button--small" id="expert-visibility-select-all">Markera alla</button>
+              <button type="button" class="button--small" id="expert-visibility-deselect-all">Avmarkera alla</button>
+            </div>
             <div id="expert-visibility-list" class="expert-visibility-list" role="list" aria-label="Alla experter"></div>
             <p class="expert-tip-modal__error" id="expert-visibility-error" aria-live="polite"></p>
             <div class="expert-tip-modal__actions">
@@ -2065,6 +2112,10 @@
         return qs;
       }
 
+      var expertsRosterTotalCount = 0;
+      var expertVisibilityCache = [];
+      var expertVisibilityBusy = false;
+
       function loadExpertsRoster() {
         var qs = expertDateTrackQuery();
         qs.push("visible=1");
@@ -2076,15 +2127,21 @@
           .then(function (res) {
             if (!res.ok) {
               expertsRosterCache = [];
+              expertsRosterTotalCount = 0;
               renderExpertsRoster([]);
               return;
             }
             expertsRosterCache = res.j.experts || [];
+            expertsRosterTotalCount =
+              (res.j.counts && res.j.counts.total != null)
+                ? res.j.counts.total
+                : expertsRosterCache.length;
             renderExpertsRoster(expertsRosterCache);
           })
           .catch(function (e) {
             console.error(e);
             expertsRosterCache = [];
+            expertsRosterTotalCount = 0;
             renderExpertsRoster([]);
           });
       }
@@ -2096,13 +2153,19 @@
         list.innerHTML = "";
         if (countEl) {
           var ready = experts.filter(function (e) { return e.has_tip; }).length;
+          var total = expertsRosterTotalCount || experts.length;
           var parts = [];
           if (experts.length) {
-            parts.push(experts.length + " synliga");
+            parts.push(experts.length + " synliga av " + total);
             if (ready) parts.push(ready + " med tip för omgången");
             countEl.textContent = parts.join(" · ");
           } else {
-            countEl.textContent = "Inga synliga experter — öppna VISA EXPERTER";
+            if (total > 0) {
+              countEl.textContent =
+                "0 synliga av " + total + " — öppna VISA EXPERTER";
+            } else {
+              countEl.textContent = "Inga synliga experter — öppna VISA EXPERTER";
+            }
           }
         }
         experts.forEach(function (ex) {
@@ -2309,26 +2372,122 @@
           });
       }
 
+      function setExpertVisibilityBusy(busy) {
+        expertVisibilityBusy = !!busy;
+        ["expert-visibility-select-all", "expert-visibility-deselect-all"].forEach(
+          function (id) {
+            var btn = document.getElementById(id);
+            if (btn) btn.disabled = expertVisibilityBusy;
+          }
+        );
+        var list = document.getElementById("expert-visibility-list");
+        if (list) {
+          list.querySelectorAll("button, input").forEach(function (el) {
+            el.disabled = expertVisibilityBusy;
+          });
+        }
+      }
+
+      function setAllExpertsVisible(visible, after) {
+        fetch(API + "/api/v1/experts/visibility", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visible: !!visible }),
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) {
+              setExpertVisibilityError(
+                (res.j.error && res.j.error.message) || "Kunde inte uppdatera synlighet"
+              );
+              if (after) after(false);
+              return;
+            }
+            setExpertVisibilityError("");
+            expertVisibilityCache = res.j.experts || [];
+            renderExpertVisibilityList(expertVisibilityCache);
+            if (after) after(true);
+          })
+          .catch(function (e) {
+            console.error(e);
+            setExpertVisibilityError("API fel — kör python -m vai serve");
+            if (after) after(false);
+          });
+      }
+
+      function reorderExpertsOnServer(order, after) {
+        fetch(API + "/api/v1/experts/reorder", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order: order }),
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) {
+              setExpertVisibilityError(
+                (res.j.error && res.j.error.message) || "Kunde inte ändra ordning"
+              );
+              if (after) after(false);
+              return;
+            }
+            setExpertVisibilityError("");
+            expertVisibilityCache = res.j.experts || [];
+            renderExpertVisibilityList(expertVisibilityCache);
+            if (after) after(true);
+          })
+          .catch(function (e) {
+            console.error(e);
+            setExpertVisibilityError("API fel — kör python -m vai serve");
+            if (after) after(false);
+          });
+      }
+
+      function moveExpertVisibility(index, delta) {
+        if (expertVisibilityBusy) return;
+        var next = index + delta;
+        if (next < 0 || next >= expertVisibilityCache.length) return;
+        var prev = expertVisibilityCache.slice();
+        var swapped = expertVisibilityCache.slice();
+        var tmp = swapped[index];
+        swapped[index] = swapped[next];
+        swapped[next] = tmp;
+        expertVisibilityCache = swapped;
+        renderExpertVisibilityList(expertVisibilityCache);
+        setExpertVisibilityBusy(true);
+        var order = swapped.map(function (e) {
+          return e.expert_id;
+        });
+        reorderExpertsOnServer(order, function (ok) {
+          setExpertVisibilityBusy(false);
+          if (!ok) {
+            expertVisibilityCache = prev;
+            renderExpertVisibilityList(expertVisibilityCache);
+          }
+        });
+      }
+
       function renderExpertVisibilityList(experts) {
         var list = document.getElementById("expert-visibility-list");
         if (!list) return;
         list.innerHTML = "";
-        if (!experts.length) {
+        expertVisibilityCache = experts || [];
+        if (!expertVisibilityCache.length) {
           list.innerHTML =
             '<p class="stake-hint" style="margin:0">Inga experter i roster.</p>';
           return;
         }
-        experts
-          .slice()
-          .sort(function (a, b) {
-            return String(a.display_name || a.expert_id).localeCompare(
-              String(b.display_name || b.expert_id),
-              "sv"
-            );
-          })
-          .forEach(function (ex) {
+        // Roster YAML order = display order (no A–Ö sort)
+        expertVisibilityCache.forEach(function (ex, index) {
             var isVisible = ex.visible !== false;
-            var row = document.createElement("label");
+            var row = document.createElement("div");
             row.className =
               "expert-visibility-row" + (isVisible ? "" : " expert-visibility-row--off");
             row.setAttribute("role", "listitem");
@@ -2344,8 +2503,10 @@
               escapeHtml(ex.expert_id) +
               '"' +
               (isVisible ? " checked" : "") +
+              (expertVisibilityBusy ? " disabled" : "") +
               " />" +
-              "<span><span class=\"ev-name\">" +
+              '<label class="ev-body">' +
+              '<span class="ev-name">' +
               escapeHtml(ex.display_name || ex.expert_id) +
               escapeHtml(product) +
               '</span><span class="ev-meta"><code>' +
@@ -2353,13 +2514,34 @@
               "</code>" +
               (ex.outlet ? " · " + escapeHtml(ex.outlet) : "") +
               (freeTag ? " · " + freeTag : "") +
-              "</span></span>";
+              "</span></label>" +
+              '<span class="ev-order">' +
+              '<button type="button" class="ev-move-up" title="Flytta upp" aria-label="Flytta upp"' +
+              (index === 0 || expertVisibilityBusy ? " disabled" : "") +
+              ">↑</button>" +
+              '<button type="button" class="ev-move-down" title="Flytta ner" aria-label="Flytta ner"' +
+              (index === expertVisibilityCache.length - 1 || expertVisibilityBusy
+                ? " disabled"
+                : "") +
+              ">↓</button>" +
+              "</span>";
             var cb = row.querySelector(".expert-visibility-cb");
+            var bodyLabel = row.querySelector(".ev-body");
+            if (bodyLabel && cb) {
+              bodyLabel.addEventListener("click", function (ev) {
+                if (expertVisibilityBusy) return;
+                // Toggle via label click without double-firing with checkbox
+                if (ev.target === cb) return;
+                cb.checked = !cb.checked;
+                cb.dispatchEvent(new Event("change"));
+              });
+            }
             if (cb) {
               cb.addEventListener("change", function () {
+                if (expertVisibilityBusy) return;
                 cb.disabled = true;
                 setExpertVisible(ex.expert_id, cb.checked, function (ok) {
-                  cb.disabled = false;
+                  cb.disabled = expertVisibilityBusy;
                   if (!ok) {
                     cb.checked = !cb.checked;
                     return;
@@ -2369,12 +2551,29 @@
                 });
               });
             }
+            var upBtn = row.querySelector(".ev-move-up");
+            var downBtn = row.querySelector(".ev-move-down");
+            if (upBtn) {
+              upBtn.addEventListener("click", function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                moveExpertVisibility(index, -1);
+              });
+            }
+            if (downBtn) {
+              downBtn.addEventListener("click", function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                moveExpertVisibility(index, 1);
+              });
+            }
             list.appendChild(row);
           });
       }
 
       function openExpertVisibilityPanel() {
         setExpertVisibilityError("");
+        expertVisibilityBusy = false;
         var modal = document.getElementById("expert-visibility-modal");
         var list = document.getElementById("expert-visibility-list");
         if (list) {
@@ -2403,6 +2602,7 @@
         var modal = document.getElementById("expert-visibility-modal");
         if (modal) modal.hidden = true;
         setExpertVisibilityError("");
+        expertVisibilityBusy = false;
         loadExpertsRoster();
       }
 
@@ -3297,6 +3497,30 @@
       var expertVisibilityClose = document.getElementById("expert-visibility-close");
       if (expertVisibilityClose) {
         expertVisibilityClose.addEventListener("click", closeExpertVisibilityPanel);
+      }
+      var expertVisibilitySelectAll = document.getElementById(
+        "expert-visibility-select-all"
+      );
+      if (expertVisibilitySelectAll) {
+        expertVisibilitySelectAll.addEventListener("click", function () {
+          if (expertVisibilityBusy) return;
+          setExpertVisibilityBusy(true);
+          setAllExpertsVisible(true, function () {
+            setExpertVisibilityBusy(false);
+          });
+        });
+      }
+      var expertVisibilityDeselectAll = document.getElementById(
+        "expert-visibility-deselect-all"
+      );
+      if (expertVisibilityDeselectAll) {
+        expertVisibilityDeselectAll.addEventListener("click", function () {
+          if (expertVisibilityBusy) return;
+          setExpertVisibilityBusy(true);
+          setAllExpertsVisible(false, function () {
+            setExpertVisibilityBusy(false);
+          });
+        });
       }
       var expertVisibilityModal = document.getElementById("expert-visibility-modal");
       if (expertVisibilityModal) {

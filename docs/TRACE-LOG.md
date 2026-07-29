@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-29 | U | Assistant | **Expert panel UX** — count `N synliga av M`; VISA EXPERTER Markera/Avmarkera alla; ↑/↓ reorder; API visibility + reorder + list counts | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) v0.4 |
 | 2026-07-29 | P | Assistant | **End of session** — Q&A **Redo** badge; close-out `cdca2c4` on origin; prod deploy still blocked (sudo) | See [§ End of session — 2026-07-29](#end-of-session--2026-07-29) |
 | 2026-07-29 | I | Assistant | **Q: What is "REDO" in EXPERT panels?** — badge = tip exists for selected date (`has_tip`); Swedish “ready”, not undo/redo | mockup Expert panel; [inbox/expert-tips/README.md](../../inbox/expert-tips/README.md) |
 | 2026-07-29 | P | Assistant | **Commit + push VISA EXPERTER** — `76a3906` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |

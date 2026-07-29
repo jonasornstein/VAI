@@ -9,7 +9,9 @@ from vai.io.experts_roster import (
     delete_expert,
     list_experts,
     load_experts_roster,
+    reorder_experts,
     reset_experts_roster,
+    set_all_visible,
     suggest_expert_id,
     update_expert,
     working_roster_path,
@@ -192,6 +194,59 @@ def test_reset_restores_defaults(tmp_path: Path) -> None:
     assert "fixture" in effective
     leboff_after = next(e for e in list_experts(repo_root=root) if e.expert_id == "leboff")
     assert leboff_after.visible is True
+
+
+def test_set_all_visible(tmp_path: Path) -> None:
+    root = tmp_path
+    public, updated = set_all_visible(False, repo_root=root)
+    assert public
+    assert updated == len(public)
+    assert all(e.visible is False for e in public)
+    assert all(e.visible is False for e in list_experts(repo_root=root, visible_only=False))
+    # Idempotent
+    _, updated2 = set_all_visible(False, repo_root=root)
+    assert updated2 == 0
+    public_on, updated_on = set_all_visible(True, repo_root=root)
+    assert updated_on == len(public_on)
+    assert all(e.visible is True for e in public_on)
+    # fixture not in public list and still present in full roster
+    full = list_experts(repo_root=root, exclude_fixture=False)
+    assert any(e.expert_id == "fixture" for e in full)
+
+
+def test_reorder_experts(tmp_path: Path) -> None:
+    root = tmp_path
+    current = list_experts(repo_root=root)
+    ids = [e.expert_id for e in current]
+    assert len(ids) >= 3
+    # Reverse order
+    reversed_ids = list(reversed(ids))
+    reordered = reorder_experts(reversed_ids, repo_root=root)
+    assert [e.expert_id for e in reordered] == reversed_ids
+    assert [e.expert_id for e in list_experts(repo_root=root)] == reversed_ids
+    # fixture remains last among full roster
+    full = list_experts(repo_root=root, exclude_fixture=False)
+    assert full[-1].expert_id == "fixture"
+
+
+def test_reorder_experts_rejects_partial_and_unknown(tmp_path: Path) -> None:
+    root = tmp_path
+    ids = [e.expert_id for e in list_experts(repo_root=root)]
+    try:
+        reorder_experts(ids[:-1], repo_root=root)
+        raise AssertionError("expected INVALID_EXPERT for partial order")
+    except ExpertRosterError as exc:
+        assert exc.code == "INVALID_EXPERT"
+    try:
+        reorder_experts(ids + ["no-such-expert"], repo_root=root)
+        raise AssertionError("expected INVALID_EXPERT for unknown id")
+    except ExpertRosterError as exc:
+        assert exc.code == "INVALID_EXPERT"
+    try:
+        reorder_experts(["fixture"] + ids, repo_root=root)
+        raise AssertionError("expected FORBIDDEN_ID for fixture")
+    except ExpertRosterError as exc:
+        assert exc.code == "FORBIDDEN_ID"
 
 
 def test_suggest_expert_id() -> None:

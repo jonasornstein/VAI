@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.3 |
+| **Version** | 0.4 |
 | **Status** | AWAITING_OPERATOR |
 | **AIRUP phase** | R / U |
 | **Reviewer** | ornstein (UX), Nisse (default roster fidelity) |
@@ -35,6 +35,8 @@ Tip YAML under `inbox/expert-tips/` is unchanged (enter/edit/delete tips already
 | ER-006 | Edit | PUT updates metadata (incl. `visible`); `expert_id` immutable |
 | ER-007 | Fixture | UI excludes `fixture`; cannot hide/mutate via API (`FORBIDDEN_ID`) |
 | ER-008 | Default visible | Missing `visible` in YAML → treat as **`true`** (backward compatible) |
+| ER-009 | Select all | Bulk set `visible` true/false for all non-fixture experts |
+| ER-010 | Display order | YAML array order is display order; operator reorders via ↑/↓ |
 
 ---
 
@@ -66,13 +68,25 @@ Same fields as defaults, plus soft-hide:
 
 | Method | Path | Result |
 |--------|------|--------|
-| GET | `/api/v1/experts` | Effective roster + tip annotations (includes hidden by default) |
+| GET | `/api/v1/experts` | Effective roster + tip annotations (includes hidden by default) + `counts` |
 | GET | `/api/v1/experts?visible=1` | Only `visible: true` |
 | GET | `/api/v1/experts?visible=0` | Only `visible: false` |
 | POST | `/api/v1/experts` | Add → `201` + entry (`visible` defaults true) |
 | PUT | `/api/v1/experts/{expert_id}` | Update (incl. `visible`) → `200` + entry |
+| PUT | `/api/v1/experts/visibility` | Body `{ "visible": bool }` → set all non-fixture experts |
+| PUT | `/api/v1/experts/reorder` | Body `{ "order": [expert_id, …] }` → YAML display order |
 | DELETE | `/api/v1/experts/{expert_id}` | Soft-hide → `200` + entry with `visible: false` (row retained) |
 | POST | `/api/v1/experts/reset` | Full reset → `200` + `{ experts, restored: true }` |
+
+### List `counts` object
+
+Always present on `GET /api/v1/experts`:
+
+| Field | Meaning |
+|-------|---------|
+| `total` | Non-fixture roster size (not reduced by `free=1` or `visible` filter) |
+| `visible` | Count with `visible: true` (full roster, not free-filtered) |
+| `with_tip` | Among **returned** experts, how many have a tip for date/track filter |
 
 ### Error codes
 
@@ -92,10 +106,12 @@ Expert tab toolbar:
 
 - **Lägg till expert** — modal (name, id slug, optional metadata, free checkbox)
 - **VISA EXPERTER** — popup listing **all** roster experts with tick-boxes for `visible` (immediate PUT)
+- Count text: **`N synliga av M · K med tip för omgången`** (`M` = roster total)
 
 Main Expert panel (`#expert-roster-list`):
 
 - Loads **`GET /api/v1/experts?visible=1`** only — hidden experts are **not** shown
+- Card order follows roster YAML order
 - Tip form icon + free/paid/ready badges unchanged
 - **No** per-card visibility checkbox; **no** trash / hard-delete
 
@@ -103,6 +119,8 @@ Visibility popup:
 
 - Checkbox on = `visible: true` (appears in main panel)
 - Checkbox off = `visible: false` (leaves main panel; row stays in working YAML)
+- **Markera alla** / **Avmarkera alla** → `PUT /api/v1/experts/visibility`
+- **↑ / ↓** per row → `PUT /api/v1/experts/reorder` (no A–Ö sort)
 
 Full reset (`POST /api/v1/experts/reset`) remains available via API; **not** bound to a toolbar button in this UX.
 
@@ -122,6 +140,7 @@ Full reset (`POST /api/v1/experts/reset`) remains available via API; **not** bou
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.4 | 2026-07-29 | Count `N synliga av M`; select/deselect all; ↑/↓ reorder; list `counts` |
 | 0.3 | 2026-07-29 | Main panel = visible only; **VISA EXPERTER** popup; reset button repurposed |
 | 0.2 | 2026-07-29 | Soft-hide: `visible` field; DELETE hides; UI tick-box replaces trash |
 | 0.1 | 2026-07-28 | Initial spec from approved plan |

@@ -31,7 +31,9 @@ from vai.io.experts_roster import (
     add_expert,
     delete_expert,
     list_experts,
+    reorder_experts,
     reset_experts_roster,
+    set_all_visible,
     update_expert,
 )
 from vai.io.race_card_json import list_race_card_ids, load_race_card_by_id, race_card_to_dict
@@ -103,7 +105,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             return
         if path.startswith("/api/v1/experts/"):
             expert_id = path.removeprefix("/api/v1/experts/").strip("/")
-            if expert_id and expert_id != "reset":
+            if expert_id and expert_id not in ("reset", "visibility", "reorder"):
                 self._handle_get_expert(expert_id)
                 return
         if path.startswith("/mockup/"):
@@ -141,9 +143,15 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path == "/api/v1/expert-tips":
             self._handle_save_expert_tip()
             return
+        if path == "/api/v1/experts/visibility":
+            self._handle_set_all_experts_visible()
+            return
+        if path == "/api/v1/experts/reorder":
+            self._handle_reorder_experts()
+            return
         if path.startswith("/api/v1/experts/"):
             expert_id = path.removeprefix("/api/v1/experts/").strip("/")
-            if expert_id and expert_id != "reset":
+            if expert_id and expert_id not in ("reset", "visibility", "reorder"):
                 self._handle_update_expert(expert_id)
                 return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
@@ -246,6 +254,14 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 visible_filter = True
             elif v in ("0", "false", "no"):
                 visible_filter = False
+        # Full roster (excl. fixture unless include_fixture) for counts; free filter
+        # does not shrink total — "N synliga av M" uses full roster size.
+        all_for_counts = list_experts(
+            repo_root=self.repo_root,
+            free_only=False,
+            exclude_fixture=not include_fixture,
+            visible_only=False,
+        )
         experts = list_experts(
             repo_root=self.repo_root,
             free_only=free_only,
@@ -261,15 +277,21 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         tip_counts: dict[str, int] = {}
         for tip in tips:
             tip_counts[tip.expert_id] = tip_counts.get(tip.expert_id, 0) + 1
+        expert_payloads = [
+            {
+                **e.to_dict(),
+                "tips_for_filter": tip_counts.get(e.expert_id, 0),
+                "has_tip": tip_counts.get(e.expert_id, 0) > 0,
+            }
+            for e in experts
+        ]
         payload = {
-            "experts": [
-                {
-                    **e.to_dict(),
-                    "tips_for_filter": tip_counts.get(e.expert_id, 0),
-                    "has_tip": tip_counts.get(e.expert_id, 0) > 0,
-                }
-                for e in experts
-            ]
+            "experts": expert_payloads,
+            "counts": {
+                "total": len(all_for_counts),
+                "visible": sum(1 for e in all_for_counts if e.visible is True),
+                "with_tip": sum(1 for e in expert_payloads if e["has_tip"]),
+            },
         }
         self._send_json(HTTPStatus.OK, payload)
 
@@ -372,6 +394,102 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         self._send_json(
             HTTPStatus.OK,
             {"ok": True, "expert_id": deleted.expert_id, "expert": deleted.to_dict()},
+        )
+
+    def _handle_set_all_experts_visible(self) -> None:
+        try:
+            body = self._read_json_body()
+        except json.JSONDecodeError:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_JSON", "message": "Bad JSON body"}},
+            )
+            return
+        if "visible" not in body:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {
+                    "error": {
+                        "code": "INVALID_EXPERT",
+                        "message": "visible (bool) is required",
+                    }
+                },
+            )
+            return
+        visible = body.get("visible")
+        if not isinstance(visible, bool):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {
+                    "error": {
+                        "code": "INVALID_EXPERT",
+                        "message": "visible must be a boolean",
+                    }
+                },
+            )
+            return
+        try:
+            entries, updated = set_all_visible(visible, repo_root=self.repo_root)
+        except ExpertRosterError as exc:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": exc.code, "message": str(exc)}},
+            )
+            return
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "WRITE_FAILED", "message": str(exc)}},
+            )
+            return
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "ok": True,
+                "updated": updated,
+                "visible": visible,
+                "experts": [e.to_dict() for e in entries],
+            },
+        )
+
+    def _handle_reorder_experts(self) -> None:
+        try:
+            body = self._read_json_body()
+        except json.JSONDecodeError:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_JSON", "message": "Bad JSON body"}},
+            )
+            return
+        order = body.get("order")
+        if not isinstance(order, list):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {
+                    "error": {
+                        "code": "INVALID_EXPERT",
+                        "message": "order must be a list of expert_id strings",
+                    }
+                },
+            )
+            return
+        try:
+            entries = reorder_experts(order, repo_root=self.repo_root)
+        except ExpertRosterError as exc:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": exc.code, "message": str(exc)}},
+            )
+            return
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+                {"error": {"code": "WRITE_FAILED", "message": str(exc)}},
+            )
+            return
+        self._send_json(
+            HTTPStatus.OK,
+            {"ok": True, "experts": [e.to_dict() for e in entries]},
         )
 
     def _handle_reset_experts(self) -> None:

@@ -22,20 +22,25 @@ Working **expert roster** for Expert mode (UC-12). Shipped defaults live in code
 Expert tab:
 
 - **Lägg till expert** — create a new roster entry
-- **VISA EXPERTER** — popup: tick-boxes for every expert’s `visible` flag
-- Main list — **visible experts only** (tip form icon on each card)
+- **VISA EXPERTER** — popup: tick-boxes, **Markera/Avmarkera alla**, **↑/↓** display order
+- Main list — **visible experts only** in roster order; count shows `N synliga av M · K med tip …`
+- Tip form icon on each card
 
 ## API
 
 ```text
-GET    /api/v1/experts              # all (incl. hidden) — used by VISA EXPERTER popup
+GET    /api/v1/experts              # all (incl. hidden) + counts — VISA EXPERTER popup
 GET    /api/v1/experts?visible=1    # visible only — main Expert panel
 GET    /api/v1/experts?visible=0    # hidden only
 POST   /api/v1/experts
 PUT    /api/v1/experts/{expert_id}  # incl. { "visible": true|false }
+PUT    /api/v1/experts/visibility   # { "visible": true|false } — all non-fixture
+PUT    /api/v1/experts/reorder      # { "order": ["id-a", "id-b", ...] }
 DELETE /api/v1/experts/{expert_id}  # soft-hide (visible=false)
 POST   /api/v1/experts/reset        # full overwrite with defaults (API)
 ```
+
+Display order is the order of entries in `roster.yaml` (and the defaults file).
 
 ## Schema
 

@@ -260,6 +260,97 @@ def reset_experts_roster(*, repo_root: str | Path) -> list[ExpertRosterEntry]:
     return defaults
 
 
+def set_all_visible(
+    visible: bool,
+    *,
+    repo_root: str | Path,
+) -> tuple[list[ExpertRosterEntry], int]:
+    """Set visible on every non-reserved expert. Returns (entries excl. fixture, updated count)."""
+    working = materialize_working_roster(repo_root)
+    entries = load_experts_roster(working)
+    updated = 0
+    next_entries: list[ExpertRosterEntry] = []
+    for entry in entries:
+        if entry.expert_id in RESERVED_EXPERT_IDS:
+            next_entries.append(entry)
+            continue
+        if entry.visible is bool(visible):
+            next_entries.append(entry)
+            continue
+        changed = parse_expert_entry(
+            {**entry.to_dict(), "expert_id": entry.expert_id, "visible": bool(visible)}
+        )
+        next_entries.append(changed)
+        updated += 1
+    if updated:
+        save_experts_roster(next_entries, working)
+    else:
+        # Still materialize path may have written defaults on first call; no-op is fine.
+        pass
+    public = [e for e in next_entries if e.expert_id not in RESERVED_EXPERT_IDS]
+    return public, updated
+
+
+def reorder_experts(
+    order: list[str] | tuple[str, ...],
+    *,
+    repo_root: str | Path,
+) -> list[ExpertRosterEntry]:
+    """Reorder non-reserved experts to match ``order``. Fixture stays at the end.
+
+    ``order`` must list each non-reserved expert_id exactly once.
+    """
+    if not isinstance(order, (list, tuple)) or not order:
+        raise ExpertRosterError(
+            "order must be a non-empty list of expert_id strings",
+            code="INVALID_EXPERT",
+        )
+    ids: list[str] = []
+    for item in order:
+        if not isinstance(item, str) or not item.strip():
+            raise ExpertRosterError(
+                "order entries must be non-empty expert_id strings",
+                code="INVALID_EXPERT",
+            )
+        eid = item.strip()
+        if eid in RESERVED_EXPERT_IDS:
+            raise ExpertRosterError(
+                f"Cannot reorder reserved expert_id: {eid!r}",
+                code="FORBIDDEN_ID",
+            )
+        ids.append(eid)
+    if len(ids) != len(set(ids)):
+        raise ExpertRosterError(
+            "order must not contain duplicate expert_id values",
+            code="INVALID_EXPERT",
+        )
+
+    working = materialize_working_roster(repo_root)
+    entries = load_experts_roster(working)
+    by_id = {e.expert_id: e for e in entries}
+    reserved = [e for e in entries if e.expert_id in RESERVED_EXPERT_IDS]
+    mutable_ids = {e.expert_id for e in entries if e.expert_id not in RESERVED_EXPERT_IDS}
+
+    missing = mutable_ids - set(ids)
+    extra = set(ids) - mutable_ids
+    if missing or extra:
+        parts: list[str] = []
+        if missing:
+            parts.append(f"missing: {sorted(missing)}")
+        if extra:
+            parts.append(f"unknown: {sorted(extra)}")
+        raise ExpertRosterError(
+            "order must list each non-reserved expert exactly once ("
+            + "; ".join(parts)
+            + ")",
+            code="INVALID_EXPERT",
+        )
+
+    reordered = [by_id[eid] for eid in ids] + reserved
+    save_experts_roster(reordered, working)
+    return [e for e in reordered if e.expert_id not in RESERVED_EXPERT_IDS]
+
+
 def suggest_expert_id(display_name: str) -> str:
     """Slugify display name for expert_id suggestions."""
     text = (display_name or "").strip().lower()

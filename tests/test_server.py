@@ -364,6 +364,56 @@ def test_api_experts_add_delete_reset(tmp_path: Path) -> None:
         fixture_status, fixture_err = _delete(f"{base}/api/v1/experts/fixture")
         assert fixture_status == 400
         assert fixture_err["error"]["code"] == "FORBIDDEN_ID"
+
+        # Counts on list endpoint
+        listed_counts = _get(f"{base}/api/v1/experts")
+        assert "counts" in listed_counts
+        assert listed_counts["counts"]["total"] == len(listed_counts["experts"])
+        assert listed_counts["counts"]["visible"] == sum(
+            1 for e in listed_counts["experts"] if e.get("visible", True)
+        )
+        assert "with_tip" in listed_counts["counts"]
+
+        # Bulk visibility + reorder
+        hide_status, hide_body = _put(
+            f"{base}/api/v1/experts/visibility",
+            {"visible": False},
+        )
+        assert hide_status == 200, hide_body
+        assert hide_body["ok"] is True
+        assert hide_body["updated"] >= 1
+        assert all(e["visible"] is False for e in hide_body["experts"])
+        visible_none = _get(f"{base}/api/v1/experts?visible=1")
+        assert visible_none["experts"] == []
+        assert visible_none["counts"]["visible"] == 0
+        assert visible_none["counts"]["total"] == hide_body["updated"] or visible_none[
+            "counts"
+        ]["total"] == len(hide_body["experts"])
+
+        show_status, show_body = _put(
+            f"{base}/api/v1/experts/visibility",
+            {"visible": True},
+        )
+        assert show_status == 200, show_body
+        assert all(e["visible"] is True for e in show_body["experts"])
+
+        order_ids = [e["expert_id"] for e in show_body["experts"]]
+        reversed_ids = list(reversed(order_ids))
+        reorder_status, reorder_body = _put(
+            f"{base}/api/v1/experts/reorder",
+            {"order": reversed_ids},
+        )
+        assert reorder_status == 200, reorder_body
+        assert [e["expert_id"] for e in reorder_body["experts"]] == reversed_ids
+        listed_after = _get(f"{base}/api/v1/experts")
+        assert [e["expert_id"] for e in listed_after["experts"]] == reversed_ids
+
+        bad_reorder_status, bad_reorder = _put(
+            f"{base}/api/v1/experts/reorder",
+            {"order": reversed_ids[:-1]},
+        )
+        assert bad_reorder_status == 400
+        assert bad_reorder["error"]["code"] == "INVALID_EXPERT"
     finally:
         VaiRequestHandler.repo_root = original_root
         server.shutdown()

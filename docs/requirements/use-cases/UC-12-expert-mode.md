@@ -45,9 +45,9 @@ This is **curated tip selection**, not algorithmic pattern generation.
 
 ## Alternate: manage roster (F-044–F-048)
 
-1. Operator opens Expert tab; **F-044** shows the **visible** effective roster only (`visible: true`).
+1. Operator opens Expert tab; **F-044** shows the **visible** effective roster only (`visible: true`), in roster display order. Count text: `N synliga av M · K med tip för omgången`.
 2. **Add** expert (**F-045**) or **edit** metadata (**F-048**, including `visible`) → working `inbox/experts/roster.yaml`.
-3. **VISA EXPERTER** popup lists all experts; uncheck sets `visible: false` (**F-046** / PUT) — expert leaves the main panel; row stays; tip YAML under `inbox/expert-tips/` is kept. No hard delete from working YAML.
+3. **VISA EXPERTER** popup lists all experts (roster order); uncheck sets `visible: false` (**F-046** / PUT) — expert leaves the main panel; row stays; tip YAML under `inbox/expert-tips/` is kept. No hard delete from working YAML. **Markera alla** / **Avmarkera alla** bulk-set visibility; **↑/↓** reorders display order (YAML array order).
 4. **Reset** (**F-047**) overwrites working roster with shipped defaults via API (full restore; customs removed; defaults visible) — not a toolbar button in current UX.
 
 ## Functions invoked
@@ -74,6 +74,7 @@ F-040–F-048, F-060, F-061 (optional F-052 basic when distributions present)
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.5 | 2026-07-29 | Count `N synliga av M`; select/deselect all; ↑/↓ display order |
 | 1.4 | 2026-07-29 | Main panel = visible only; VISA EXPERTER popup for tick-boxes |
 | 1.3 | 2026-07-29 | Soft-hide: F-046 sets `visible=false` (row retained); Visa tick-box |
 | 1.2 | 2026-07-28 | Roster manage: add/delete/reset (F-044–048); tips still separate |
