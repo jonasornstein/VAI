@@ -3,13 +3,14 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-12 |
-| **Status** | REVIEW |
-| **Version** | 1.4 |
+| **Status** | APPROVED (roster manage extension) |
+| **Version** | 1.5 |
 | **Reviewer** | Nisse (roster/fidelity), ornstein (operator UX) |
 | **Last updated** | 2026-07-29 |
 | **Primary actor** | Operator |
 | **Implements** | F-040–F-048 (betslip catalog + roster manage) |
 | **Spec** | [expert-v1.md](../../../outbox/specs/expert-v1.md) |
+| **Roster manage** | [expert-roster-manage-v1.md](../../../outbox/specs/expert-roster-manage-v1.md) (**APPROVED**) |
 | **Supersedes** | v1.0 pattern-template narrative (spik/halvleg/öppen generator) |
 
 ## Brief description
@@ -57,7 +58,8 @@ F-040–F-048, F-060, F-061 (optional F-052 basic when distributions present)
 ## Special requirements
 
 - [expert.md](../../strategies/expert.md) — roster, tip format, attribution
-- [expert-v1.md](../../../outbox/specs/expert-v1.md) — implementation
+- [expert-v1.md](../../../outbox/specs/expert-v1.md) — implementation (tips)
+- [expert-roster-manage-v1.md](../../../outbox/specs/expert-roster-manage-v1.md) — roster add / soft-hide / order (**APPROVED**)
 - Tips are for **private operator use**; always attribute source; no automated republication
 - Operator pools (F-026) are **not** required for Expert load
 

@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-29 | P | ornstein | **expert-roster-manage-v1 APPROVED** — published to outbox/specs; review recorded; pending stub → canonical | [expert-roster-manage-v1.md](../../outbox/specs/expert-roster-manage-v1.md), [REVIEW_expert-roster-manage-v1.md](../../outbox/reviews/REVIEW_expert-roster-manage-v1.md) |
 | 2026-07-29 | P | ornstein | **End of session (O&O)** — expert panel UX (counts, select-all, reorder, dark theme) shipped; session closed | See [§ End of session — 2026-07-29 (expert panel UX)](#end-of-session--2026-07-29-expert-panel-ux) |
 | 2026-07-29 | P | Assistant | **Commit + push expert panel UX** — `879e1e6` + dark-theme `dd09fc3` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |
 | 2026-07-29 | U | Assistant | **Dark theme visibility controls** — Markera/Avmarkera alla + ↑/↓ use theme tokens (mörk mode) | `dd09fc3`; mockup Expert **VISA EXPERTER** |
@@ -271,7 +272,7 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 ### Carry-over
 
 - Prod deploy: `sudo bash /opt/vai/deploy/update-server.sh` (soft-hide → VISA EXPERTER → counts/select-all/reorder/dark theme)
-- Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
+- ~~Promote expert-roster-manage-v1~~ — **APPROVED** → [outbox/specs/expert-roster-manage-v1.md](../../outbox/specs/expert-roster-manage-v1.md)
 - Next race-day: V85 Hari/Expert entry (UC-22)
 
 ---
@@ -301,7 +302,7 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 ### Carry-over
 
 - Prod deploy when ready: `sudo bash /opt/vai/deploy/update-server.sh`
-- Promote [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) to `outbox/specs/` when operator APPROVED
+- ~~Promote expert-roster-manage-v1~~ — **APPROVED** → [outbox/specs/](../../outbox/specs/expert-roster-manage-v1.md)
 
 ---
 

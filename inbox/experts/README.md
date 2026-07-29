@@ -50,7 +50,7 @@ Same as defaults (`expert_id`, `display_name`, optional product/outlet/url/notes
 |-------|--------|
 | `visible` | bool; default **true** when missing |
 
-See [pending/specs/expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md).
+See [outbox/specs/expert-roster-manage-v1.md](../../outbox/specs/expert-roster-manage-v1.md) (**APPROVED**).
 
 ## Do not
 

@@ -12,7 +12,7 @@
 | **Research** | [2026-07-15-experts-travet.md](../../inbox/research/2026-07-15-experts-travet.md) |
 | **Machine roster (defaults)** | [experts.yaml](../../src/vai/strategies/experts.yaml) |
 | **Working roster (operator)** | [inbox/experts/roster.yaml](../../inbox/experts/) — full editable copy; reset restores defaults |
-| **Roster manage spec** | [expert-roster-manage-v1.md](../../pending/specs/expert-roster-manage-v1.md) |
+| **Roster manage spec** | [expert-roster-manage-v1.md](../../outbox/specs/expert-roster-manage-v1.md) (**APPROVED**) |
 
 ---
 
