@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-31 | P | ornstein | **End of session (O&O)** — activity logging v1 shipped (F-110/F-111); AIRUP P complete; session closed | See [§ End of session — 2026-07-31 (activity logging)](#end-of-session--2026-07-31-activity-logging) |
 | 2026-07-31 | P | Assistant | **Commit + push activity logging** — `7d36f44` on `origin/master`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` then `tail -f /opt/vai/logs/activity.jsonl` | https://github.com/jonasornstein/VAI ; [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md) |
 | 2026-07-31 | P | Povl, ornstein | **activity-logging-v1 APPROVED** — published to outbox/specs; review recorded; pending stub → canonical; F-110/F-111 in functions.md | [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md), [REVIEW_activity-logging-v1.md](../../outbox/reviews/REVIEW_activity-logging-v1.md) |
 | 2026-07-29 | P | ornstein | **expert-roster-manage-v1 APPROVED** — published to outbox/specs; review recorded; pending stub → canonical | [expert-roster-manage-v1.md](../../outbox/specs/expert-roster-manage-v1.md), [REVIEW_expert-roster-manage-v1.md](../../outbox/reviews/REVIEW_expert-roster-manage-v1.md) |
@@ -242,6 +243,40 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-31 (activity logging)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `7d36f44` / `705a477` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — operator may already have updated `/opt/vai`; agent shell cannot sudo
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Deep research → inbox | Done | [2026-07-31-activity-logging-deep-research.md](../../inbox/research/2026-07-31-activity-logging-deep-research.md) |
+| Spec I→R→P (Povl + ornstein) | **APPROVED** | [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md), [REVIEW](../../outbox/reviews/REVIEW_activity-logging-v1.md) |
+| F-110 / F-111 catalogued | Done | [functions.md](./requirements/functions.md) v1.4 |
+| Implementation JSONL + XFF IP | Done | `src/vai/activity_log.py`, `server.py`, `cli.py` |
+| Default log path | Done | `logs/activity.jsonl` (gitignored) |
+| Tests | Done | 92 passed (incl. `test_activity_log`, server XFF) |
+| Commit + push `master` | Done | `7d36f44`, `705a477` → origin |
+| Prod deploy | Operator / optional | `sudo bash /opt/vai/deploy/update-server.sh` then `tail -f /opt/vai/logs/activity.jsonl` |
+
+### Operator notes
+
+- Each HTTP response → one JSONL event: `ts`, `client_ip`/`peer_ip`, `operation`/`function`, `status`.
+- No bodies/seeds in logs. Distinct from TRACE-LOG / F-014.
+- View: `tail -f logs/activity.jsonl` (dev) or under `/opt/vai` after deploy.
+- Disable: `python -m vai serve --activity-log none` or `VAI_ACTIVITY_LOG=none`.
+
+### Carry-over
+
+- Confirm prod service writes `/opt/vai/logs/activity.jsonl` after `update-server.sh` if not already deployed.
+- Next race-day: V85 Hari/Expert entry (UC-22).
 
 ---
 
