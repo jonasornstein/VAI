@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-31 | P | ornstein | **End of session (O&O)** — standalone activity stats page shipped; session closed | See [§ End of session — 2026-07-31 (activity stats)](#end-of-session--2026-07-31-activity-stats) |
 | 2026-07-31 | P | Assistant | **Commit + push activity stats** — `a594e15` + docs `576a97f` on origin; standalone `vai-stats.html`; nginx locations in deploy/; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` then `sudo bash /opt/vai/deploy/fix-nginx-https.sh` | https://vai.ornstein.work/vai-stats.html |
 | 2026-07-31 | P | ornstein | **End of session (O&O)** — activity logging v1 shipped (F-110/F-111); AIRUP P complete; session closed | See [§ End of session — 2026-07-31 (activity logging)](#end-of-session--2026-07-31-activity-logging) |
 | 2026-07-31 | P | Assistant | **Commit + push activity logging** — `7d36f44` on `origin/master`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` then `tail -f /opt/vai/logs/activity.jsonl` | https://github.com/jonasornstein/VAI ; [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md) |
@@ -244,6 +245,42 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-07-31 (activity stats)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `a594e15` / `7fa9e08` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **deploy blocked** (agent shell has no sudo password)
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Standalone activity viewer | Done | `vai-stats.html` (sort, filter, summary cards; not wired into Python app) |
+| Nginx static locations | Done | `/vai-stats.html`, `/activity.jsonl` in `deploy/nginx-*.conf`, `fix-nginx-https.sh` |
+| Deploy docs | Done | [deploy/README.md](../../deploy/README.md) |
+| Commit + push `master` | Done | `a594e15`, `576a97f`, `7fa9e08` → origin |
+| Prod deploy | **Blocked** (sudo password) | Operator: see below |
+
+### Operator notes
+
+- Page is **static only** — load via nginx or **Load JSONL** in the browser; no VAI API dependency.
+- Target URL after deploy: **https://vai.ornstein.work/vai-stats.html**
+- Raw log alias: **https://vai.ornstein.work/activity.jsonl** → `/opt/vai/logs/activity.jsonl`
+- Schema: [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md)
+
+### Carry-over
+
+```bash
+sudo bash /opt/vai/deploy/update-server.sh
+sudo bash /opt/vai/deploy/fix-nginx-https.sh
+curl -sI https://vai.ornstein.work/vai-stats.html | head -5
+```
+
+- Next race-day: V85 Hari/Expert entry (UC-22).
 
 ---
 
