@@ -2,13 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 1.0 |
+| **Version** | 1.4 |
 | **Status** | APPROVED |
 | **Reviewer** | Povl (math), ornstein (operator) |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-07-07 |
+| **Last updated** | 2026-07-31 |
 | **Owner** | ornstein (M-004) |
-| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md) |
+| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md), [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
 
 Concrete system functions referenced by use-case steps (`F-*`). Implementation: `src/vai/` per [src/README.md](../../src/README.md).
 
@@ -148,7 +148,16 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 ---
 
-## 12. Implementation priority
+## 12. Activity logging (local UI)
+
+| ID | Name | Description | Inputs | Outputs | Use cases |
+|----|------|-------------|--------|---------|-----------|
+| F-110 | `log_activity_event` | Append structured JSONL user-activity event (ts, IP, operation, status) | HTTP request context, status | Line in activity log (default `logs/activity.jsonl`) | Local UI ops; [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
+| F-111 | `resolve_client_ip` | Derive end-client IP from peer + trusted `X-Forwarded-For` hops | peer IP, XFF, hop count, trusted proxies | client_ip string or peer | F-110 |
+
+---
+
+## 13. Implementation priority
 
 | Priority | Functions | Notes |
 |----------|-----------|-------|
@@ -160,6 +169,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | **Agent / manual (AIRUP)** | F-002–003, F-010–014, F-072–073, F-080–081 | Skills and operator workflow; not automated in `src/` |
 | **Shipped (v1.3 — Expert betslips)** | F-040–043 | Tip catalog YAML; list/select/load; no scraper |
 | **Shipped (v1.3.x — Expert roster manage)** | F-044–048 | Add/update/delete/reset working roster (`inbox/experts/roster.yaml`) |
+| **Shipped (activity logging v1)** | F-110–F-111 | JSONL activity log on `serve`; [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
 | **Deferred** | F-008, F-050–051, F-053–054 | Scrape fallback; full quant model |
 | **Could (v1.2+)** | Reduced-stake cost variants (UC-14 §3a), F-054, F-090 (PDF) | α ∈ {0.30, 0.50, 0.70} |
 
@@ -179,7 +189,8 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | `io/experts_roster.py` | F-044–048 effective roster load/add/update/delete/reset |
 | `cost.py` | F-060–062 |
 | `hit_summary.py` | F-052 (basic) |
-| `server.py` | Local UI API routes (random + expert) |
+| `activity_log.py` | F-110, F-111 |
+| `server.py` | Local UI API routes (random + expert); emits F-110 via `log_request` |
 
 ---
 
@@ -187,6 +198,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.4 | 2026-07-31 | F-110–F-111 activity logging (JSONL; trusted XFF) — [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
 | 1.3 | 2026-07-28 | F-044–048 expert roster manage (working copy + reset) |
 | 1.2 | 2026-07-15 | F-040–043 Expert betslips (list/select/load); not pattern templates |
 | 1.1 | 2026-07-08 | F-029 race info shipped (UC-15) |

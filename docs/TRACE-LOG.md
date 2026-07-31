@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-29 |
+| **Last updated** | 2026-07-31 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-07-31 | P | Povl, ornstein | **activity-logging-v1 APPROVED** — published to outbox/specs; review recorded; pending stub → canonical; F-110/F-111 in functions.md | [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md), [REVIEW_activity-logging-v1.md](../../outbox/reviews/REVIEW_activity-logging-v1.md) |
 | 2026-07-29 | P | ornstein | **expert-roster-manage-v1 APPROVED** — published to outbox/specs; review recorded; pending stub → canonical | [expert-roster-manage-v1.md](../../outbox/specs/expert-roster-manage-v1.md), [REVIEW_expert-roster-manage-v1.md](../../outbox/reviews/REVIEW_expert-roster-manage-v1.md) |
 | 2026-07-29 | P | ornstein | **End of session (O&O)** — expert panel UX (counts, select-all, reorder, dark theme) shipped; session closed | See [§ End of session — 2026-07-29 (expert panel UX)](#end-of-session--2026-07-29-expert-panel-ux) |
 | 2026-07-29 | P | Assistant | **Commit + push expert panel UX** — `879e1e6` + dark-theme `dd09fc3` on `origin/master`; prod deploy blocked (sudo password) | https://github.com/jonasornstein/VAI ; run `sudo bash /opt/vai/deploy/update-server.sh` |

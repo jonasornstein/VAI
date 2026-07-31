@@ -6,6 +6,7 @@ from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
+from vai.activity_log import ActivityLogger
 from vai.schedule import V85Round, V85Schedule
 from vai.server import VaiRequestHandler, find_repo_root
 
@@ -28,12 +29,20 @@ MOCK_SCHEDULE = V85Schedule(
 )
 
 
-def _start_test_server() -> tuple[ThreadingHTTPServer, str]:
+def _start_test_server(
+    *,
+    activity_log: Path | None = None,
+    trusted_proxy_hops: int = 1,
+    trusted_proxies: frozenset[str] | None = None,
+) -> tuple[ThreadingHTTPServer, str]:
     root = find_repo_root()
     VaiRequestHandler.repo_root = root
     VaiRequestHandler.mockup_dir = root / "outbox" / "mockups"
     VaiRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
     VaiRequestHandler.expert_tips_dir = root / "inbox" / "expert-tips"
+    VaiRequestHandler.activity_logger = ActivityLogger(activity_log) if activity_log else None
+    VaiRequestHandler.trusted_proxy_hops = trusted_proxy_hops
+    VaiRequestHandler.trusted_proxies = trusted_proxies or frozenset()
     server = ThreadingHTTPServer(("127.0.0.1", 0), VaiRequestHandler)
     port = server.server_address[1]
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -86,6 +95,43 @@ def test_head_index_returns_200_without_body() -> None:
     finally:
         server.shutdown()
         server.server_close()
+        VaiRequestHandler.activity_logger = None
+
+
+def test_activity_log_records_request_with_xff(tmp_path: Path) -> None:
+    log_path = tmp_path / "activity.jsonl"
+    server, base = _start_test_server(activity_log=log_path)
+    try:
+        with patch("vai.server.fetch_atg_schedule", return_value=MOCK_SCHEDULE):
+            request = Request(
+                f"{base}/api/v1/schedule/v85",
+                headers={
+                    "X-Forwarded-For": "203.0.113.44",
+                    "User-Agent": "VAI-Test/1.0",
+                },
+            )
+            with urlopen(request) as response:
+                assert response.status == 200
+                json.loads(response.read().decode("utf-8"))
+        lines = log_path.read_text(encoding="utf-8").strip().splitlines()
+        assert len(lines) >= 1
+        event = json.loads(lines[-1])
+        assert event["operation"] == "get_schedule_v85"
+        assert event["method"] == "GET"
+        assert event["path"] == "/api/v1/schedule/v85"
+        assert event["status"] == 200
+        assert event["outcome"] == "success"
+        assert event["client_ip"] == "203.0.113.44"
+        assert event["peer_ip"] in ("127.0.0.1", "::1")
+        assert event["user_agent"] == "VAI-Test/1.0"
+        assert "ts" in event and event["ts"].endswith("Z")
+        assert event["event_id"]
+        assert "seed" not in event
+        assert "body" not in event
+    finally:
+        server.shutdown()
+        server.server_close()
+        VaiRequestHandler.activity_logger = None
 
 
 def test_api_schedule_v85() -> None:

@@ -71,6 +71,28 @@ def main(argv: list[str] | None = None) -> int:
         default=8766,
         help="Bind port (default 8766 for dev; production vai.service uses 8765)",
     )
+    serve_parser.add_argument(
+        "--activity-log",
+        default=None,
+        metavar="PATH",
+        help=(
+            "JSONL activity log path (default: logs/activity.jsonl under repo; "
+            "use 'none' to disable). Env: VAI_ACTIVITY_LOG"
+        ),
+    )
+    serve_parser.add_argument(
+        "--trusted-proxy-hops",
+        type=int,
+        default=None,
+        metavar="N",
+        help="X-Forwarded-For hops to trust from a trusted peer (default 1). Env: VAI_TRUSTED_PROXY_HOPS",
+    )
+    serve_parser.add_argument(
+        "--trusted-proxies",
+        default=None,
+        metavar="IPS",
+        help="Comma-separated proxy IPs allowed to set X-Forwarded-For (loopback always trusted)",
+    )
 
     args = parser.parse_args(argv)
 
@@ -88,9 +110,35 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _run_serve(args: argparse.Namespace) -> int:
-    from vai.server import serve
+    import os
 
-    serve(host=args.host, port=args.port)
+    from vai.activity_log import parse_activity_log_path, parse_trusted_proxies
+    from vai.server import find_repo_root, serve
+
+    root = find_repo_root()
+    raw_log = args.activity_log
+    if raw_log is None:
+        raw_log = os.environ.get("VAI_ACTIVITY_LOG")
+    # None from both → default path; explicit "none" disables
+    if args.activity_log is None and raw_log is None:
+        log_path = parse_activity_log_path(None, repo_root=root)
+    else:
+        log_path = parse_activity_log_path(raw_log, repo_root=root)
+
+    hops = args.trusted_proxy_hops
+    if hops is None:
+        env_hops = os.environ.get("VAI_TRUSTED_PROXY_HOPS")
+        hops = int(env_hops) if env_hops not in (None, "") else 1
+
+    trusted = parse_trusted_proxies(args.trusted_proxies)
+
+    serve(
+        host=args.host,
+        port=args.port,
+        activity_log=log_path,
+        trusted_proxy_hops=hops,
+        trusted_proxies=trusted,
+    )
     return 0
 
 

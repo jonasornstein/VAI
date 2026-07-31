@@ -31,3 +31,6 @@ Thumbs.db
 # Local overrides
 CLAUDE.local.md
 AGENTS.local.md
+
+# Runtime activity logs (JSONL; see pending/specs/activity-logging-v1.md)
+logs/

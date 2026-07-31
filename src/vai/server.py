@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
+from vai.activity_log import ActivityLogger
 from vai.atg_fetch import AtgFetchError
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
 from vai.hit_summary import compute_hit_summary
@@ -65,9 +66,36 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
     mockup_dir: Path = repo_root / "outbox" / "mockups"
     race_cards_dir: Path = repo_root / "inbox" / "race-cards"
     expert_tips_dir: Path = repo_root / "inbox" / "expert-tips"
+    activity_logger: ActivityLogger | None = None
+    trusted_proxy_hops: int = 1
+    trusted_proxies: frozenset[str] = frozenset()
 
     def log_message(self, format: str, *args: Any) -> None:
+        # Structured activity log replaces default access lines.
         return
+
+    def log_request(self, code: int | str = "-", size: int | str = "-") -> None:
+        """Emit one activity event per completed response (timestamp, IP, operation)."""
+        logger = type(self).activity_logger
+        if logger is None or not logger.enabled:
+            return
+        try:
+            status = int(code)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            status = 0
+        peer_ip = None
+        if self.client_address:
+            peer_ip = self.client_address[0]
+        path = urlparse(self.path).path if self.path else "/"
+        logger.emit_from_request(
+            method=self.command or "GET",
+            path=path,
+            status=status,
+            peer_ip=peer_ip,
+            headers=self.headers,
+            trusted_proxy_hops=type(self).trusted_proxy_hops,
+            trusted_proxies=type(self).trusted_proxies,
+        )
 
     def do_HEAD(self) -> None:
         """Support health checks (curl -I) without a response body."""
@@ -926,12 +954,39 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
 
-def serve(*, host: str = "127.0.0.1", port: int = DEFAULT_PORT) -> None:
+def serve(
+    *,
+    host: str = "127.0.0.1",
+    port: int = DEFAULT_PORT,
+    activity_log: Path | None | object = ...,
+    trusted_proxy_hops: int = 1,
+    trusted_proxies: frozenset[str] | None = None,
+) -> None:
+    """Run the local UI server.
+
+    ``activity_log``:
+      - omitted / Ellipsis → default ``{repo}/logs/activity.jsonl``
+      - ``None`` → disabled
+      - ``Path`` → write JSONL there
+    """
+    from vai.activity_log import ActivityLogger, parse_activity_log_path
+
     root = find_repo_root()
     VaiRequestHandler.repo_root = root
     VaiRequestHandler.mockup_dir = root / "outbox" / "mockups"
     VaiRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
     VaiRequestHandler.expert_tips_dir = root / "inbox" / "expert-tips"
+    VaiRequestHandler.trusted_proxy_hops = max(0, int(trusted_proxy_hops))
+    VaiRequestHandler.trusted_proxies = trusted_proxies or frozenset()
+
+    if activity_log is ...:
+        log_path = parse_activity_log_path(None, repo_root=root)
+    elif activity_log is None:
+        log_path = None
+    else:
+        log_path = Path(activity_log)  # type: ignore[arg-type]
+    VaiRequestHandler.activity_logger = ActivityLogger(log_path)
+
     try:
         server = ThreadingHTTPServer((host, port), VaiRequestHandler)
     except OSError as exc:
@@ -945,6 +1000,10 @@ def serve(*, host: str = "127.0.0.1", port: int = DEFAULT_PORT) -> None:
         raise SystemExit(1) from exc
     print(f"VAI local UI: http://{host}:{port}/")
     print(f"  Experts API: http://{host}:{port}/api/v1/experts")
+    if log_path is None:
+        print("  Activity log: disabled")
+    else:
+        print(f"  Activity log: {log_path}")
     if port != 8765:
         print("  Production (if deployed): https://vai.ornstein.work/  (port 8765)")
     print("Press Ctrl+C to stop.")
