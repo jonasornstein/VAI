@@ -14,7 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
-| 2026-07-31 | P | Assistant | **Commit + push + deploy activity stats** — `a594e15` standalone `vai-stats.html` (sort/filter); nginx static `/vai-stats.html` + `/activity.jsonl`; not wired into Python app | https://vai.ornstein.work/vai-stats.html ; `vai-stats.html`; deploy/nginx-*.conf |
+| 2026-07-31 | P | Assistant | **Commit + push activity stats** — `a594e15` + docs `576a97f` on origin; standalone `vai-stats.html`; nginx locations in deploy/; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` then `sudo bash /opt/vai/deploy/fix-nginx-https.sh` | https://vai.ornstein.work/vai-stats.html |
 | 2026-07-31 | P | ornstein | **End of session (O&O)** — activity logging v1 shipped (F-110/F-111); AIRUP P complete; session closed | See [§ End of session — 2026-07-31 (activity logging)](#end-of-session--2026-07-31-activity-logging) |
 | 2026-07-31 | P | Assistant | **Commit + push activity logging** — `7d36f44` on `origin/master`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` then `tail -f /opt/vai/logs/activity.jsonl` | https://github.com/jonasornstein/VAI ; [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md) |
 | 2026-07-31 | P | Povl, ornstein | **activity-logging-v1 APPROVED** — published to outbox/specs; review recorded; pending stub → canonical; F-110/F-111 in functions.md | [activity-logging-v1.md](../../outbox/specs/activity-logging-v1.md), [REVIEW_activity-logging-v1.md](../../outbox/reviews/REVIEW_activity-logging-v1.md) |
