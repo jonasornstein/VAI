@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VAI Activity Stats</title>
+  <!--
+    Standalone Activity logging v1 viewer.
+    Not part of the VAI Python app — static HTML only.
+    Schema: outbox/specs/activity-logging-v1.md
+  -->
+  <style>
+    :root {
+      --bg: #0f1419;
+      --bg2: #1a2332;
+      --bg3: #243044;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9bb4;
+      --accent: #3d8bfd;
+      --ok: #3dd68c;
+      --fail: #f07178;
+      --warn: #e6c07b;
+      --gen: #c678dd;
+      --change: #56b6c2;
+      --row-hover: #1e2a3c;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1.25rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    header h1 span {
+      color: var(--muted);
+      font-weight: 400;
+      font-size: 0.85rem;
+      margin-left: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button, .file-btn, select, input[type="search"], input[type="text"] {
+      font: inherit;
+      color: var(--text);
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.4rem 0.7rem;
+    }
+
+    button, .file-btn {
+      cursor: pointer;
+      background: var(--accent);
+      border-color: transparent;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    button.secondary {
+      background: var(--bg3);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    button:hover, .file-btn:hover { filter: brightness(1.08); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+
+    .file-btn { display: inline-block; }
+    .file-btn input { display: none; }
+
+    main { padding: 1rem 1.25rem 2rem; max-width: 1600px; margin: 0 auto; }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .status-bar strong { color: var(--text); font-weight: 600; }
+    .status-bar .err { color: var(--fail); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+    }
+
+    .card .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .card .value {
+      font-size: 1.4rem;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .card.ok .value { color: var(--ok); }
+    .card.fail .value { color: var(--fail); }
+    .card.gen .value { color: var(--gen); }
+    .card.change .value { color: var(--change); }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.65rem;
+      align-items: end;
+      margin-bottom: 1rem;
+      padding: 0.85rem 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 120px;
+    }
+
+    .field.grow { flex: 1 1 200px; min-width: 180px; }
+
+    .field label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .field select, .field input { min-height: 2.1rem; }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg2);
+      max-height: calc(100vh - 340px);
+      min-height: 240px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th, td {
+      padding: 0.45rem 0.65rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--bg3);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      user-select: none;
+      z-index: 1;
+    }
+
+    th:hover { color: var(--text); }
+    th .arrow { margin-left: 0.25rem; color: var(--accent); }
+    th.sorted { color: var(--text); }
+
+    tbody tr:hover { background: var(--row-hover); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    td.mono, .mono { font-family: var(--mono); font-size: 0.78rem; }
+    td.path, td.ua {
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    td.path:hover, td.ua:hover {
+      white-space: normal;
+      word-break: break-all;
+      overflow: visible;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .badge.access { background: #1e3a5f; color: #7eb6ff; }
+    .badge.change { background: #163a3f; color: #6ed4df; }
+    .badge.generation { background: #3a1f4a; color: #d7a6ef; }
+    .badge.error { background: #4a1f24; color: #f5a0a5; }
+    .badge.success { background: #1a3d2c; color: #6ee7a8; }
+    .badge.failure { background: #4a1f24; color: #f5a0a5; }
+
+    .status-code.ok { color: var(--ok); }
+    .status-code.fail { color: var(--fail); }
+
+    .empty {
+      padding: 2.5rem 1rem;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 1.25rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    footer code {
+      font-family: var(--mono);
+      background: var(--bg3);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 640px) {
+      .table-wrap { max-height: none; }
+      header { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>VAI Activity Stats <span>logging v1</span></h1>
+    <div class="header-actions">
+      <label class="file-btn">
+        Load JSONL
+        <input type="file" id="file-input" accept=".jsonl,.json,text/plain,application/json" />
+      </label>
+      <button type="button" class="secondary" id="btn-reload" title="Fetch from /activity.jsonl">Reload</button>
+      <button type="button" class="secondary" id="btn-clear">Clear filters</button>
+      <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;color:var(--muted)">
+        <input type="checkbox" id="auto-refresh" />
+        Auto 30s
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <div class="status-bar" id="status-bar">
+      <span>Source: <strong id="source-label">none</strong></span>
+      <span>Loaded: <strong id="loaded-count">0</strong></span>
+      <span>Showing: <strong id="shown-count">0</strong></span>
+      <span id="status-msg"></span>
+    </div>
+
+    <div class="cards" id="cards">
+      <div class="card"><div class="label">Events</div><div class="value" id="stat-total">0</div></div>
+      <div class="card ok"><div class="label">Success</div><div class="value" id="stat-ok">0</div></div>
+      <div class="card fail"><div class="label">Failure</div><div class="value" id="stat-fail">0</div></div>
+      <div class="card gen"><div class="label">Generation</div><div class="value" id="stat-gen">0</div></div>
+      <div class="card change"><div class="label">Change</div><div class="value" id="stat-change">0</div></div>
+      <div class="card"><div class="label">Unique IPs</div><div class="value" id="stat-ips">0</div></div>
+    </div>
+
+    <div class="filters" id="filters">
+      <div class="field grow">
+        <label for="f-search">Search</label>
+        <input type="search" id="f-search" placeholder="IP, path, operation, UA…" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="f-type">Event type</label>
+        <select id="f-type"><option value="">All</option></select>
+      </div>
+      <div class="field">
+        <label for="f-outcome">Outcome</label>
+        <select id="f-outcome">
+          <option value="">All</option>
+          <option value="success">success</option>
+          <option value="failure">failure</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-op">Operation</label>
+        <select id="f-op"><option value="">All</option></select>
+      </div>
+      <div class="field">
+        <label for="f-method">Method</label>
+        <select id="f-method"><option value="">All</option></select>
+      </div>
+      <div class="field">
+        <label for="f-status">Status</label>
+        <select id="f-status"><option value="">All</option></select>
+      </div>
+      <div class="field">
+        <label for="f-ip">Client IP</label>
+        <select id="f-ip"><option value="">All</option></select>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr id="thead-row"></tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td class="empty" colspan="12">Load <code>activity.jsonl</code> or open this page where nginx serves it next to the log.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      Standalone viewer for Activity logging v1 (<code>ts</code>, <code>client_ip</code>, <code>operation</code>, <code>status</code>…).
+      Not wired into the VAI app — open <code>/vai-stats.html</code> or load a local JSONL file.
+      Default fetch path: <code id="default-src-label">/activity.jsonl</code>.
+    </footer>
+  </main>
+
+  <script>
+(function () {
+  "use strict";
+
+  /** Default URL when served beside nginx alias (see deploy/nginx-*.conf). */
+  var DEFAULT_SRC = "/activity.jsonl";
+  var COLUMNS = [
+    { key: "ts", label: "Time", mono: true },
+    { key: "event_type", label: "Type", badge: true },
+    { key: "operation", label: "Operation", mono: true },
+    { key: "method", label: "Method" },
+    { key: "path", label: "Path", cls: "path mono" },
+    { key: "status", label: "Status" },
+    { key: "outcome", label: "Outcome", badge: true },
+    { key: "client_ip", label: "Client IP", mono: true },
+    { key: "peer_ip", label: "Peer IP", mono: true },
+    { key: "function", label: "Function", mono: true },
+    { key: "actor", label: "Actor" },
+    { key: "user_agent", label: "User-Agent", cls: "ua" }
+  ];
+
+  var state = {
+    rows: [],
+    filtered: [],
+    sortKey: "ts",
+    sortDir: -1, // newest first
+    source: "none",
+    refreshTimer: null
+  };
+
+  var el = {
+    fileInput: document.getElementById("file-input"),
+    btnReload: document.getElementById("btn-reload"),
+    btnClear: document.getElementById("btn-clear"),
+    autoRefresh: document.getElementById("auto-refresh"),
+    sourceLabel: document.getElementById("source-label"),
+    loadedCount: document.getElementById("loaded-count"),
+    shownCount: document.getElementById("shown-count"),
+    statusMsg: document.getElementById("status-msg"),
+    tbody: document.getElementById("tbody"),
+    theadRow: document.getElementById("thead-row"),
+    fSearch: document.getElementById("f-search"),
+    fType: document.getElementById("f-type"),
+    fOutcome: document.getElementById("f-outcome"),
+    fOp: document.getElementById("f-op"),
+    fMethod: document.getElementById("f-method"),
+    fStatus: document.getElementById("f-status"),
+    fIp: document.getElementById("f-ip"),
+    defaultSrcLabel: document.getElementById("default-src-label")
+  };
+
+  el.defaultSrcLabel.textContent = DEFAULT_SRC;
+
+  function esc(s) {
+    if (s == null || s === "") return "";
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function parseJsonl(text) {
+    var rows = [];
+    var lines = text.split(/\r?\n/);
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      try {
+        var obj = JSON.parse(line);
+        if (obj && typeof obj === "object") rows.push(normalize(obj));
+      } catch (e) {
+        // skip bad lines
+      }
+    }
+    return rows;
+  }
+
+  function normalize(obj) {
+    return {
+      ts: obj.ts != null ? String(obj.ts) : "",
+      event_id: obj.event_id != null ? String(obj.event_id) : "",
+      event_type: obj.event_type != null ? String(obj.event_type) : "",
+      operation: obj.operation != null ? String(obj.operation) : "",
+      method: obj.method != null ? String(obj.method) : "",
+      path: obj.path != null ? String(obj.path) : "",
+      status: obj.status != null ? Number(obj.status) : "",
+      outcome: obj.outcome != null ? String(obj.outcome) : "",
+      client_ip: obj.client_ip != null ? String(obj.client_ip) : "",
+      peer_ip: obj.peer_ip != null ? String(obj.peer_ip) : "",
+      function: obj.function != null ? String(obj.function) : "",
+      actor: obj.actor != null ? String(obj.actor) : "",
+      user_agent: obj.user_agent != null ? String(obj.user_agent) : ""
+    };
+  }
+
+  function uniqueSorted(arr) {
+    var seen = Object.create(null);
+    var out = [];
+    for (var i = 0; i < arr.length; i++) {
+      var v = arr[i];
+      if (v === "" || v == null) continue;
+      var k = String(v);
+      if (!seen[k]) {
+        seen[k] = true;
+        out.push(k);
+      }
+    }
+    out.sort(function (a, b) {
+      return a < b ? -1 : a > b ? 1 : 0;
+    });
+    return out;
+  }
+
+  function fillSelect(select, values, keepAll) {
+    var current = select.value;
+    select.innerHTML = keepAll !== false ? '<option value="">All</option>' : "";
+    for (var i = 0; i < values.length; i++) {
+      var opt = document.createElement("option");
+      opt.value = values[i];
+      opt.textContent = values[i];
+      select.appendChild(opt);
+    }
+    if (current && values.indexOf(current) !== -1) select.value = current;
+  }
+
+  function rebuildFilterOptions() {
+    var rows = state.rows;
+    fillSelect(el.fType, uniqueSorted(rows.map(function (r) { return r.event_type; })));
+    fillSelect(el.fOp, uniqueSorted(rows.map(function (r) { return r.operation; })));
+    fillSelect(el.fMethod, uniqueSorted(rows.map(function (r) { return r.method; })));
+    fillSelect(
+      el.fStatus,
+      uniqueSorted(rows.map(function (r) { return r.status === "" ? "" : String(r.status); }))
+    );
+    fillSelect(el.fIp, uniqueSorted(rows.map(function (r) { return r.client_ip; })));
+  }
+
+  function applyFilters() {
+    var q = (el.fSearch.value || "").trim().toLowerCase();
+    var type = el.fType.value;
+    var outcome = el.fOutcome.value;
+    var op = el.fOp.value;
+    var method = el.fMethod.value;
+    var status = el.fStatus.value;
+    var ip = el.fIp.value;
+
+    var filtered = state.rows.filter(function (r) {
+      if (type && r.event_type !== type) return false;
+      if (outcome && r.outcome !== outcome) return false;
+      if (op && r.operation !== op) return false;
+      if (method && r.method !== method) return false;
+      if (status && String(r.status) !== status) return false;
+      if (ip && r.client_ip !== ip) return false;
+      if (q) {
+        var hay = [
+          r.ts, r.event_type, r.operation, r.method, r.path,
+          r.status, r.outcome, r.client_ip, r.peer_ip, r.function,
+          r.actor, r.user_agent, r.event_id
+        ].join(" ").toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+
+    var key = state.sortKey;
+    var dir = state.sortDir;
+    filtered.sort(function (a, b) {
+      var av = a[key];
+      var bv = b[key];
+      if (key === "status") {
+        av = Number(av) || 0;
+        bv = Number(bv) || 0;
+      } else {
+        av = av == null ? "" : String(av);
+        bv = bv == null ? "" : String(bv);
+      }
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+
+    state.filtered = filtered;
+    renderStats();
+    renderTable();
+  }
+
+  function renderStats() {
+    var rows = state.filtered;
+    var ok = 0, fail = 0, gen = 0, change = 0;
+    var ips = Object.create(null);
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      if (r.outcome === "success") ok++;
+      else if (r.outcome === "failure") fail++;
+      if (r.event_type === "generation") gen++;
+      if (r.event_type === "change") change++;
+      if (r.client_ip) ips[r.client_ip] = true;
+    }
+    document.getElementById("stat-total").textContent = String(rows.length);
+    document.getElementById("stat-ok").textContent = String(ok);
+    document.getElementById("stat-fail").textContent = String(fail);
+    document.getElementById("stat-gen").textContent = String(gen);
+    document.getElementById("stat-change").textContent = String(change);
+    document.getElementById("stat-ips").textContent = String(Object.keys(ips).length);
+    el.loadedCount.textContent = String(state.rows.length);
+    el.shownCount.textContent = String(rows.length);
+    el.sourceLabel.textContent = state.source;
+  }
+
+  function badgeHtml(value, kind) {
+    if (!value) return "—";
+    var cls = kind || value;
+    return '<span class="badge ' + esc(cls) + '">' + esc(value) + "</span>";
+  }
+
+  function cellHtml(col, row) {
+    var v = row[col.key];
+    if (v == null || v === "") return "—";
+    if (col.key === "event_type" || col.key === "outcome") {
+      return badgeHtml(v, v);
+    }
+    if (col.key === "status") {
+      var n = Number(v);
+      var cls = n > 0 && n < 400 ? "ok" : "fail";
+      return '<span class="status-code ' + cls + ' mono">' + esc(v) + "</span>";
+    }
+    var clsAttr = col.cls ? ' class="' + col.cls + '"' : col.mono ? ' class="mono"' : "";
+    var title = col.key === "path" || col.key === "user_agent" ? ' title="' + esc(v) + '"' : "";
+    return "<span" + clsAttr + title + ">" + esc(v) + "</span>";
+  }
+
+  function renderHead() {
+    var html = "";
+    for (var i = 0; i < COLUMNS.length; i++) {
+      var c = COLUMNS[i];
+      var sorted = state.sortKey === c.key;
+      var arrow = sorted ? (state.sortDir === 1 ? "▲" : "▼") : "";
+      html +=
+        '<th data-key="' +
+        esc(c.key) +
+        '" class="' +
+        (sorted ? "sorted" : "") +
+        '" title="Sort by ' +
+        esc(c.label) +
+        '">' +
+        esc(c.label) +
+        (arrow ? '<span class="arrow">' + arrow + "</span>" : "") +
+        "</th>";
+    }
+    el.theadRow.innerHTML = html;
+  }
+
+  function renderTable() {
+    renderHead();
+    var rows = state.filtered;
+    if (!rows.length) {
+      el.tbody.innerHTML =
+        '<tr><td class="empty" colspan="' +
+        COLUMNS.length +
+        '">' +
+        (state.rows.length
+          ? "No events match the current filters."
+          : "No events loaded. Use <strong>Load JSONL</strong> or <strong>Reload</strong>.") +
+        "</td></tr>";
+      return;
+    }
+
+    var parts = [];
+    // Cap DOM size for very large logs
+    var max = 5000;
+    var slice = rows.length > max ? rows.slice(0, max) : rows;
+    for (var i = 0; i < slice.length; i++) {
+      var r = slice[i];
+      parts.push("<tr>");
+      for (var j = 0; j < COLUMNS.length; j++) {
+        var c = COLUMNS[j];
+        var tdCls = c.cls ? ' class="' + c.cls + '"' : c.mono ? ' class="mono"' : "";
+        parts.push("<td" + tdCls + ">" + cellHtml(c, r) + "</td>");
+      }
+      parts.push("</tr>");
+    }
+    if (rows.length > max) {
+      parts.push(
+        '<tr><td class="empty" colspan="' +
+          COLUMNS.length +
+          '">Showing first ' +
+          max +
+          " of " +
+          rows.length +
+          " filtered rows (narrow filters to see more).</td></tr>"
+      );
+    }
+    el.tbody.innerHTML = parts.join("");
+  }
+
+  function setData(rows, source) {
+    state.rows = rows;
+    state.source = source || "unknown";
+    el.statusMsg.textContent = "";
+    el.statusMsg.className = "";
+    rebuildFilterOptions();
+    applyFilters();
+  }
+
+  function setError(msg) {
+    el.statusMsg.textContent = msg;
+    el.statusMsg.className = "err";
+  }
+
+  function loadText(text, source) {
+    var rows = parseJsonl(text);
+    if (!rows.length) {
+      setError("No valid JSONL events found.");
+      setData([], source);
+      return;
+    }
+    setData(rows, source);
+  }
+
+  function fetchSrc(url) {
+    el.statusMsg.textContent = "Loading…";
+    el.statusMsg.className = "";
+    return fetch(url, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status + " for " + url);
+        return res.text();
+      })
+      .then(function (text) {
+        loadText(text, url);
+      })
+      .catch(function (err) {
+        setError(err.message || String(err));
+      });
+  }
+
+  el.fileInput.addEventListener("change", function () {
+    var file = el.fileInput.files && el.fileInput.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      loadText(String(reader.result || ""), file.name);
+    };
+    reader.onerror = function () {
+      setError("Failed to read file.");
+    };
+    reader.readAsText(file);
+  });
+
+  el.btnReload.addEventListener("click", function () {
+    var params = new URLSearchParams(window.location.search);
+    var src = params.get("src") || DEFAULT_SRC;
+    fetchSrc(src);
+  });
+
+  el.btnClear.addEventListener("click", function () {
+    el.fSearch.value = "";
+    el.fType.value = "";
+    el.fOutcome.value = "";
+    el.fOp.value = "";
+    el.fMethod.value = "";
+    el.fStatus.value = "";
+    el.fIp.value = "";
+    applyFilters();
+  });
+
+  ["fSearch", "fType", "fOutcome", "fOp", "fMethod", "fStatus", "fIp"].forEach(function (id) {
+    el[id].addEventListener("input", applyFilters);
+    el[id].addEventListener("change", applyFilters);
+  });
+
+  el.theadRow.addEventListener("click", function (ev) {
+    var th = ev.target.closest("th[data-key]");
+    if (!th) return;
+    var key = th.getAttribute("data-key");
+    if (state.sortKey === key) {
+      state.sortDir = -state.sortDir;
+    } else {
+      state.sortKey = key;
+      state.sortDir = key === "ts" ? -1 : 1;
+    }
+    applyFilters();
+  });
+
+  el.autoRefresh.addEventListener("change", function () {
+    if (state.refreshTimer) {
+      clearInterval(state.refreshTimer);
+      state.refreshTimer = null;
+    }
+    if (el.autoRefresh.checked) {
+      state.refreshTimer = setInterval(function () {
+        var params = new URLSearchParams(window.location.search);
+        var src = params.get("src") || DEFAULT_SRC;
+        if (state.source === src || state.source === "none" || String(state.source).indexOf("activity") !== -1) {
+          fetchSrc(src);
+        }
+      }, 30000);
+    }
+  });
+
+  // Initial load: try ?src= or default /activity.jsonl
+  var params = new URLSearchParams(window.location.search);
+  var initialSrc = params.get("src") || DEFAULT_SRC;
+  fetchSrc(initialSrc);
+})();
+  </script>
+</body>
+</html>

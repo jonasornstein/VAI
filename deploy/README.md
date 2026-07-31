@@ -90,6 +90,15 @@ bash /opt/vai/deploy/setup-domain.sh
 
 Opens **https://vai.ornstein.work/** with automatic HTTP→HTTPS redirect.
 
+### Activity stats (standalone)
+
+`vai-stats.html` is a static page (not part of the Python app). After nginx is updated:
+
+- **https://vai.ornstein.work/vai-stats.html** — sort/filter activity log
+- **https://vai.ornstein.work/activity.jsonl** — raw JSONL (nginx alias to `logs/activity.jsonl`)
+
+Apply nginx locations with `sudo bash /opt/vai/deploy/fix-nginx-https.sh` (or copy from `deploy/nginx-vai-https.conf`).
+
 Manual certbot alternative:
 
 ```bash
