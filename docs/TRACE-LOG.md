@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | P | Assistant | **Commit + push betslip SPARA/LADDA UPP** — `8705fd5` on `origin/master`; YAML save/load + Datum-Bana-Spelform naming; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; [betslip.py](../../src/vai/io/betslip.py) |
 | 2026-08-07 | U | Assistant | **Betslip SPARA / LADDA UPP** — YAML save/load beside print; file name `{datum}-{bana}-{spelform}[-n].yaml`; print title uses Datum+Bana+Spelform; API `POST /api/v1/betslips` + `/parse` | [betslip.py](../../src/vai/io/betslip.py), mockup `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
 | 2026-08-07 | P | ornstein | **End of session (O&O)** — activity stats IP lookup + app-served deploy live; session closed | See [§ End of session — 2026-08-07 (activity stats)](#end-of-session--2026-08-07-activity-stats) |
 | 2026-08-07 | P | Assistant | **Activity stats part of app** — `4e9c572` on `origin/master`; app serves `/vai-stats.html` + `/activity.jsonl`; nginx aliases removed; update-server verifies Lookup IPs; **prod later live** at `dbe8ab9` | https://vai.ornstein.work/vai-stats.html |
