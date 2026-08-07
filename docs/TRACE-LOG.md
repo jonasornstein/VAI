@@ -852,6 +852,41 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 
 ---
 
+## End of session — 2026-08-07 (v1.3.1)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `c5d635e` / `8ab604c` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **v1.3.1 live** (operator tested & approved)
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Expert auto-slip (no UPPDATERA button) | Done | Horse select/deselect recalcs cost + slip |
+| Hari / Expert mode isolation | Done | Independent grids, freezes, tips per mode |
+| Multi-tip per expert | Done | Unique tip_ids; form switcher; product name |
+| Copy: Senast sparad / tips wording | Done | SPARA status + Experttips section hint |
+| Package **v1.3.1** | Done | `pyproject.toml`, `__version__`, UI, tag `v1.3.1` |
+| Tests | Done | expert tips + server multi-tip paths |
+| Commit + push + tag | Done | `23cad2c`, `c5d635e`, `8ab604c` → origin; tag `v1.3.1` |
+| Operator test + approve | Done | All features O&O on prod |
+| Prod | **Live** | Operator deploy after agent sudo block |
+
+### Operator notes
+
+- UI banner / pill shows **v1.3.1**
+- Expert: several systems per expert via form **+ Nytt tips**; list shows all
+- Hari and Expert keep separate spelkvitto state when switching tabs
+- **Rensa alla** clears the active mode only
+
+### Carry-over
+
+- Next race-day: V85 Hari/Expert entry (UC-22)
+- Quantitative mode still future; same `modeStates` pattern when added
+
+---
+
 ## Release v1.3.1 — 2026-08-07
 
 **Product line:** Expert multi-tip + slip UX polish on Hari/Expert v1.3.
@@ -864,12 +899,13 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 | Form UX | Tip switcher chips, **+ Nytt tips**, editable product/system name |
 | Roster | Badge **N tips** when count &gt; 1; lookup returns `tips[]` + count |
 | Slip copy | **Senast sparad:** after SPARA; expert hint “tips och/eller” |
+| Mode isolation | Hari/Expert independent grid + slip state |
 | Package | `pyproject.toml` / `vai.__version__` / UI → **1.3.1** |
 
 ### Commit / deploy
 
 - Commit: `c5d635e` · tag `v1.3.1`
-- Prod deploy: **blocked** (sudo) — run `sudo bash /opt/vai/deploy/update-server.sh`
+- Deploy: operator `update-server.sh` → https://vai.ornstein.work/ **live O&O**
 
 ---
 
