@@ -1614,6 +1614,8 @@
       var expertsRosterCache = [];
       var expertTipMeta = null;
       var expertBaseSelections = null;
+      var randomBaseSelections = null;
+      var lastRandomGenerateMeta = null;
       var RATIONALE_DEFAULT =
         "Slumpmässigt urval ur operatörens kandidatpool per avdelning.";
       function applyTheme(theme) {
@@ -1720,9 +1722,59 @@
         if (!opts || !opts.silent) onHorseGridChanged();
       }
 
+      /** Empty spelkvitto + cost/hit stats (used by Rensa alla avdelningar). */
+      function clearSlip() {
+        slipReady = false;
+        var grid = document.getElementById("slip-grid");
+        if (grid) grid.innerHTML = "";
+        updateSlipFooter(0, 0);
+        var costBig = document.getElementById("cost-big");
+        if (costBig) costBig.innerHTML = "— <span>SEK</span>";
+        var rowsEl = document.getElementById("stat-rows-count");
+        if (rowsEl) rowsEl.textContent = "—";
+        var breakdownEl = document.getElementById("stat-breakdown");
+        if (breakdownEl) breakdownEl.textContent = "—";
+        var shrinkEl = document.getElementById("stat-shrink");
+        if (shrinkEl) shrinkEl.textContent = "—";
+        resetHitSummary();
+        resetOperatorChecklist();
+        updateSlipPrintMeta();
+        updateSlipActions();
+        randomBaseSelections = null;
+        lastRandomGenerateMeta = null;
+        var updateBtn = document.getElementById("btn-update-slip");
+        if (updateBtn && activeMode === "expert") {
+          updateBtn.disabled = !selectedTipId;
+        }
+        var rationaleT = document.getElementById("rationale-text");
+        if (rationaleT) {
+          if (activeMode === "expert" && selectedTipId && expertTipMeta) {
+            var product = expertTipMeta.product_name
+              ? " (" + expertTipMeta.product_name + ")"
+              : "";
+            rationaleT.textContent =
+              "Expert: " +
+              expertTipMeta.expert_name +
+              product +
+              " · tip_id " +
+              expertTipMeta.tip_id +
+              " — alla avdelningar rensade. Klicka hästar för att bygga om." +
+              (expertTipMeta.rationale ? " — " + expertTipMeta.rationale : "");
+          } else if (activeMode === "expert") {
+            rationaleT.textContent =
+              "Välj ett experttips (t.ex. Björn Goop / Björnkollen) för att ladda spelsystemet.";
+          } else {
+            rationaleT.textContent = RATIONALE_DEFAULT;
+          }
+        }
+      }
+
       function deselectAllLegs(opts) {
         document.querySelectorAll(".horse").forEach(clearHorseSelection);
-        if (!opts || !opts.silent) onHorseGridChanged();
+        if (!opts || !opts.silent) {
+          // Always null the betslip — do not leave incomplete 8-row "—" slip.
+          clearSlip();
+        }
       }
 
       function collectFrozenLegs() {
@@ -1826,13 +1878,31 @@
       }
 
       /**
-       * Rebuild slip + cost from current grid marks (Expert mode edits).
+       * Rebuild slip + cost from current grid marks (Expert + Hari manual edits).
        */
       function refreshSlipFromGrid(opts) {
         opts = opts || {};
         var selections = collectGridSelections();
         var cost = computeSystemCost(selections);
         var updateBtn = document.getElementById("btn-update-slip");
+        // Expert: all marks are intentional picks. Hari: only pool-selected are operator locks.
+        var operatorPools =
+          activeMode === "random" ? collectPools() : selections;
+        var anyMarked = false;
+        for (var legCheck = 1; legCheck <= 8; legCheck++) {
+          if ((selections[String(legCheck)] || []).length) {
+            anyMarked = true;
+            break;
+          }
+        }
+        // No horses on any leg → fully empty slip (same as Rensa alla).
+        if (!anyMarked) {
+          clearSlip();
+          if (opts.alertIncomplete) {
+            alert("Varje avdelning måste ha minst en häst.");
+          }
+          return false;
+        }
         if (!cost.complete) {
           slipReady = false;
           document.getElementById("cost-big").innerHTML = "— <span>SEK</span>";
@@ -1848,10 +1918,11 @@
             grid.innerHTML = "";
             for (var i = 1; i <= 8; i++) {
               var horses = selections[String(i)] || [];
+              var opSet = new Set(operatorPools[String(i)] || []);
               var row = document.createElement("div");
               row.className = "slip-row";
               var text = horses.length
-                ? formatSlipLegHorses(i, horses, new Set(horses))
+                ? formatSlipLegHorses(i, horses, opSet)
                 : '<span class="slip-empty">—</span>';
               row.innerHTML =
                 '<div class="slip-row-leg">' + i + '</div>' +
@@ -1867,11 +1938,25 @@
           }
           return false;
         }
-        renderSlip(selections, null, selections);
-        var label = "expert tip";
-        if (expertBaseSelections && !selectionsEqual(selections, expertBaseSelections)) {
-          label = "justerad";
+        renderSlip(selections, null, operatorPools);
+        var label = null;
+        var isEdited = false;
+        if (activeMode === "expert") {
+          label = "expert tip";
+          if (expertBaseSelections && !selectionsEqual(selections, expertBaseSelections)) {
+            label = "justerad";
+            isEdited = true;
+          }
+        } else if (activeMode === "random") {
+          if (randomBaseSelections && !selectionsEqual(selections, randomBaseSelections)) {
+            label = "justerad";
+            isEdited = true;
+          }
         }
+        var budgetForCompare =
+          activeMode === "random"
+            ? parseFloat(document.getElementById("stake-input").value, 10) || cost.cost_sek
+            : cost.cost_sek;
         updateCost(
           {
             selections: selections,
@@ -1879,17 +1964,19 @@
             cost_sek: cost.cost_sek,
             cost_breakdown: cost.cost_breakdown,
             shrink_steps_used: null,
-            hit_summary: null
+            hit_summary: null,
+            seed:
+              lastRandomGenerateMeta && lastRandomGenerateMeta.seed != null
+                ? lastRandomGenerateMeta.seed
+                : null,
+            manual_edit: true
           },
-          cost.cost_sek,
+          budgetForCompare,
           label
         );
-        if (expertTipMeta) {
+        if (activeMode === "expert" && expertTipMeta) {
           var product = expertTipMeta.product_name ? " (" + expertTipMeta.product_name + ")" : "";
-          var edited =
-            expertBaseSelections && !selectionsEqual(selections, expertBaseSelections)
-              ? " · justerad i UI"
-              : "";
+          var edited = isEdited ? " · justerad i UI" : "";
           var rationaleT = document.getElementById("rationale-text");
           if (rationaleT) {
             rationaleT.textContent =
@@ -1907,7 +1994,12 @@
       }
 
       function onHorseGridChanged() {
-        if (activeMode === "expert" && selectedTipId) {
+        if (activeMode === "expert") {
+          if (!selectedTipId) return;
+          refreshSlipFromGrid();
+          return;
+        }
+        if (activeMode === "random") {
           refreshSlipFromGrid();
         }
       }
@@ -2096,7 +2188,7 @@
         if (hint) {
           hint.textContent = isExpert
             ? "Välj ett tip, sedan klicka hästar för att lägga till eller ta bort. Spelkvitto och kostnad uppdateras automatiskt."
-            : "Klicka för att markera hästar du vill låsa. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar.";
+            : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar.";
         }
         if (rationaleH) {
           rationaleH.textContent = isExpert ? "Rationale — Expert" : "Rationale — Hari";
@@ -3326,6 +3418,9 @@
         var budgetLabel = exact ? "= budget" : (ok ? "≤ budget" : "");
         if (activeMode === "expert") {
           budgetLabel = expertLabel || "expert tip";
+        } else if (expertLabel) {
+          // e.g. "justerad" after manual Hari edit
+          budgetLabel = expertLabel;
         }
         document.getElementById("cost-big").innerHTML =
           fmtSek(data.cost_sek) + ' <span>SEK</span>' + (budgetLabel ? '<span class="cost-ok">' + budgetLabel + "</span>" : "");
@@ -3346,12 +3441,28 @@
           renderHitSummary(null);
         }
         if (activeMode === "random") {
-          document.getElementById("rationale-text").textContent =
-            RATIONALE_DEFAULT +
-            " Markerade hästar låses. Slumpen fyller på med " +
-            data.shrink_steps_used +
-            " hästar till budget." +
-            (data.seed != null ? " Seed " + data.seed + "." : "");
+          var rationaleEl = document.getElementById("rationale-text");
+          if (!rationaleEl) {
+            /* skip */
+          } else if (data.manual_edit) {
+            var editedNote =
+              randomBaseSelections &&
+              data.selections &&
+              !selectionsEqual(data.selections, randomBaseSelections)
+                ? " Manuellt justerat i UI."
+                : " Kostnad beräknad från markerade hästar.";
+            rationaleEl.textContent =
+              RATIONALE_DEFAULT +
+              editedNote +
+              (data.seed != null ? " Seed " + data.seed + "." : "");
+          } else {
+            rationaleEl.textContent =
+              RATIONALE_DEFAULT +
+              " Markerade hästar låses. Slumpen fyller på med " +
+              data.shrink_steps_used +
+              " hästar till budget." +
+              (data.seed != null ? " Seed " + data.seed + "." : "");
+          }
         }
       }
 
@@ -3457,6 +3568,16 @@
               return;
             }
             applyGeneratedSelections(operatorPools, res.j.selections);
+            randomBaseSelections = {};
+            for (var leg = 1; leg <= 8; leg++) {
+              randomBaseSelections[String(leg)] = (
+                res.j.selections[String(leg)] || res.j.selections[leg] || []
+              ).slice();
+            }
+            lastRandomGenerateMeta = {
+              seed: res.j.seed,
+              shrink_steps_used: res.j.shrink_steps_used
+            };
             renderSlip(res.j.selections, res.j.seed, operatorPools);
             updateCost(res.j, budget);
           })
