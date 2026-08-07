@@ -1601,10 +1601,8 @@
           <div class="hit-bars" id="hit-bars" hidden aria-describedby="hit-summary-help-text"></div>
         </div>
         <button class="button button--blue btn-action btn-generate" id="btn-generate" type="button">Generera system</button>
-        <button class="button button--blue btn-action" id="btn-update-slip" type="button" hidden disabled>Uppdatera spelkvitto</button>
         <p class="stake-hint" id="expert-generate-hint" hidden>
-          Välj ett tip i listan. Klicka sedan hästar för att lägga till/ta bort — spelkvitto och kostnad uppdateras.
-          Använd <strong>Uppdatera spelkvitto</strong> om du vill tvinga omräkning.
+          Välj ett tip i listan, eller klicka hästar direkt. Spelkvitto och kostnad räknas om vid varje markering.
         </p>
         <div class="summary-card">
           <h3>Innan spel på atg.se</h3>
@@ -1650,6 +1648,12 @@
       var expertBaseSelections = null;
       var randomBaseSelections = null;
       var lastRandomGenerateMeta = null;
+      /** Per-mode betslip/grid state — RANDOM and EXPERT do not share selections. */
+      var modeStates = {
+        random: null,
+        expert: null
+        // quantitative: null  — later
+      };
       var RATIONALE_DEFAULT =
         "Slumpmässigt urval ur operatörens kandidatpool per avdelning.";
       function applyTheme(theme) {
@@ -1756,7 +1760,118 @@
         if (!opts || !opts.silent) onHorseGridChanged();
       }
 
-      /** Empty spelkvitto + cost/hit stats (used by Rensa alla avdelningar). */
+      function cloneSelectionsMap(src) {
+        var out = emptyLegMap();
+        if (!src) return out;
+        for (var leg = 1; leg <= 8; leg++) {
+          var key = String(leg);
+          var arr = src[key] || src[leg] || [];
+          out[key] = arr.slice();
+        }
+        return out;
+      }
+
+      function emptyModeState() {
+        return {
+          selections: emptyLegMap(),
+          operatorPools: emptyLegMap(),
+          frozenLegs: {},
+          selectedTipId: null,
+          expertTipMeta: null,
+          expertBaseSelections: null,
+          randomBaseSelections: null,
+          lastRandomGenerateMeta: null
+        };
+      }
+
+      /** Snapshot current grid + mode fields into modeStates[activeMode]. */
+      function captureModeState() {
+        modeStates[activeMode] = {
+          selections: collectGridSelections(),
+          operatorPools:
+            activeMode === "random" ? collectPools() : collectGridSelections(),
+          frozenLegs: Object.assign({}, frozenLegs),
+          selectedTipId: selectedTipId,
+          expertTipMeta: expertTipMeta
+            ? {
+                tip_id: expertTipMeta.tip_id,
+                expert_name: expertTipMeta.expert_name,
+                product_name: expertTipMeta.product_name,
+                rationale: expertTipMeta.rationale
+              }
+            : null,
+          expertBaseSelections: expertBaseSelections
+            ? cloneSelectionsMap(expertBaseSelections)
+            : null,
+          randomBaseSelections: randomBaseSelections
+            ? cloneSelectionsMap(randomBaseSelections)
+            : null,
+          lastRandomGenerateMeta: lastRandomGenerateMeta
+            ? {
+                seed: lastRandomGenerateMeta.seed,
+                shrink_steps_used: lastRandomGenerateMeta.shrink_steps_used
+              }
+            : null
+        };
+      }
+
+      /** Apply a saved mode snapshot to the grid and globals, then rebuild slip. */
+      function restoreModeState(state) {
+        state = state || emptyModeState();
+        frozenLegs = Object.assign({}, state.frozenLegs || {});
+        selectedTipId = state.selectedTipId || null;
+        expertTipMeta = state.expertTipMeta
+          ? {
+              tip_id: state.expertTipMeta.tip_id,
+              expert_name: state.expertTipMeta.expert_name,
+              product_name: state.expertTipMeta.product_name,
+              rationale: state.expertTipMeta.rationale
+            }
+          : null;
+        expertBaseSelections = state.expertBaseSelections
+          ? cloneSelectionsMap(state.expertBaseSelections)
+          : null;
+        randomBaseSelections = state.randomBaseSelections
+          ? cloneSelectionsMap(state.randomBaseSelections)
+          : null;
+        lastRandomGenerateMeta = state.lastRandomGenerateMeta
+          ? {
+              seed: state.lastRandomGenerateMeta.seed,
+              shrink_steps_used: state.lastRandomGenerateMeta.shrink_steps_used
+            }
+          : null;
+
+        if (!currentCard) {
+          clearSlip();
+          return;
+        }
+        var selections = state.selections || emptyLegMap();
+        var operatorPools = state.operatorPools || selections;
+        applyGeneratedSelections(operatorPools, selections);
+        for (var legNum = 1; legNum <= 8; legNum++) {
+          updateLegFreezeUi(legNum);
+        }
+        if (activeMode === "expert") {
+          renderExpertTipsList(expertTipsCache);
+        }
+        refreshSlipFromGrid();
+      }
+
+      function clearAllModeStates(opts) {
+        opts = opts || {};
+        modeStates.random = emptyModeState();
+        modeStates.expert = emptyModeState();
+        if (!opts.keepGlobals) {
+          frozenLegs = {};
+          selectedTipId = null;
+          expertTipMeta = null;
+          expertBaseSelections = null;
+          randomBaseSelections = null;
+          lastRandomGenerateMeta = null;
+        }
+      }
+
+      /** Empty spelkvitto + cost/hit stats (used by Rensa alla avdelningar). Current mode only. */
       function clearSlip() {
         slipReady = false;
         var grid = document.getElementById("slip-grid");
@@ -1774,11 +1889,10 @@
         resetOperatorChecklist();
         updateSlipPrintMeta();
         updateSlipActions();
-        randomBaseSelections = null;
-        lastRandomGenerateMeta = null;
-        var updateBtn = document.getElementById("btn-update-slip");
-        if (updateBtn && activeMode === "expert") {
-          updateBtn.disabled = !selectedTipId;
+        // Only wipe generate baselines for the active mode (do not touch the other mode).
+        if (activeMode === "random") {
+          randomBaseSelections = null;
+          lastRandomGenerateMeta = null;
         }
         var rationaleT = document.getElementById("rationale-text");
         if (rationaleT) {
@@ -1796,7 +1910,7 @@
               (expertTipMeta.rationale ? " — " + expertTipMeta.rationale : "");
           } else if (activeMode === "expert") {
             rationaleT.textContent =
-              "Välj ett experttips (t.ex. Björn Goop / Björnkollen) för att ladda spelsystemet.";
+              "Välj ett experttips (t.ex. Björn Goop / Björnkollen) eller klicka hästar för att bygga system.";
           } else {
             rationaleT.textContent = RATIONALE_DEFAULT;
           }
@@ -1906,19 +2020,14 @@
         return true;
       }
 
-      function setUpdateSlipEnabled(enabled) {
-        var btn = document.getElementById("btn-update-slip");
-        if (btn) btn.disabled = !enabled;
-      }
-
       /**
        * Rebuild slip + cost from current grid marks (Expert + Hari manual edits).
+       * Called automatically on every horse select/deselect — no manual button.
        */
       function refreshSlipFromGrid(opts) {
         opts = opts || {};
         var selections = collectGridSelections();
         var cost = computeSystemCost(selections);
-        var updateBtn = document.getElementById("btn-update-slip");
         // Expert: all marks are intentional picks. Hari: only pool-selected are operator locks.
         var operatorPools =
           activeMode === "random" ? collectPools() : selections;
@@ -1966,7 +2075,6 @@
           }
           updateSlipPrintMeta();
           updateSlipActions();
-          if (updateBtn && activeMode === "expert") updateBtn.disabled = !selectedTipId;
           if (opts.alertIncomplete) {
             alert("Varje avdelning måste ha minst en häst.");
           }
@@ -1976,10 +2084,14 @@
         var label = null;
         var isEdited = false;
         if (activeMode === "expert") {
-          label = "expert tip";
-          if (expertBaseSelections && !selectionsEqual(selections, expertBaseSelections)) {
-            label = "justerad";
-            isEdited = true;
+          if (selectedTipId || expertTipMeta) {
+            label = "expert tip";
+            if (expertBaseSelections && !selectionsEqual(selections, expertBaseSelections)) {
+              label = "justerad";
+              isEdited = true;
+            }
+          } else {
+            label = "manuell";
           }
         } else if (activeMode === "random") {
           if (randomBaseSelections && !selectionsEqual(selections, randomBaseSelections)) {
@@ -1991,14 +2103,18 @@
           activeMode === "random"
             ? parseFloat(document.getElementById("stake-input").value, 10) || cost.cost_sek
             : cost.cost_sek;
+        var hitSummary = computeHitSummaryClient(selections);
         updateCost(
           {
             selections: selections,
             combinations: cost.combinations,
             cost_sek: cost.cost_sek,
             cost_breakdown: cost.cost_breakdown,
-            shrink_steps_used: null,
-            hit_summary: null,
+            shrink_steps_used:
+              lastRandomGenerateMeta && lastRandomGenerateMeta.shrink_steps_used != null
+                ? lastRandomGenerateMeta.shrink_steps_used
+                : null,
+            hit_summary: hitSummary,
             seed:
               lastRandomGenerateMeta && lastRandomGenerateMeta.seed != null
                 ? lastRandomGenerateMeta.seed
@@ -2022,20 +2138,68 @@
               edited +
               (expertTipMeta.rationale ? " — " + expertTipMeta.rationale : "");
           }
+        } else if (activeMode === "expert" && !expertTipMeta) {
+          var rationaleManual = document.getElementById("rationale-text");
+          if (rationaleManual) {
+            rationaleManual.textContent =
+              "Manuellt expert-system (inget tip valt). Kostnad " +
+              fmtSek(cost.cost_sek) +
+              " SEK.";
+          }
         }
-        if (updateBtn && activeMode === "expert") updateBtn.disabled = false;
         return true;
       }
 
+      /** Client-side hit summary (same model as server) when ATG andelar are on the card. */
+      function computeHitSummaryClient(selections) {
+        var dist = currentCard && currentCard.leg_distributions;
+        if (!dist || !selections) return null;
+        var legProbs = [];
+        for (var leg = 1; leg <= 8; leg++) {
+          var legMap = dist[String(leg)] || dist[leg];
+          if (!legMap) return null;
+          var horses = selections[String(leg)] || selections[leg] || [];
+          if (!horses.length) return null;
+          var p = 0;
+          for (var i = 0; i < horses.length; i++) {
+            var h = horses[i];
+            var v = legMap[String(h)];
+            if (v == null) v = legMap[h];
+            if (v != null && !isNaN(v)) p += Number(v);
+          }
+          legProbs.push(Math.min(1, Math.max(0, p)));
+        }
+        // exact[k] = P(exactly k legs correct)
+        var exact = [1];
+        for (var li = 0; li < legProbs.length; li++) {
+          var prob = legProbs[li];
+          var next = [];
+          for (var k = 0; k <= exact.length; k++) next[k] = 0;
+          for (var c = 0; c < exact.length; c++) {
+            next[c] += exact[c] * (1 - prob);
+            next[c + 1] += exact[c] * prob;
+          }
+          exact = next;
+        }
+        var p7plus = 0;
+        var p6plus = 0;
+        var p5plus = 0;
+        for (var j = 5; j <= 8; j++) {
+          if (j >= 5) p5plus += exact[j] || 0;
+          if (j >= 6) p6plus += exact[j] || 0;
+          if (j >= 7) p7plus += exact[j] || 0;
+        }
+        return {
+          p8: exact[8] || 0,
+          p7plus: p7plus,
+          p6plus: p6plus,
+          p5plus: p5plus
+        };
+      }
+
       function onHorseGridChanged() {
-        if (activeMode === "expert") {
-          if (!selectedTipId) return;
-          refreshSlipFromGrid();
-          return;
-        }
-        if (activeMode === "random") {
-          refreshSlipFromGrid();
-        }
+        // Always recompute slip + cost for the active mode (no tip gate, no manual button).
+        refreshSlipFromGrid();
       }
 
       function applyGeneratedSelections(operatorPools, selections) {
@@ -2180,8 +2344,15 @@
         return { date: date, track: track, game: selectedGameType(), mode: modeLabel };
       }
 
-      function setActiveMode(mode) {
-        activeMode = mode === "expert" ? "expert" : "random";
+      function setActiveMode(mode, opts) {
+        opts = opts || {};
+        var next = mode === "expert" ? "expert" : "random";
+        var switching = next !== activeMode;
+        // Preserve current mode's grid/slip before leaving (unless bootstrap or forced wipe).
+        if (switching && !opts.skipCapture) {
+          captureModeState();
+        }
+        activeMode = next;
         document.querySelectorAll(".mode-tabs [data-mode]").forEach(function (btn) {
           var on = btn.getAttribute("data-mode") === activeMode;
           btn.classList.toggle("active", on);
@@ -2191,7 +2362,6 @@
         var hariBudget = document.getElementById("hari-budget-card");
         var hariSeed = document.getElementById("hari-seed-card");
         var genBtn = document.getElementById("btn-generate");
-        var updateSlipBtn = document.getElementById("btn-update-slip");
         var expertHint = document.getElementById("expert-generate-hint");
         var title = document.getElementById("legs-section-title");
         var hint = document.getElementById("legs-section-hint");
@@ -2206,10 +2376,6 @@
           genBtn.hidden = isExpert;
           genBtn.disabled = isExpert;
         }
-        if (updateSlipBtn) {
-          updateSlipBtn.hidden = !isExpert;
-          updateSlipBtn.disabled = !isExpert || !selectedTipId;
-        }
         if (expertHint) expertHint.hidden = !isExpert;
         document.querySelectorAll(".leg-freeze-btn").forEach(function (btn) {
           btn.hidden = isExpert;
@@ -2221,24 +2387,30 @@
         }
         if (hint) {
           hint.textContent = isExpert
-            ? "Välj ett tip, sedan klicka hästar för att lägga till eller ta bort. Spelkvitto och kostnad uppdateras automatiskt."
-            : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar.";
+            ? "Välj ett tip eller klicka hästar. Spelkvitto och kostnad uppdateras automatiskt vid varje markering. (Hari och Expert har skilda system.)"
+            : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar. (Hari och Expert har skilda system.)";
         }
         if (rationaleH) {
           rationaleH.textContent = isExpert ? "Rationale — Expert" : "Rationale — Hari";
         }
-        if (rationaleT && isExpert && !selectedTipId) {
-          rationaleT.textContent =
-            "Välj ett experttips (t.ex. Björn Goop / Björnkollen) för att ladda spelsystemet.";
-        }
-        if (rationaleT && !isExpert) {
-          rationaleT.textContent =
-            "Slumpmässigt urval ur operatörens kandidatpool per avdelning.";
-        }
-        updateSlipPrintMeta();
         if (isExpert) {
           loadExpertsRoster();
           loadExpertTips();
+        }
+        // Restore this mode's independent grid + slip (skip when caller applies payload itself).
+        if (switching && !opts.skipRestore) {
+          restoreModeState(modeStates[activeMode] || emptyModeState());
+        } else if (!switching) {
+          updateSlipPrintMeta();
+          if (rationaleT && isExpert && !selectedTipId && !expertTipMeta) {
+            rationaleT.textContent =
+              "Välj ett experttips (t.ex. Björn Goop / Björnkollen) eller klicka hästar för att bygga system.";
+          }
+          if (rationaleT && !isExpert && !randomBaseSelections) {
+            rationaleT.textContent = RATIONALE_DEFAULT;
+          }
+        } else {
+          updateSlipPrintMeta();
         }
       }
 
@@ -3007,7 +3179,8 @@
             }
             if (selectedTipId === tipId) {
               selectedTipId = null;
-              setUpdateSlipEnabled(false);
+              expertTipMeta = null;
+              expertBaseSelections = null;
             }
             closeExpertTipForm();
             removeExpertTipFromList(tipId, savedExpertId);
@@ -3158,8 +3331,10 @@
           alert("Ladda startlista först (välj datum och bana).");
           return;
         }
+        if (activeMode !== "expert") {
+          setActiveMode("expert");
+        }
         selectedTipId = tipId;
-        setUpdateSlipEnabled(false);
         fetch(API + "/api/v1/generate/expert", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -3191,7 +3366,7 @@
             updateCost(res.j, res.j.cost_sek, "expert tip");
             if (res.j.hit_summary) renderHitSummary(res.j.hit_summary);
             renderExpertTipsList(expertTipsCache);
-            setUpdateSlipEnabled(true);
+            captureModeState();
             var product = res.j.product_name ? " (" + res.j.product_name + ")" : "";
             var rationaleT = document.getElementById("rationale-text");
             if (rationaleT) {
@@ -3202,7 +3377,7 @@
                 " · tip_id " +
                 res.j.tip_id +
                 (res.j.rationale ? " — " + res.j.rationale : "") +
-                " Klicka hästar för att justera.";
+                " Klicka hästar för att justera — spelkvitto uppdateras automatiskt.";
             }
           })
           .catch(function (e) {
@@ -3728,7 +3903,8 @@
             payload.seed != null && payload.seed !== "" ? String(payload.seed) : "";
         }
         var mode = payload.mode === "expert" ? "expert" : "random";
-        setActiveMode(mode);
+        // Switch mode chrome; keep other mode's saved state; apply payload into this mode only.
+        setActiveMode(mode, { skipRestore: true });
         if (mode === "expert" && payload.expert && payload.expert.tip_id) {
           selectedTipId = payload.expert.tip_id;
           expertTipMeta = {
@@ -3741,7 +3917,7 @@
           selectedTipId = null;
           expertTipMeta = null;
         }
-        return loadSelectedCard().then(function (card) {
+        return loadSelectedCard({ preserveModeStates: true }).then(function (card) {
           if (!card) {
             alert("Kunde inte ladda startlista för sparat spelkvitto.");
             return;
@@ -3761,19 +3937,22 @@
             for (var el = 1; el <= 8; el++) {
               expertBaseSelections[String(el)] = (selections[String(el)] || []).slice();
             }
-            randomBaseSelections = null;
+            // Do not touch random mode baselines — they live in modeStates.random
           } else {
             randomBaseSelections = {};
             for (var rl = 1; rl <= 8; rl++) {
               randomBaseSelections[String(rl)] = (selections[String(rl)] || []).slice();
             }
-            expertBaseSelections = null;
+            lastRandomGenerateMeta = {
+              seed: payload.seed != null ? payload.seed : null,
+              shrink_steps_used: null
+            };
           }
           refreshSlipFromGrid();
+          captureModeState();
           if (mode === "expert") {
             loadExpertsRoster();
             loadExpertTips();
-            setUpdateSlipEnabled(!!selectedTipId);
           }
           updateSlipActions();
         });
@@ -4085,10 +4264,8 @@
         updateOperatorChecklist(data.selections, data.cost_sek, budget);
         if (data.hit_summary) {
           renderHitSummary(data.hit_summary);
-        } else if (activeMode === "expert") {
-          resetHitSummary();
         } else {
-          renderHitSummary(null);
+          resetHitSummary();
         }
         if (activeMode === "random") {
           var rationaleEl = document.getElementById("rationale-text");
@@ -4151,16 +4328,37 @@
         }
       }
 
-      function loadSelectedCard() {
+      function loadSelectedCard(opts) {
+        opts = opts || {};
         var id = document.getElementById("bana").value;
         if (!id) return Promise.resolve(null);
         return fetch(API + "/api/v1/race-cards/" + encodeURIComponent(id))
           .then(function (r) { return r.json(); })
           .then(function (card) {
+            var prevId = currentCard && currentCard.id;
+            var cardChanged = !prevId || prevId !== card.id;
             currentCard = card;
             document.getElementById("source-badge").textContent = (card.source || "yaml").toUpperCase();
             renderLegs(card);
-            resetHitSummary();
+            // Different race day/track → horse numbers no longer apply in any mode.
+            if (cardChanged) {
+              if (opts.preserveModeStates) {
+                // Caller re-applies live globals; still wipe cached per-mode snapshots.
+                clearAllModeStates({ keepGlobals: true });
+              } else {
+                clearAllModeStates();
+                clearSlip();
+                for (var legNum = 1; legNum <= 8; legNum++) {
+                  updateLegFreezeUi(legNum);
+                }
+                if (activeMode === "expert") {
+                  renderExpertTipsList(expertTipsCache);
+                }
+              }
+            }
+            if (!opts.preserveModeStates) {
+              resetHitSummary();
+            }
             updateSlipActions();
             return card;
           })
@@ -4236,6 +4434,7 @@
             };
             renderSlip(res.j.selections, res.j.seed, operatorPools);
             updateCost(res.j, budget);
+            captureModeState();
           })
           .catch(function (e) {
             document.getElementById("btn-generate").disabled = false;
@@ -4257,18 +4456,10 @@
         }
       });
       document.getElementById("btn-generate").addEventListener("click", generate);
-      var btnUpdateSlip = document.getElementById("btn-update-slip");
-      if (btnUpdateSlip) {
-        btnUpdateSlip.addEventListener("click", function () {
-          if (activeMode !== "expert") return;
-          if (!selectedTipId) {
-            alert("Välj ett experttips först.");
-            return;
-          }
-          refreshSlipFromGrid({ alertIncomplete: true });
-        });
-      }
-      document.getElementById("btn-deselect-all").addEventListener("click", deselectAllLegs);
+      document.getElementById("btn-deselect-all").addEventListener("click", function () {
+        deselectAllLegs();
+        captureModeState();
+      });
       document.getElementById("btn-print-slip").addEventListener("click", printSlip);
       document.getElementById("btn-save-slip").addEventListener("click", saveSlip);
       document.getElementById("btn-load-slip").addEventListener("click", openBetslipLoadModal);
