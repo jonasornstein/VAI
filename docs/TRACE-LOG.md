@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-07-31 |
+| **Last updated** | 2026-08-07 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | P | Assistant | **Commit + push Hari live betslip** — `4c5e4eb` on `origin/master`; horse select/deselect updates spelkvitto + cost under Hari; **Rensa alla** fully clears slip; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; mockup `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
+| 2026-08-07 | U | Assistant | **Hari betslip live update** — RANDOM matches Expert: `onHorseGridChanged` → `refreshSlipFromGrid`; cost = ∏×0.50; clearSlip on Rensa alla / empty grid | `4c5e4eb` |
 | 2026-07-31 | P | ornstein | **End of session (O&O)** — standalone activity stats page shipped; session closed | See [§ End of session — 2026-07-31 (activity stats)](#end-of-session--2026-07-31-activity-stats) |
 | 2026-07-31 | P | Assistant | **Commit + push activity stats** — `a594e15` + docs `576a97f` on origin; standalone `vai-stats.html`; nginx locations in deploy/; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` then `sudo bash /opt/vai/deploy/fix-nginx-https.sh` | https://vai.ornstein.work/vai-stats.html |
 | 2026-07-31 | P | ornstein | **End of session (O&O)** — activity logging v1 shipped (F-110/F-111); AIRUP P complete; session closed | See [§ End of session — 2026-07-31 (activity logging)](#end-of-session--2026-07-31-activity-logging) |
