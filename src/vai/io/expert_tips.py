@@ -43,6 +43,42 @@ def default_tip_id(expert_id: str, date: str) -> str:
     return f"{expert_id.strip()}-{date.strip()}"
 
 
+def _existing_tip_ids(tips_dir: str | Path) -> set[str]:
+    """All tip_id values currently loadable under tips_dir."""
+    root = Path(tips_dir)
+    if not root.is_dir():
+        return set()
+    ids: set[str] = set()
+    for path in root.rglob("*.yaml"):
+        if path.name.startswith("."):
+            continue
+        try:
+            tip = load_expert_tip(path)
+        except (ExpertTipValidationError, OSError, yaml.YAMLError):
+            continue
+        ids.add(tip.tip_id)
+    return ids
+
+
+def allocate_tip_id(tips_dir: str | Path, expert_id: str, date: str) -> str:
+    """Return a tip_id not already used: base, then base-2, base-3, …"""
+    base = default_tip_id(expert_id, date)
+    used = _existing_tip_ids(tips_dir)
+    if base not in used:
+        return base
+    n = 2
+    while True:
+        candidate = f"{base}-{n}"
+        if candidate not in used:
+            return candidate
+        n += 1
+        if n > 10_000:
+            raise ExpertTipValidationError(
+                f"Could not allocate tip_id for {expert_id!r} {date!r}",
+                code="TIP_ID_COLLISION",
+            )
+
+
 def tip_dir(tips_dir: str | Path, date: str, track: str) -> Path:
     return Path(tips_dir) / f"{date.strip()}-{track_slug(track)}"
 
@@ -228,7 +264,12 @@ def save_expert_tip(
     *,
     fetched_at: str | None = None,
 ) -> ExpertTip:
-    """Validate and write tip YAML. Overwrites existing tip for same expert/date/track."""
+    """Validate and write tip YAML.
+
+    - With ``tip_id``: update that tip file if it exists, otherwise create it.
+    - Without ``tip_id``: allocate a new unique id (``expert-date``, ``-2``, …)
+      so the same expert can have multiple systems for one omgång.
+    """
     root = Path(tips_dir)
     if isinstance(data, ExpertTip):
         raw: dict[str, Any] = tip_to_dict(data)
@@ -239,29 +280,40 @@ def save_expert_tip(
     date = _optional_str(raw.get("date")) or ""
     track = _optional_str(raw.get("track")) or ""
 
-    existing: ExpertTip | None = None
-    if expert_id and date and track:
-        existing = find_expert_tip_for(root, expert_id=expert_id, date=date, track=track)
-
-    if not _optional_str(raw.get("tip_id")):
-        if existing is not None:
-            raw["tip_id"] = existing.tip_id
-        elif expert_id and date:
-            raw["tip_id"] = default_tip_id(expert_id, date)
+    requested_id = _optional_str(raw.get("tip_id"))
+    existing_by_id: ExpertTip | None = None
+    if requested_id:
+        try:
+            existing_by_id = find_expert_tip(root, requested_id)
+        except ExpertTipValidationError as exc:
+            if exc.code != "TIP_NOT_FOUND":
+                raise
+            existing_by_id = None
+        raw["tip_id"] = requested_id
+    elif expert_id and date:
+        raw["tip_id"] = allocate_tip_id(root, expert_id, date)
+    # else: parse_expert_tip will raise Missing tip_id
 
     if not _optional_str(raw.get("status")):
-        raw["status"] = existing.status if existing is not None else "DRAFT"
+        raw["status"] = existing_by_id.status if existing_by_id is not None else "DRAFT"
 
     if fetched_at is not None:
         raw["fetched_at"] = fetched_at
     elif not _optional_str(raw.get("fetched_at")):
-        raw["fetched_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        if existing_by_id is not None and existing_by_id.fetched_at:
+            raw["fetched_at"] = existing_by_id.fetched_at
+        else:
+            raw["fetched_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     # Validate before choosing path so missing fields raise cleanly.
     tip = parse_expert_tip(raw)
 
-    if existing is not None and existing.path:
-        out_path = Path(existing.path)
+    if existing_by_id is not None and existing_by_id.path:
+        out_path = Path(existing_by_id.path)
+        # If date/track changed, prefer canonical path for the new location
+        # but keep overwriting same tip_id file when path still valid.
+        if tip.date != existing_by_id.date or not _tracks_match(tip.track, existing_by_id.track):
+            out_path = tip_path(root, tip.date, tip.track, tip.tip_id)
     else:
         out_path = tip_path(root, tip.date, tip.track, tip.tip_id)
 
@@ -271,6 +323,18 @@ def save_expert_tip(
         yaml.safe_dump(payload, allow_unicode=True, sort_keys=False, default_flow_style=None),
         encoding="utf-8",
     )
+    # If we moved tip_id to a new path, remove the old file
+    if (
+        existing_by_id is not None
+        and existing_by_id.path
+        and Path(existing_by_id.path).resolve() != out_path.resolve()
+        and Path(existing_by_id.path).is_file()
+    ):
+        try:
+            Path(existing_by_id.path).unlink()
+        except OSError:
+            pass
+
     return ExpertTip(
         tip_id=tip.tip_id,
         expert_id=tip.expert_id,

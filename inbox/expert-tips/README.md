@@ -19,10 +19,12 @@ Example: `2026-07-18-axevalla/fixture-axevalla-2026-07-18.yaml`
 1. Open the local UI (`python -m vai serve`) → **Expert** tab.
 2. Choose **Datum** and **Bana**.
 3. Click the small form icon to the left of **Gratis** / **Andel/betald** on the expert’s roster card.
-4. Enter horse numbers per avdelning (e.g. `2, 3, 5`), optional source URL / note, then **Spara**.
-5. The tip is written under this directory; the card shows **Redo** when a tip exists for the omgång.
+4. Enter horse numbers per avdelning (e.g. `2, 3, 5`), optional **Produkt / systemnamn**, source URL / note, then **Spara**.
+5. The tip is written under this directory; the card shows **Redo** (or **N tips**) when tip(s) exist for the omgång.
 
-First open for that expert + date + track is empty; later opens prefill the saved tip. **Avbryt** discards changes.
+**Multiple systems per expert** are supported for the same date/track (e.g. Stora + Lilla). Use **+ Nytt tips** in the form to add another; each gets its own `tip_id` (`expert-date`, `expert-date-2`, …). Distinguish them with `product_name`. Editing always updates the selected tip only.
+
+First open for that expert + date + track is empty; later opens list existing tips. **Avbryt** discards changes.
 
 ### Manual YAML
 

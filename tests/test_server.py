@@ -411,11 +411,15 @@ def test_api_expert_tips_save_and_lookup(tmp_path: Path) -> None:
         )
         assert lookup["tip"]["legs"]["1"] == [1]
         assert lookup["tip"]["source_note"] == "via UI test"
+        assert lookup["count"] == 1
+        assert len(lookup["tips"]) == 1
 
+        # Update same tip by tip_id → still one file
         legs2 = {str(leg): [2] for leg in range(1, 9)}
         status2, updated = _put(
             f"{base}/api/v1/expert-tips",
             {
+                "tip_id": "bjorn-goop-2026-08-01",
                 "expert_id": "bjorn-goop",
                 "expert_name": "Björn Goop",
                 "game": "v85",
@@ -427,6 +431,30 @@ def test_api_expert_tips_save_and_lookup(tmp_path: Path) -> None:
         assert status2 == 200
         assert updated["tip"]["legs"]["1"] == [2]
         assert len(list(tmp_path.rglob("*.yaml"))) == 1
+
+        # Second system without tip_id → new tip (multi-tip per expert)
+        legs3 = {str(leg): [3] for leg in range(1, 9)}
+        status3, second = _put(
+            f"{base}/api/v1/expert-tips",
+            {
+                "expert_id": "bjorn-goop",
+                "expert_name": "Björn Goop",
+                "product_name": "Alternativ",
+                "game": "v85",
+                "date": "2026-08-01",
+                "track": "Solvalla",
+                "legs": legs3,
+            },
+        )
+        assert status3 == 200
+        assert second["tip_id"] == "bjorn-goop-2026-08-01-2"
+        assert len(list(tmp_path.rglob("*.yaml"))) == 2
+        multi = _get(
+            f"{base}/api/v1/expert-tips/lookup"
+            "?expert_id=bjorn-goop&date=2026-08-01&track=Solvalla"
+        )
+        assert multi["count"] == 2
+        assert len(multi["tips"]) == 2
 
         bad_status, bad = _put(
             f"{base}/api/v1/expert-tips",
@@ -449,10 +477,12 @@ def test_api_expert_tips_save_and_lookup(tmp_path: Path) -> None:
         assert deleted["ok"] is True
         assert deleted["tip_id"] == "bjorn-goop-2026-08-01"
         assert not (tmp_path / "2026-08-01-solvalla" / "bjorn-goop-2026-08-01.yaml").is_file()
+        # Second tip remains
         listed_after = _get(
             f"{base}/api/v1/expert-tips?date=2026-08-01&track=Solvalla&expert_id=bjorn-goop"
         )
-        assert listed_after["tips"] == []
+        assert len(listed_after["tips"]) == 1
+        assert listed_after["tips"][0]["tip_id"] == "bjorn-goop-2026-08-01-2"
 
         missing_status, missing = _delete(f"{base}/api/v1/expert-tips/no-such-tip")
         assert missing_status == 404

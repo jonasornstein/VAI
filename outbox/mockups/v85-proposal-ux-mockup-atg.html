@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.3.0</title>
+  <title>VAI V85 — Local UI v1.3.1</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -601,6 +601,48 @@
       border: 1px solid var(--atg-border);
       padding: 0.05em 0.3em;
       border-radius: 3px;
+    }
+    .expert-tip-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      align-items: center;
+      margin: 0 0 0.85rem;
+    }
+    .expert-tip-switcher__label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--horse-meta);
+      margin-right: 0.15rem;
+    }
+    .expert-tip-chip {
+      font-family: Roboto, sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.55rem;
+      border: 1px solid var(--atg-border);
+      border-radius: 999px;
+      background: var(--atg-muted-bg);
+      color: var(--atg-text);
+      cursor: pointer;
+      max-width: 14rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .expert-tip-chip:hover {
+      border-color: var(--v85-light);
+    }
+    .expert-tip-chip.active {
+      background-image: var(--v85-gradient);
+      border-color: var(--v85-light);
+      color: #fff;
+    }
+    .expert-tip-chip--new {
+      border-style: dashed;
+      font-weight: 700;
     }
     .expert-tip-form-grid {
       display: grid;
@@ -1295,7 +1337,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.3.0 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.1 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -1335,7 +1377,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.3.0</span>
+        <span class="game-header__pill">v1.3.1</span>
       </div>
     </header>
 
@@ -1466,6 +1508,11 @@
           <div class="expert-tip-modal__panel">
             <h3 id="expert-tip-modal-title">Experttips</h3>
             <p class="expert-tip-modal__meta" id="expert-tip-modal-meta"></p>
+            <div class="expert-tip-switcher" id="expert-tip-switcher" hidden aria-label="Välj systemtips">
+              <span class="expert-tip-switcher__label">System</span>
+              <div id="expert-tip-switcher-chips" style="display:contents"></div>
+              <button type="button" class="expert-tip-chip expert-tip-chip--new" id="expert-tip-new-btn" title="Lägg till ytterligare systemtips">+ Nytt tips</button>
+            </div>
             <form id="expert-tip-form" autocomplete="off">
               <input type="hidden" id="et-expert-id" />
               <input type="hidden" id="et-tip-id" />
@@ -1488,6 +1535,9 @@
                 <input type="text" id="et-leg-8" inputmode="numeric" />
               </div>
               <div class="expert-tip-form-fields">
+                <label>Produkt / systemnamn
+                  <input type="text" id="et-product-name" placeholder="t.ex. Stora V85, Björnkollen" />
+                </label>
                 <label>Källa (URL)
                   <input type="url" id="et-source-url" placeholder="https://…" />
                 </label>
@@ -1602,7 +1652,7 @@
         </div>
         <button class="button button--blue btn-action btn-generate" id="btn-generate" type="button">Generera system</button>
         <p class="stake-hint" id="expert-generate-hint" hidden>
-          Välj ett tip i listan, eller klicka hästar direkt. Spelkvitto och kostnad räknas om vid varje markering.
+          Välj ett tips i listan och/eller klicka hästar. Spelkvitto och kostnad räknas om vid varje markering.
         </p>
         <div class="summary-card">
           <h3>Innan spel på atg.se</h3>
@@ -1624,7 +1674,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.3.0 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.1 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -2327,7 +2377,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.3.0";
+        document.title = title + " — Local UI v1.3.1";
         var logo = document.getElementById("app-logo");
         if (logo) logo.setAttribute("title", title);
         updateOpenAtgButton();
@@ -2387,7 +2437,7 @@
         }
         if (hint) {
           hint.textContent = isExpert
-            ? "Välj ett tip eller klicka hästar. Spelkvitto och kostnad uppdateras automatiskt vid varje markering. (Hari och Expert har skilda system.)"
+            ? "Välj ett tips och/eller klicka hästar. Spelkvitto och kostnad uppdateras automatiskt vid varje markering. (Hari och Expert har skilda system.)"
             : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar. (Hari och Expert har skilda system.)";
         }
         if (rationaleH) {
@@ -2489,11 +2539,24 @@
         }
         experts.forEach(function (ex) {
           var card = document.createElement("div");
-          card.className = "expert-roster-card" + (ex.has_tip ? " has-tip" : "");
-          var formLabel = ex.has_tip ? "Redigera experttips" : "Ange experttips";
+          var tipCount =
+            ex.tip_count != null
+              ? ex.tip_count
+              : ex.tips_for_filter != null
+                ? ex.tips_for_filter
+                : ex.has_tip
+                  ? 1
+                  : 0;
+          card.className = "expert-roster-card" + (tipCount > 0 ? " has-tip" : "");
+          var formLabel =
+            tipCount > 1
+              ? "Redigera experttips (" + tipCount + ")"
+              : tipCount === 1
+                ? "Redigera experttips"
+                : "Ange experttips";
           var formBtn =
             '<button type="button" class="expert-tip-form-btn' +
-            (ex.has_tip ? " has-tip" : "") +
+            (tipCount > 0 ? " has-tip" : "") +
             '" data-expert-id="' +
             escapeHtml(ex.expert_id) +
             '" title="' +
@@ -2508,7 +2571,14 @@
           var badges = formBtn;
           if (ex.free === true) badges += '<span class="expert-badge free">Gratis</span>';
           else if (ex.free === false) badges += '<span class="expert-badge paid">Andel/betald</span>';
-          if (ex.has_tip) badges += '<span class="expert-badge ready">Redo</span>';
+          if (tipCount > 1) {
+            badges +=
+              '<span class="expert-badge ready">' +
+              tipCount +
+              " tips</span>";
+          } else if (tipCount === 1) {
+            badges += '<span class="expert-badge ready">Redo</span>';
+          }
           var product = ex.product_name ? " · " + ex.product_name : "";
           var outlet = ex.outlet ? escapeHtml(ex.outlet) : "";
           var link = "";
@@ -2975,6 +3045,8 @@
       }
 
       var expertTipFormContext = null;
+      /** Tips loaded for the open form (same expert+date+track). */
+      var expertTipFormTips = [];
 
       function setExpertTipFormError(msg) {
         var el = document.getElementById("expert-tip-form-error");
@@ -2990,12 +3062,88 @@
           : "Ingen sparad fil — radera ej tillgänglig";
       }
 
+      function tipChipLabel(tip) {
+        if (!tip) return "Tips";
+        if (tip.product_name) return tip.product_name;
+        if (tip.tip_id) return tip.tip_id;
+        return "Tips";
+      }
+
+      function renderExpertTipSwitcher(activeTipId) {
+        var wrap = document.getElementById("expert-tip-switcher");
+        var chips = document.getElementById("expert-tip-switcher-chips");
+        if (!wrap || !chips) return;
+        chips.innerHTML = "";
+        // Always show switcher so "Nytt tips" is available (multiple systems per expert).
+        wrap.hidden = false;
+        expertTipFormTips.forEach(function (tip) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className =
+            "expert-tip-chip" +
+            (tip.tip_id === activeTipId ? " active" : "");
+          btn.textContent = tipChipLabel(tip);
+          btn.title = tip.tip_id || tipChipLabel(tip);
+          btn.setAttribute("data-tip-id", tip.tip_id || "");
+          btn.addEventListener("click", function () {
+            selectExpertTipInForm(tip.tip_id);
+          });
+          chips.appendChild(btn);
+        });
+        var newBtn = document.getElementById("expert-tip-new-btn");
+        if (newBtn) {
+          newBtn.classList.toggle("active", !activeTipId);
+        }
+      }
+
+      function selectExpertTipInForm(tipId) {
+        if (!tipId) {
+          startNewExpertTipForm();
+          return;
+        }
+        var tip = null;
+        for (var i = 0; i < expertTipFormTips.length; i++) {
+          if (expertTipFormTips[i].tip_id === tipId) {
+            tip = expertTipFormTips[i];
+            break;
+          }
+        }
+        if (!tip) return;
+        fillExpertTipForm(tip);
+        renderExpertTipSwitcher(tip.tip_id);
+        setExpertTipFormError("");
+      }
+
+      function startNewExpertTipForm() {
+        clearExpertTipForm();
+        if (expertTipFormContext) {
+          var productEl = document.getElementById("et-product-name");
+          if (productEl) {
+            // Prefill roster default only when creating the first tip; leave blank for extras.
+            productEl.value =
+              expertTipFormTips.length === 0
+                ? expertTipFormContext.product_name || ""
+                : "";
+          }
+          if (expertTipFormContext.source_url_default) {
+            document.getElementById("et-source-url").value =
+              expertTipFormContext.source_url_default;
+          }
+        }
+        renderExpertTipSwitcher(null);
+        setExpertTipFormError("");
+        var first = document.getElementById("et-leg-1");
+        if (first) first.focus();
+      }
+
       function clearExpertTipForm() {
         document.getElementById("et-tip-id").value = "";
         for (var leg = 1; leg <= 8; leg++) {
           var input = document.getElementById("et-leg-" + leg);
           if (input) input.value = "";
         }
+        var productEl = document.getElementById("et-product-name");
+        if (productEl) productEl.value = "";
         document.getElementById("et-source-url").value = "";
         document.getElementById("et-source-note").value = "";
         document.getElementById("et-rationale").value = "";
@@ -3011,6 +3159,8 @@
           var input = document.getElementById("et-leg-" + leg);
           if (input) input.value = Array.isArray(horses) ? horses.join(", ") : "";
         }
+        var productEl = document.getElementById("et-product-name");
+        if (productEl) productEl.value = tip.product_name || "";
         document.getElementById("et-source-url").value = tip.source_url || "";
         document.getElementById("et-source-note").value = tip.source_note || "";
         document.getElementById("et-rationale").value = tip.rationale || "";
@@ -3048,6 +3198,7 @@
         var modal = document.getElementById("expert-tip-modal");
         if (modal) modal.hidden = true;
         expertTipFormContext = null;
+        expertTipFormTips = [];
         setExpertTipFormError("");
       }
 
@@ -3066,24 +3217,29 @@
           date: date,
           track: track
         };
+        expertTipFormTips = [];
         document.getElementById("et-expert-id").value = ex.expert_id;
-        var product = ex.product_name ? " · " + ex.product_name : "";
         document.getElementById("expert-tip-modal-meta").innerHTML =
           "<strong>" +
           escapeHtml(expertTipFormContext.expert_name) +
-          escapeHtml(product) +
           "</strong><br>" +
           escapeHtml(date) +
           " · " +
           escapeHtml(track) +
           " · <code>" +
           escapeHtml(ex.expert_id) +
-          "</code>";
+          "</code>" +
+          "<br><span class=\"tip-meta\">Flera systemtips per expert går bra — välj system eller skapa nytt.</span>";
         clearExpertTipForm();
         setExpertTipDeleteEnabled(false);
         if (ex.source_url) {
           document.getElementById("et-source-url").value = ex.source_url;
         }
+        var productEl = document.getElementById("et-product-name");
+        if (productEl && ex.product_name) {
+          productEl.value = ex.product_name;
+        }
+        renderExpertTipSwitcher(null);
         var modal = document.getElementById("expert-tip-modal");
         if (modal) modal.hidden = false;
         var qs =
@@ -3100,15 +3256,23 @@
             });
           })
           .then(function (res) {
-            if (res.ok && res.j.tip) {
-              fillExpertTipForm(res.j.tip);
-            } else if (res.status !== 404) {
+            if (res.ok) {
+              expertTipFormTips = res.j.tips || (res.j.tip ? [res.j.tip] : []);
+              if (expertTipFormTips.length) {
+                fillExpertTipForm(expertTipFormTips[0]);
+                renderExpertTipSwitcher(expertTipFormTips[0].tip_id);
+              } else {
+                startNewExpertTipForm();
+              }
+            } else if (res.status === 404) {
+              expertTipFormTips = [];
+              startNewExpertTipForm();
+            } else {
               var msg =
                 (res.j.error && res.j.error.message) ||
                 "Kunde inte hämta sparat tips";
               setExpertTipFormError(msg);
-            } else {
-              setExpertTipDeleteEnabled(false);
+              renderExpertTipSwitcher(null);
             }
             var first = document.getElementById("et-leg-1");
             if (first) first.focus();
@@ -3219,8 +3383,13 @@
         };
         var tipId = document.getElementById("et-tip-id").value.trim();
         if (tipId) body.tip_id = tipId;
-        if (expertTipFormContext.product_name) {
-          body.product_name = expertTipFormContext.product_name;
+        var productNameEl = document.getElementById("et-product-name");
+        var productName = productNameEl ? productNameEl.value.trim() : "";
+        if (productName) {
+          body.product_name = productName;
+        } else if (expertTipFormContext.product_name && tipId) {
+          // Keep empty product_name as intentional clear only when editing;
+          // for brand-new tips without product, omit field.
         }
         var sourceUrl = document.getElementById("et-source-url").value.trim();
         var sourceNote = document.getElementById("et-source-note").value.trim();
@@ -3586,7 +3755,7 @@
             var filename = res.j.filename || base + ".yaml";
             bumpSessionBetslipFromFilename(filename);
             downloadTextFile(filename, res.j.yaml || dumpBetslipYamlClient(payload));
-            setSlipSaveStatus("Sparad: " + filename);
+            setSlipSaveStatus("Senast sparad: " + filename);
           })
           .catch(function (err) {
             console.warn("Server save failed, client-only download:", err);
@@ -4600,6 +4769,12 @@
       var expertTipDelete = document.getElementById("expert-tip-delete");
       if (expertTipDelete) {
         expertTipDelete.addEventListener("click", deleteExpertTipForm);
+      }
+      var expertTipNewBtn = document.getElementById("expert-tip-new-btn");
+      if (expertTipNewBtn) {
+        expertTipNewBtn.addEventListener("click", function () {
+          startNewExpertTipForm();
+        });
       }
       var expertTipModal = document.getElementById("expert-tip-modal");
       if (expertTipModal) {

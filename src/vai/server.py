@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert API (v1.3.0)."""
+"""Local HTTP server — mockup + random/expert API (v1.3.1)."""
 
 from __future__ import annotations
 
@@ -354,6 +354,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             {
                 **e.to_dict(),
                 "tips_for_filter": tip_counts.get(e.expert_id, 0),
+                "tip_count": tip_counts.get(e.expert_id, 0),
                 "has_tip": tip_counts.get(e.expert_id, 0) > 0,
             }
             for e in experts
@@ -633,19 +634,41 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                     },
                 )
                 return
-            tip = find_expert_tip_for(
+            # Multi-tip: return all tips for expert+date+track; tip = first for compat.
+            summaries = list_expert_tips(
                 self.expert_tips_dir,
-                expert_id=expert_id,
                 date=date,
                 track=track,
+                expert_id=expert_id,
             )
-            if tip is None:
+            tips_full: list[dict[str, Any]] = []
+            for summary in summaries:
+                try:
+                    full = find_expert_tip(self.expert_tips_dir, summary.tip_id)
+                except ExpertTipValidationError:
+                    continue
+                tips_full.append(tip_to_dict(full))
+            if not tips_full:
                 self._send_json(
                     HTTPStatus.NOT_FOUND,
-                    {"error": {"code": "TIP_NOT_FOUND", "message": "No tip for expert/date/track"}},
+                    {
+                        "error": {
+                            "code": "TIP_NOT_FOUND",
+                            "message": "No tip for expert/date/track",
+                        },
+                        "tips": [],
+                        "tip": None,
+                    },
                 )
                 return
-            self._send_json(HTTPStatus.OK, {"tip": tip_to_dict(tip)})
+            self._send_json(
+                HTTPStatus.OK,
+                {
+                    "tips": tips_full,
+                    "tip": tips_full[0],  # first tip — backward compatible
+                    "count": len(tips_full),
+                },
+            )
             return
 
         if not tip_id or not CARD_ID_PATTERN.match(tip_id):

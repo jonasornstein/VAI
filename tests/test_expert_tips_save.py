@@ -9,9 +9,11 @@ import yaml
 
 from vai.io.expert_tips import (
     ExpertTipValidationError,
+    allocate_tip_id,
     default_tip_id,
     delete_expert_tip,
     find_expert_tip_for,
+    list_expert_tips,
     load_expert_tip,
     save_expert_tip,
     track_slug,
@@ -65,8 +67,8 @@ def test_save_and_load_roundtrip(tmp_path: Path) -> None:
     assert raw["legs"][1] == [1] or raw["legs"]["1"] == [1]
 
 
-def test_find_and_overwrite(tmp_path: Path) -> None:
-    save_expert_tip(
+def test_overwrite_same_tip_id(tmp_path: Path) -> None:
+    first = save_expert_tip(
         tmp_path,
         {
             "expert_id": "leboff",
@@ -89,6 +91,7 @@ def test_find_and_overwrite(tmp_path: Path) -> None:
     updated = save_expert_tip(
         tmp_path,
         {
+            "tip_id": first.tip_id,
             "expert_id": "leboff",
             "expert_name": "Leboff",
             "game": "v85",
@@ -101,9 +104,68 @@ def test_find_and_overwrite(tmp_path: Path) -> None:
     assert updated.tip_id == "leboff-2026-07-25"
     assert Path(updated.path).resolve() == Path(found.path).resolve()  # type: ignore[arg-type]
     assert load_expert_tip(updated.path).legs[1] == [2, 4]  # type: ignore[arg-type]
-    # Only one yaml for this expert
+    # Only one yaml when same tip_id is updated
     yamls = list(tmp_path.rglob("*.yaml"))
     assert len(yamls) == 1
+
+
+def test_multiple_tips_same_expert_date_track(tmp_path: Path) -> None:
+    """Same expert may have several systems for one omgång."""
+    first = save_expert_tip(
+        tmp_path,
+        {
+            "expert_id": "stridbeck",
+            "expert_name": "Stridbeck",
+            "product_name": "Stora V85",
+            "game": "v85",
+            "date": "2026-07-25",
+            "track": "Bollnäs",
+            "legs": _minimal_legs(),
+        },
+        fetched_at="2026-07-25T10:00:00Z",
+    )
+    legs2 = _minimal_legs()
+    legs2[1] = [3, 5]
+    second = save_expert_tip(
+        tmp_path,
+        {
+            "expert_id": "stridbeck",
+            "expert_name": "Stridbeck",
+            "product_name": "Lilla V85",
+            "game": "v85",
+            "date": "2026-07-25",
+            "track": "Bollnäs",
+            "legs": legs2,
+        },
+        fetched_at="2026-07-25T11:00:00Z",
+    )
+    assert first.tip_id == "stridbeck-2026-07-25"
+    assert second.tip_id == "stridbeck-2026-07-25-2"
+    assert first.tip_id != second.tip_id
+    yamls = list(tmp_path.rglob("*.yaml"))
+    assert len(yamls) == 2
+    listed = list_expert_tips(
+        tmp_path, date="2026-07-25", track="Bollnäs", expert_id="stridbeck"
+    )
+    assert len(listed) == 2
+    ids = {t.tip_id for t in listed}
+    assert ids == {first.tip_id, second.tip_id}
+    assert load_expert_tip(second.path).legs[1] == [3, 5]  # type: ignore[arg-type]
+
+
+def test_allocate_tip_id_skips_existing(tmp_path: Path) -> None:
+    save_expert_tip(
+        tmp_path,
+        {
+            "expert_id": "x",
+            "expert_name": "X",
+            "game": "v85",
+            "date": "2026-01-01",
+            "track": "Test",
+            "legs": _minimal_legs(),
+        },
+    )
+    assert allocate_tip_id(tmp_path, "x", "2026-01-01") == "x-2026-01-01-2"
 
 
 def test_save_rejects_empty_leg(tmp_path: Path) -> None:
