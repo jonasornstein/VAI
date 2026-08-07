@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | P | ornstein | **End of session (O&O)** — server betslip list/open/delete + readable saved-at tested & approved; session closed | See [§ End of session — 2026-08-07 (server betslip archive)](#end-of-session--2026-08-07-server-betslip-archive) |
 | 2026-08-07 | P | Assistant | **Commit + push readable betslip saved-at** — `0813046` on `origin/master`; LADDA UPP list shows local `sparad YYYY-MM-DD  HH:MM`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; mockup |
 | 2026-08-07 | P | Assistant | **Commit + push server betslip list/open/delete** — `51b50e7` on `origin/master`; GET list/get, DELETE + batch delete, LADDA UPP modal; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; [betslip.py](../../src/vai/io/betslip.py) |
 | 2026-08-07 | U | Assistant | **Server betslip list/open/delete** — `GET /api/v1/betslips`, get one, DELETE + batch delete; LADDA UPP modal (select all/none, Öppna, Radera, Från fil); `betslips/*.yaml` gitignored | [betslip.py](../../src/vai/io/betslip.py), mockup, tests |
@@ -259,6 +260,44 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-08-07 (server betslip archive)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `0813046` / `193ebcd` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **live** (operator tested & approved; list API + LADDA UPP modal + readable saved-at present)
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Feasibility | Done | Server save already existed; list/get/delete were gaps |
+| `GET /api/v1/betslips` list | Done | Metadata, newest first; skip non-YAML |
+| `GET /api/v1/betslips/{file}` | Done | Full payload + YAML |
+| `DELETE` one + `POST …/delete` batch | Done | Path-safe; multi-select UI |
+| LADDA UPP modal | Done | Checkboxes, Markera/Avmarkera alla, Öppna, Radera, Från fil |
+| SPARA | Unchanged | Server archive + always local download; status “Sparad: …” |
+| Readable saved-at | Done | `sparad YYYY-MM-DD  HH:MM` (local) in list meta |
+| `betslips/*.yaml` gitignored | Done | Runtime archive on host |
+| Tests | Done | `test_betslip_io` + `test_server` (107 suite green at ship) |
+| Operator test + approve | Done | All new features O&O |
+| Commit + push `master` | Done | `51b50e7`, `04de214`, `0813046`, `193ebcd` → origin |
+| Prod | **Live** | Operator deploy after agent sudo block |
+
+### Operator notes
+
+- UI: `outbox/mockups/v85-proposal-ux-mockup-atg.html` (served at `/`)
+- **LADDA UPP** → server list first; **Från fil…** remains secondary
+- **SPARA** still always downloads a local copy; server files under `betslips/`
+- Delete requires confirm; only `.yaml`/`.yml` under `betslips/`
+
+### Carry-over
+
+- Next race-day: V85 Hari/Expert entry (UC-22); use SPARA mid-build and server list to resume
+- Optional later: filter list by date/track in UI (API already supports query params)
 
 ---
 
