@@ -1057,6 +1057,7 @@
       flex-wrap: wrap;
       gap: 8px;
       margin-top: 10px;
+      align-items: center;
     }
     .slip-actions .button {
       font-size: 12px;
@@ -1065,6 +1066,14 @@
     .slip-actions .button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
+    }
+    .slip-actions .button--secondary {
+      background: var(--atg-surface);
+      color: var(--atg-text);
+      border: 1px solid var(--atg-border);
+    }
+    .slip-actions .button--secondary:hover:not(:disabled) {
+      border-color: var(--atg-accent, #c8102e);
     }
 
     .sidebar {
@@ -1517,6 +1526,9 @@
         </div>
         <div class="slip-actions" aria-label="Spelkvitto">
           <button class="button" id="btn-print-slip" type="button" disabled>Skriv ut spelkvitto</button>
+          <button class="button button--secondary" id="btn-save-slip" type="button" disabled title="Spara spelkvitto som YAML-fil">SPARA</button>
+          <button class="button button--secondary" id="btn-load-slip" type="button" title="Ladda upp sparad spelkvittofil">LADDA UPP</button>
+          <input id="input-load-slip" type="file" accept=".yaml,.yml,text/yaml,application/x-yaml" hidden />
         </div>
       </section>
 
@@ -3184,10 +3196,387 @@
         el.textContent = meta.game + " · " + meta.track + " · " + meta.date + " · " + meta.mode;
       }
 
+      function trackSlugClient(track) {
+        var s = String(track || "").trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return s.toLowerCase().replace(/[^a-z0-9]+/g, "").replace(/^-+|-+$/g, "");
+      }
+
+      function betslipBaseName(meta) {
+        meta = meta || getSlipMeta();
+        var date = meta.date || "";
+        var slug = trackSlugClient(meta.track);
+        var game = (meta.game || "V85").toUpperCase();
+        if (!date || !slug) return "";
+        return date + "-" + slug + "-" + game;
+      }
+
+      function betslipPrintTitle(meta) {
+        meta = meta || getSlipMeta();
+        var parts = [];
+        if (meta.date) parts.push(meta.date);
+        if (meta.track) parts.push(meta.track);
+        if (meta.game) parts.push(meta.game);
+        return parts.join(" ") || "VAI spelkvitto";
+      }
+
+      function nextSessionBetslipFilename(base) {
+        var key = "vai-betslip-n:" + base;
+        var n = 0;
+        try {
+          n = parseInt(sessionStorage.getItem(key) || "0", 10) || 0;
+        } catch (e) {
+          n = 0;
+        }
+        n += 1;
+        try {
+          sessionStorage.setItem(key, String(n));
+        } catch (e2) {}
+        if (n === 1) return base + ".yaml";
+        return base + "-" + n + ".yaml";
+      }
+
+      function bumpSessionBetslipFromFilename(filename) {
+        if (!filename) return;
+        var m = String(filename).match(/^(.+?)(?:-(\d+))?\.ya?ml$/i);
+        if (!m) return;
+        var base = m[1];
+        var n = m[2] ? parseInt(m[2], 10) : 1;
+        var key = "vai-betslip-n:" + base;
+        try {
+          var cur = parseInt(sessionStorage.getItem(key) || "0", 10) || 0;
+          if (n > cur) sessionStorage.setItem(key, String(n));
+        } catch (e) {}
+      }
+
+      function downloadTextFile(filename, text, mime) {
+        var blob = new Blob([text], { type: mime || "text/yaml;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () {
+          URL.revokeObjectURL(url);
+        }, 1000);
+      }
+
+      function emptyLegMap() {
+        var m = {};
+        for (var i = 1; i <= 8; i++) m[String(i)] = [];
+        return m;
+      }
+
+      function buildBetslipPayload() {
+        var meta = getSlipMeta();
+        var selections = collectGridSelections();
+        var operatorPools =
+          activeMode === "random" ? collectPools() : selections;
+        var cost = computeSystemCost(selections);
+        var seed = readSeed();
+        if (seed === undefined) seed = null;
+        var budget = parseFloat(document.getElementById("stake-input").value, 10);
+        if (isNaN(budget)) budget = 500;
+        var payload = {
+          vai_betslip_version: 1,
+          date: meta.date,
+          track: meta.track,
+          game: meta.game,
+          race_card_id: (document.getElementById("bana") && document.getElementById("bana").value) || null,
+          mode: activeMode === "expert" ? "expert" : "random",
+          stake_budget_sek: budget,
+          seed: seed,
+          frozen_legs: collectFrozenLegs(),
+          operator_pools: operatorPools,
+          selections: selections
+        };
+        if (activeMode === "expert" && (selectedTipId || expertTipMeta)) {
+          payload.expert = {
+            tip_id: selectedTipId || (expertTipMeta && expertTipMeta.tip_id) || null,
+            expert_name: (expertTipMeta && expertTipMeta.expert_name) || null
+          };
+        }
+        if (cost.complete) {
+          payload.cost_sek = cost.cost_sek;
+          payload.combinations = cost.combinations;
+        }
+        return payload;
+      }
+
+      function dumpBetslipYamlClient(p) {
+        function q(s) {
+          return JSON.stringify(String(s == null ? "" : s));
+        }
+        function legBlock(map) {
+          var lines = [];
+          for (var i = 1; i <= 8; i++) {
+            var horses = map[String(i)] || map[i] || [];
+            lines.push('  "' + i + '": [' + horses.join(", ") + "]");
+          }
+          return lines.join("\n");
+        }
+        var lines = [
+          "vai_betslip_version: 1",
+          "saved_at: " + q(new Date().toISOString().replace(/\.\d{3}Z$/, "Z")),
+          "date: " + q(p.date),
+          "track: " + q(p.track),
+          "game: " + q(p.game)
+        ];
+        if (p.race_card_id) lines.push("race_card_id: " + q(p.race_card_id));
+        lines.push("mode: " + q(p.mode || "random"));
+        lines.push("stake_budget_sek: " + Number(p.stake_budget_sek));
+        if (p.seed != null && p.seed !== "") lines.push("seed: " + Number(p.seed));
+        if (p.frozen_legs && p.frozen_legs.length) {
+          lines.push("frozen_legs: [" + p.frozen_legs.join(", ") + "]");
+        }
+        lines.push("operator_pools:");
+        lines.push(legBlock(p.operator_pools || emptyLegMap()));
+        lines.push("selections:");
+        lines.push(legBlock(p.selections || emptyLegMap()));
+        if (p.expert && (p.expert.tip_id || p.expert.expert_name)) {
+          lines.push("expert:");
+          if (p.expert.tip_id) lines.push("  tip_id: " + q(p.expert.tip_id));
+          if (p.expert.expert_name) lines.push("  expert_name: " + q(p.expert.expert_name));
+        }
+        if (p.cost_sek != null) lines.push("cost_sek: " + Number(p.cost_sek));
+        if (p.combinations != null) lines.push("combinations: " + Number(p.combinations));
+        return lines.join("\n") + "\n";
+      }
+
+      function canSaveSlip() {
+        var meta = getSlipMeta();
+        return !!(meta.date && meta.track);
+      }
+
       function updateSlipActions() {
         var ready = hasSlip();
         var printBtn = document.getElementById("btn-print-slip");
         if (printBtn) printBtn.disabled = !ready;
+        var saveBtn = document.getElementById("btn-save-slip");
+        if (saveBtn) saveBtn.disabled = !canSaveSlip();
+      }
+
+      function saveSlip() {
+        if (!canSaveSlip()) {
+          alert("Välj datum och bana först.");
+          return;
+        }
+        var payload = buildBetslipPayload();
+        var base = betslipBaseName(getSlipMeta());
+        fetch(API + "/api/v1/betslips", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) {
+              var msg =
+                (res.j && res.j.error && res.j.error.message) || "Kunde inte spara";
+              throw new Error(msg);
+            }
+            var filename = res.j.filename || base + ".yaml";
+            bumpSessionBetslipFromFilename(filename);
+            downloadTextFile(filename, res.j.yaml || dumpBetslipYamlClient(payload));
+          })
+          .catch(function (err) {
+            console.warn("Server save failed, client-only download:", err);
+            var filename = nextSessionBetslipFilename(base || "spelkvitto");
+            downloadTextFile(filename, dumpBetslipYamlClient(payload));
+          });
+      }
+
+      function selectBanaForBetslip(payload) {
+        var bana = document.getElementById("bana");
+        if (!bana) return false;
+        var wantId = payload.race_card_id || "";
+        var wantTrack = (payload.track || "").trim().toLowerCase();
+        var options = Array.prototype.slice.call(bana.options || []);
+        var i;
+        if (wantId) {
+          for (i = 0; i < options.length; i++) {
+            if (options[i].value === wantId) {
+              bana.value = wantId;
+              return true;
+            }
+          }
+        }
+        for (i = 0; i < options.length; i++) {
+          if ((options[i].textContent || "").trim().toLowerCase() === wantTrack) {
+            bana.value = options[i].value;
+            return true;
+          }
+        }
+        // Date/track not in current schedule — still try race_card_id directly.
+        if (wantId) {
+          var opt = document.createElement("option");
+          opt.value = wantId;
+          opt.textContent = payload.track || wantId;
+          bana.appendChild(opt);
+          bana.value = wantId;
+          return true;
+        }
+        return options.length > 0;
+      }
+
+      function applyBetslipToUi(payload) {
+        var gameSel = document.getElementById("spelform");
+        if (gameSel && payload.game) {
+          var g = String(payload.game).toUpperCase();
+          var foundGame = false;
+          Array.prototype.forEach.call(gameSel.options || [], function (opt) {
+            if (opt.value.toUpperCase() === g) foundGame = true;
+          });
+          if (foundGame) gameSel.value = g;
+          else gameSel.value = payload.game;
+          updateAppTitle();
+        }
+        var datum = document.getElementById("datum");
+        if (datum && payload.date) {
+          var hasDate = false;
+          Array.prototype.forEach.call(datum.options || [], function (opt) {
+            if (opt.value === payload.date) hasDate = true;
+          });
+          if (!hasDate && payload.date) {
+            var opt = document.createElement("option");
+            opt.value = payload.date;
+            opt.textContent = payload.date;
+            datum.appendChild(opt);
+          }
+          datum.value = payload.date;
+        }
+        syncBanaOptionsOnly();
+        if (!selectBanaForBetslip(payload)) {
+          alert(
+            "Kunde inte matcha bana \"" +
+              (payload.track || "") +
+              "\" för " +
+              (payload.date || "") +
+              ". Laddar startlista om möjligt."
+          );
+        }
+        var stake = document.getElementById("stake-input");
+        if (stake && payload.stake_budget_sek != null) {
+          stake.value = String(payload.stake_budget_sek);
+        }
+        var seedInput = document.getElementById("seed-input");
+        if (seedInput) {
+          seedInput.value =
+            payload.seed != null && payload.seed !== "" ? String(payload.seed) : "";
+        }
+        var mode = payload.mode === "expert" ? "expert" : "random";
+        setActiveMode(mode);
+        if (mode === "expert" && payload.expert && payload.expert.tip_id) {
+          selectedTipId = payload.expert.tip_id;
+          expertTipMeta = {
+            tip_id: payload.expert.tip_id,
+            expert_name: payload.expert.expert_name || "",
+            product_name: null,
+            rationale: null
+          };
+        } else {
+          selectedTipId = null;
+          expertTipMeta = null;
+        }
+        return loadSelectedCard().then(function (card) {
+          if (!card) {
+            alert("Kunde inte ladda startlista för sparat spelkvitto.");
+            return;
+          }
+          frozenLegs = {};
+          (payload.frozen_legs || []).forEach(function (leg) {
+            frozenLegs[String(leg)] = true;
+          });
+          var selections = payload.selections || emptyLegMap();
+          var operatorPools = payload.operator_pools || selections;
+          applyGeneratedSelections(operatorPools, selections);
+          for (var legNum = 1; legNum <= 8; legNum++) {
+            updateLegFreezeUi(legNum);
+          }
+          if (mode === "expert") {
+            expertBaseSelections = {};
+            for (var el = 1; el <= 8; el++) {
+              expertBaseSelections[String(el)] = (selections[String(el)] || []).slice();
+            }
+            randomBaseSelections = null;
+          } else {
+            randomBaseSelections = {};
+            for (var rl = 1; rl <= 8; rl++) {
+              randomBaseSelections[String(rl)] = (selections[String(rl)] || []).slice();
+            }
+            expertBaseSelections = null;
+          }
+          refreshSlipFromGrid();
+          if (mode === "expert") {
+            loadExpertsRoster();
+            loadExpertTips();
+            setUpdateSlipEnabled(!!selectedTipId);
+          }
+          updateSlipActions();
+        });
+      }
+
+      function loadSlipFromFile(file) {
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var text = String(reader.result || "");
+          fetch(API + "/api/v1/betslips/parse", {
+            method: "POST",
+            headers: { "Content-Type": "text/yaml; charset=utf-8" },
+            body: text
+          })
+            .then(function (r) {
+              return r.json().then(function (j) {
+                return { ok: r.ok, j: j };
+              });
+            })
+            .then(function (res) {
+              if (!res.ok) {
+                var msg =
+                  (res.j && res.j.error && res.j.error.message) || "Ogiltig fil";
+                alert("Ogiltig spelkvittofil: " + msg);
+                return;
+              }
+              return applyBetslipToUi(res.j.betslip || res.j);
+            })
+            .catch(function (e) {
+              alert("Kunde inte ladda spelkvitto — är servern igång?");
+              console.error(e);
+            });
+        };
+        reader.onerror = function () {
+          alert("Kunde inte läsa filen.");
+        };
+        reader.readAsText(file, "utf-8");
+      }
+
+      function syncBanaOptionsOnly() {
+        if (!schedule) return;
+        var date = document.getElementById("datum").value;
+        var tracks = (schedule.rounds || []).filter(function (r) {
+          return r.date === date;
+        });
+        var bana = document.getElementById("bana");
+        var prev = bana.value;
+        bana.innerHTML = tracks
+          .map(function (r) {
+            return '<option value="' + r.game_id + '">' + r.track + "</option>";
+          })
+          .join("");
+        if (prev) {
+          for (var i = 0; i < bana.options.length; i++) {
+            if (bana.options[i].value === prev) {
+              bana.value = prev;
+              break;
+            }
+          }
+        }
       }
 
       function setChecklistItem(id, state, hint) {
@@ -3291,11 +3680,14 @@
           return;
         }
         updateSlipPrintMeta();
+        var prevTitle = document.title;
+        document.title = betslipPrintTitle(getSlipMeta());
         document.body.classList.add("print-slip-only");
         window.addEventListener(
           "afterprint",
           function () {
             document.body.classList.remove("print-slip-only");
+            document.title = prevTitle;
           },
           { once: true }
         );
@@ -3503,16 +3895,22 @@
 
       function loadSelectedCard() {
         var id = document.getElementById("bana").value;
-        if (!id) return;
-        fetch(API + "/api/v1/race-cards/" + encodeURIComponent(id))
+        if (!id) return Promise.resolve(null);
+        return fetch(API + "/api/v1/race-cards/" + encodeURIComponent(id))
           .then(function (r) { return r.json(); })
           .then(function (card) {
             currentCard = card;
             document.getElementById("source-badge").textContent = (card.source || "yaml").toUpperCase();
             renderLegs(card);
             resetHitSummary();
+            updateSlipActions();
+            return card;
           })
-          .catch(function (e) { setApiStatus(false, "card load"); console.error(e); });
+          .catch(function (e) {
+            setApiStatus(false, "card load");
+            console.error(e);
+            return null;
+          });
       }
 
       function offerSuggestedStake(err, budget, onAccept) {
@@ -3614,8 +4012,23 @@
       }
       document.getElementById("btn-deselect-all").addEventListener("click", deselectAllLegs);
       document.getElementById("btn-print-slip").addEventListener("click", printSlip);
+      document.getElementById("btn-save-slip").addEventListener("click", saveSlip);
+      document.getElementById("btn-load-slip").addEventListener("click", function () {
+        var input = document.getElementById("input-load-slip");
+        if (input) {
+          input.value = "";
+          input.click();
+        }
+      });
+      document.getElementById("input-load-slip").addEventListener("change", function (ev) {
+        var file = ev.target.files && ev.target.files[0];
+        if (file) loadSlipFromFile(file);
+      });
       document.getElementById("btn-open-atg").addEventListener("click", openAtg);
-      document.getElementById("spelform").addEventListener("change", updateAppTitle);
+      document.getElementById("spelform").addEventListener("change", function () {
+        updateAppTitle();
+        updateSlipActions();
+      });
       document.querySelectorAll(".mode-tabs [data-mode]").forEach(function (btn) {
         btn.addEventListener("click", function () {
           if (btn.disabled) return;

@@ -20,6 +20,10 @@ def main() -> int:
         logo_text = page.locator(".game-header__logo text").text_content().strip()
         pdf_gone = page.locator("#btn-export-pdf").count() == 0
         print_disabled = page.locator("#btn-print-slip").is_disabled()
+        save_label = page.locator("#btn-save-slip").inner_text().strip()
+        load_label = page.locator("#btn-load-slip").inner_text().strip()
+        save_enabled_meta = not page.locator("#btn-save-slip").is_disabled()
+        load_enabled = not page.locator("#btn-load-slip").is_disabled()
 
         page.fill("#stake-input", "432")
         page.fill("#seed-input", "42")
@@ -28,6 +32,11 @@ def main() -> int:
 
         print_enabled = not page.locator("#btn-print-slip").is_disabled()
         footer = page.locator("#slip-footer").inner_text().strip()
+
+        with page.expect_download() as download_info:
+            page.click("#btn-save-slip")
+        download = download_info.value
+        save_name = download.suggested_filename
 
         with page.expect_popup() as popup_info:
             page.click("#btn-open-atg")
@@ -41,15 +50,25 @@ def main() -> int:
         print("PDF button removed:", pdf_gone)
         print("Print disabled before generate:", print_disabled)
         print("Print enabled after generate:", print_enabled)
+        print("SPARA / LADDA UPP:", save_label, "/", load_label)
+        print("SPARA enabled with meta:", save_enabled_meta)
+        print("LADDA UPP enabled:", load_enabled)
+        print("Save filename:", save_name)
         print("Slip footer:", footer)
         print("ATG URL:", atg_url)
 
+        name_ok = bool(save_name) and save_name.endswith(".yaml") and "V85" in save_name
         ok = (
             headline == "VAI V85"
             and logo_text == "VAI"
             and pdf_gone
             and print_disabled
             and print_enabled
+            and save_label == "SPARA"
+            and load_label == "LADDA UPP"
+            and save_enabled_meta
+            and load_enabled
+            and name_ok
             and footer == "864 rader x 0,50 kr = 432,00 kr"
             and atg_url.startswith("https://www.atg.se/v85")
         )

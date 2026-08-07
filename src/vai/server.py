@@ -17,6 +17,13 @@ from vai.activity_log import ActivityLogger
 from vai.atg_fetch import AtgFetchError
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
 from vai.hit_summary import compute_hit_summary
+from vai.io.betslip import (
+    BetslipValidationError,
+    default_betslips_dir,
+    parse_betslip_yaml,
+    save_betslip_file,
+    validate_betslip_payload,
+)
 from vai.io.expert_tips import (
     ExpertTipValidationError,
     delete_expert_tip,
@@ -66,6 +73,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
     mockup_dir: Path = repo_root / "outbox" / "mockups"
     race_cards_dir: Path = repo_root / "inbox" / "race-cards"
     expert_tips_dir: Path = repo_root / "inbox" / "expert-tips"
+    betslips_dir: Path = repo_root / "betslips"
     activity_logger: ActivityLogger | None = None
     trusted_proxy_hops: int = 1
     trusted_proxies: frozenset[str] = frozenset()
@@ -165,6 +173,12 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/v1/generate/expert":
             self._handle_generate_expert()
+            return
+        if path == "/api/v1/betslips/parse":
+            self._handle_parse_betslip()
+            return
+        if path == "/api/v1/betslips":
+            self._handle_save_betslip()
             return
         if path == "/api/v1/expert-tips":
             self._handle_save_expert_tip()
@@ -832,6 +846,93 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             response["hit_summary"] = hit_summary
         self._send_json(HTTPStatus.OK, response)
 
+    def _handle_parse_betslip(self) -> None:
+        """Parse YAML (or JSON object) betslip text into validated JSON."""
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length) if length else b""
+        content_type = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+        try:
+            if content_type == "application/json":
+                try:
+                    body = json.loads(raw.decode("utf-8") or "{}")
+                except json.JSONDecodeError as exc:
+                    self._send_json(
+                        HTTPStatus.BAD_REQUEST,
+                        {"error": {"code": "INVALID_JSON", "message": str(exc)}},
+                    )
+                    return
+                if isinstance(body, dict) and "yaml" in body:
+                    payload = parse_betslip_yaml(str(body["yaml"]))
+                elif isinstance(body, dict) and "text" in body:
+                    payload = parse_betslip_yaml(str(body["text"]))
+                elif isinstance(body, dict):
+                    payload = validate_betslip_payload(body)
+                else:
+                    self._send_json(
+                        HTTPStatus.BAD_REQUEST,
+                        {
+                            "error": {
+                                "code": "INVALID_BODY",
+                                "message": "Expected JSON object or {yaml|text: string}",
+                            }
+                        },
+                    )
+                    return
+            else:
+                # Raw YAML body (text/yaml, text/plain, or unspecified)
+                payload = parse_betslip_yaml(raw.decode("utf-8"))
+        except BetslipValidationError as exc:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": exc.code, "message": str(exc)}},
+            )
+            return
+        self._send_json(HTTPStatus.OK, {"betslip": payload})
+
+    def _handle_save_betslip(self) -> None:
+        """Validate payload, write unique YAML under betslips/, return filename."""
+        try:
+            body = self._read_json_body()
+        except json.JSONDecodeError as exc:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_JSON", "message": str(exc)}},
+            )
+            return
+        try:
+            if isinstance(body.get("yaml"), str):
+                payload = parse_betslip_yaml(body["yaml"])
+            elif isinstance(body.get("betslip"), dict):
+                payload = validate_betslip_payload(body["betslip"])
+            else:
+                payload = validate_betslip_payload(body)
+            out_dir = type(self).betslips_dir
+            if not out_dir:
+                out_dir = default_betslips_dir(self.repo_root)
+            path = save_betslip_file(payload, directory=out_dir)
+            yaml_text = path.read_text(encoding="utf-8")
+            # Re-parse so response betslip matches written file (incl. saved_at).
+            payload = parse_betslip_yaml(yaml_text)
+        except BetslipValidationError as exc:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": exc.code, "message": str(exc)}},
+            )
+            return
+        try:
+            rel = str(path.relative_to(self.repo_root))
+        except ValueError:
+            rel = str(path)
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "filename": path.name,
+                "path": rel,
+                "yaml": yaml_text,
+                "betslip": payload,
+            },
+        )
+
     def _handle_generate_random(self) -> None:
         try:
             body = self._read_json_body()
@@ -1020,6 +1121,7 @@ def serve(
     VaiRequestHandler.mockup_dir = root / "outbox" / "mockups"
     VaiRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
     VaiRequestHandler.expert_tips_dir = root / "inbox" / "expert-tips"
+    VaiRequestHandler.betslips_dir = root / "betslips"
     VaiRequestHandler.trusted_proxy_hops = max(0, int(trusted_proxy_hops))
     VaiRequestHandler.trusted_proxies = trusted_proxies or frozenset()
 

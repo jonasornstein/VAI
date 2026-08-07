@@ -176,6 +176,63 @@ def test_activity_log_records_request_with_xff(tmp_path: Path) -> None:
         VaiRequestHandler.activity_logger = None
 
 
+def test_api_betslip_parse_and_save(tmp_path: Path) -> None:
+    server, base = _start_test_server()
+    VaiRequestHandler.betslips_dir = tmp_path
+    try:
+        payload = {
+            "vai_betslip_version": 1,
+            "date": "2026-07-18",
+            "track": "Axevalla",
+            "game": "V85",
+            "mode": "random",
+            "stake_budget_sek": 500,
+            "selections": {
+                "1": [1],
+                "2": [2],
+                "3": [3],
+                "4": [4],
+                "5": [5],
+                "6": [6],
+                "7": [7],
+                "8": [8],
+            },
+        }
+        status, body = _post(f"{base}/api/v1/betslips", payload)
+        assert status == 200, body
+        assert body["filename"] == "2026-07-18-axevalla-V85.yaml"
+        assert (tmp_path / body["filename"]).is_file()
+        assert "vai_betslip_version" in body["yaml"]
+
+        status2, body2 = _post(f"{base}/api/v1/betslips", payload)
+        assert status2 == 200
+        assert body2["filename"] == "2026-07-18-axevalla-V85-2.yaml"
+
+        yaml_text = body["yaml"]
+        req = Request(
+            f"{base}/api/v1/betslips/parse",
+            data=yaml_text.encode("utf-8"),
+            headers={"Content-Type": "text/yaml"},
+            method="POST",
+        )
+        with urlopen(req) as response:
+            parsed = json.loads(response.read().decode("utf-8"))
+        assert parsed["betslip"]["track"] == "Axevalla"
+        assert parsed["betslip"]["selections"]["1"] == [1]
+
+        status_bad, bad = _post(
+            f"{base}/api/v1/betslips/parse",
+            {"yaml": "vai_betslip_version: 1\ndate: ''\ntrack: X\n"},
+        )
+        # parse endpoint accepts JSON with yaml key
+        assert status_bad == 400
+        assert bad["error"]["code"] in ("MISSING_DATE", "INVALID_BETSLIP")
+    finally:
+        server.shutdown()
+        server.server_close()
+        VaiRequestHandler.betslips_dir = find_repo_root() / "betslips"
+
+
 def test_api_schedule_v85() -> None:
     server, base = _start_test_server()
     try:
