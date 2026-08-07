@@ -3445,6 +3445,28 @@
         if (el) el.textContent = msg || "";
       }
 
+      /** Format ISO saved_at for list meta: "2026-08-07 21:30" (local clock). */
+      function formatBetslipSavedAt(iso) {
+        if (!iso) return "";
+        var raw = String(iso).trim();
+        var d = new Date(raw);
+        if (!isNaN(d.getTime())) {
+          var y = d.getFullYear();
+          var m = String(d.getMonth() + 1).padStart(2, "0");
+          var day = String(d.getDate()).padStart(2, "0");
+          var h = String(d.getHours()).padStart(2, "0");
+          var min = String(d.getMinutes()).padStart(2, "0");
+          return y + "-" + m + "-" + day + "  " + h + ":" + min;
+        }
+        // Fallback: "2026-08-07T19:30:00Z" → "2026-08-07  19:30"
+        return raw
+          .replace("T", "  ")
+          .replace(/Z$/i, "")
+          .replace(/\.\d+/, "")
+          .replace(/(\d{2}:\d{2}):\d{2}/, "$1")
+          .trim();
+      }
+
       function renderBetslipServerList(items) {
         var list = document.getElementById("betslip-server-list");
         if (!list) return;
@@ -3479,7 +3501,9 @@
           if (item.track) parts.push(item.track);
           if (item.game) parts.push(item.game);
           if (item.mode) parts.push(item.mode);
-          if (item.saved_at) parts.push(item.saved_at);
+          if (item.saved_at) {
+            parts.push("sparad " + formatBetslipSavedAt(item.saved_at));
+          }
           if (item.cost_sek != null) parts.push(item.cost_sek + " kr");
           meta.textContent = parts.join(" · ");
           body.appendChild(title);
