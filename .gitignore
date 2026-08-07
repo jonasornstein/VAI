@@ -34,3 +34,7 @@ AGENTS.local.md
 
 # Runtime activity logs (JSONL; see pending/specs/activity-logging-v1.md)
 logs/
+
+# Runtime operator betslips (SPARA archive on host; not versioned)
+betslips/*.yaml
+betslips/*.yml

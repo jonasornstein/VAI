@@ -55,6 +55,14 @@ def _get(url: str) -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
+def _get_status(url: str) -> tuple[int, dict]:
+    try:
+        with urlopen(url) as response:
+            return response.status, json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        return exc.code, json.loads(exc.read().decode("utf-8"))
+
+
 def _post(url: str, payload: dict) -> tuple[int, dict]:
     body = json.dumps(payload).encode("utf-8")
     request = Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
@@ -227,6 +235,39 @@ def test_api_betslip_parse_and_save(tmp_path: Path) -> None:
         # parse endpoint accepts JSON with yaml key
         assert status_bad == 400
         assert bad["error"]["code"] in ("MISSING_DATE", "INVALID_BETSLIP")
+
+        listing = _get(f"{base}/api/v1/betslips")
+        assert "betslips" in listing
+        names = {item["filename"] for item in listing["betslips"]}
+        assert body["filename"] in names
+        assert body2["filename"] in names
+
+        one = _get(f"{base}/api/v1/betslips/{body['filename']}")
+        assert one["filename"] == body["filename"]
+        assert one["betslip"]["track"] == "Axevalla"
+        assert "yaml" in one
+
+        status_trav, trav = _get_status(f"{base}/api/v1/betslips/..%2Fsecrets.yaml")
+        assert status_trav == 400
+        assert trav["error"]["code"] == "INVALID_FILENAME"
+
+        status_del, del_body = _delete(f"{base}/api/v1/betslips/{body2['filename']}")
+        assert status_del == 200
+        assert del_body["deleted"] == body2["filename"]
+        assert not (tmp_path / body2["filename"]).exists()
+
+        status_batch, batch = _post(
+            f"{base}/api/v1/betslips/delete",
+            {"filenames": [body["filename"], "nope.yaml"]},
+        )
+        assert status_batch == 200
+        assert body["filename"] in batch["deleted"]
+        assert any(f["filename"] == "nope.yaml" for f in batch["failed"])
+        assert not (tmp_path / body["filename"]).exists()
+
+        status_404, not_found = _get_status(f"{base}/api/v1/betslips/{body['filename']}")
+        assert status_404 == 404
+        assert not_found["error"]["code"] == "NOT_FOUND"
     finally:
         server.shutdown()
         server.server_close()

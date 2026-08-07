@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | U | Assistant | **Server betslip list/open/delete** — `GET /api/v1/betslips`, get one, DELETE + batch delete; LADDA UPP modal (select all/none, Öppna, Radera, Från fil); `betslips/*.yaml` gitignored | [betslip.py](../../src/vai/io/betslip.py), mockup, tests |
 | 2026-08-07 | P | ornstein | **End of session (O&O)** — betslip SPARA/LADDA UPP + named print/save shipped; session closed | See [§ End of session — 2026-08-07 (betslip SPARA/LADDA UPP)](#end-of-session--2026-08-07-betslip-sparaladda-upp) |
 | 2026-08-07 | P | Assistant | **Commit + push betslip SPARA/LADDA UPP** — `8705fd5` on `origin/master`; YAML save/load + Datum-Bana-Spelform naming; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; [betslip.py](../../src/vai/io/betslip.py) |
 | 2026-08-07 | U | Assistant | **Betslip SPARA / LADDA UPP** — YAML save/load beside print; file name `{datum}-{bana}-{spelform}[-n].yaml`; print title uses Datum+Bana+Spelform; API `POST /api/v1/betslips` + `/parse` | [betslip.py](../../src/vai/io/betslip.py), mockup `outbox/mockups/v85-proposal-ux-mockup-atg.html` |

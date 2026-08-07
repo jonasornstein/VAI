@@ -281,3 +281,132 @@ def save_betslip_file(
     path = next_available_path(root, base)
     path.write_text(dump_betslip_yaml(payload), encoding="utf-8")
     return path
+
+
+def _is_yaml_name(name: str) -> bool:
+    lower = name.lower()
+    return lower.endswith(".yaml") or lower.endswith(".yml")
+
+
+def safe_betslip_path(directory: str | Path, filename: str) -> Path:
+    """Resolve filename under directory only; reject traversal and non-YAML names."""
+    if not isinstance(filename, str) or not filename.strip():
+        raise BetslipValidationError("filename is required", code="INVALID_FILENAME")
+    name = filename.strip()
+    if name != Path(name).name or "/" in name or "\\" in name or name in (".", ".."):
+        raise BetslipValidationError(
+            f"invalid betslip filename: {filename!r}",
+            code="INVALID_FILENAME",
+        )
+    if ".." in name:
+        raise BetslipValidationError(
+            f"invalid betslip filename: {filename!r}",
+            code="INVALID_FILENAME",
+        )
+    if not _is_yaml_name(name):
+        raise BetslipValidationError(
+            f"betslip must be .yaml or .yml: {name!r}",
+            code="INVALID_FILENAME",
+        )
+    root = Path(directory).resolve()
+    path = (root / name).resolve()
+    try:
+        path.relative_to(root)
+    except ValueError as exc:
+        raise BetslipValidationError(
+            f"path outside betslips directory: {filename!r}",
+            code="INVALID_FILENAME",
+        ) from exc
+    return path
+
+
+def load_betslip_file(directory: str | Path, filename: str) -> tuple[Path, dict[str, Any], str]:
+    """Load and validate a betslip YAML. Returns (path, payload, raw_yaml)."""
+    path = safe_betslip_path(directory, filename)
+    if not path.is_file():
+        raise BetslipValidationError(f"betslip not found: {path.name}", code="NOT_FOUND")
+    text = path.read_text(encoding="utf-8")
+    payload = parse_betslip_yaml(text)
+    return path, payload, text
+
+
+def delete_betslip_file(directory: str | Path, filename: str) -> Path:
+    """Delete one betslip YAML under directory. Returns the path that was removed."""
+    path = safe_betslip_path(directory, filename)
+    if not path.is_file():
+        raise BetslipValidationError(f"betslip not found: {path.name}", code="NOT_FOUND")
+    path.unlink()
+    return path
+
+
+def delete_betslip_files(
+    directory: str | Path,
+    filenames: list[str],
+) -> dict[str, Any]:
+    """Delete multiple betslips. Returns {deleted: [...], failed: [{filename, code, message}]}."""
+    deleted: list[str] = []
+    failed: list[dict[str, str]] = []
+    if not isinstance(filenames, list):
+        raise BetslipValidationError("filenames must be a list", code="INVALID_BODY")
+    for raw in filenames:
+        name = str(raw) if raw is not None else ""
+        try:
+            delete_betslip_file(directory, name)
+            deleted.append(Path(name.strip()).name if name.strip() else name)
+        except BetslipValidationError as exc:
+            failed.append(
+                {
+                    "filename": name,
+                    "code": exc.code,
+                    "message": str(exc),
+                }
+            )
+    return {"deleted": deleted, "failed": failed}
+
+
+def betslip_summary(filename: str, payload: dict[str, Any]) -> dict[str, Any]:
+    """Metadata dict for list API."""
+    return {
+        "filename": filename,
+        "date": payload.get("date"),
+        "track": payload.get("track"),
+        "game": payload.get("game"),
+        "mode": payload.get("mode"),
+        "saved_at": payload.get("saved_at"),
+        "cost_sek": payload.get("cost_sek"),
+        "combinations": payload.get("combinations"),
+        "stake_budget_sek": payload.get("stake_budget_sek"),
+    }
+
+
+def list_betslips(
+    directory: str | Path,
+    *,
+    date: str | None = None,
+    track: str | None = None,
+) -> list[dict[str, Any]]:
+    """List YAML betslips under directory (newest saved_at first). Skips invalid/non-YAML."""
+    root = Path(directory)
+    if not root.is_dir():
+        return []
+    date_f = (date or "").strip() or None
+    track_slug_f = track_slug(track) if track else ""
+    items: list[dict[str, Any]] = []
+    for path in sorted(root.iterdir()):
+        if not path.is_file() or not _is_yaml_name(path.name):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+            payload = parse_betslip_yaml(text)
+        except (OSError, BetslipValidationError, UnicodeDecodeError):
+            continue
+        if date_f and payload.get("date") != date_f:
+            continue
+        if track_slug_f and track_slug(str(payload.get("track") or "")) != track_slug_f:
+            continue
+        items.append(betslip_summary(path.name, payload))
+    items.sort(
+        key=lambda m: (m.get("saved_at") or "", m.get("filename") or ""),
+        reverse=True,
+    )
+    return items

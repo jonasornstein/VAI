@@ -20,6 +20,10 @@ from vai.hit_summary import compute_hit_summary
 from vai.io.betslip import (
     BetslipValidationError,
     default_betslips_dir,
+    delete_betslip_file,
+    delete_betslip_files,
+    list_betslips,
+    load_betslip_file,
     parse_betslip_yaml,
     save_betslip_file,
     validate_betslip_payload,
@@ -155,6 +159,14 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             if expert_id and expert_id not in ("reset", "visibility", "reorder"):
                 self._handle_get_expert(expert_id)
                 return
+        if path == "/api/v1/betslips":
+            self._handle_list_betslips(parsed.query)
+            return
+        if path.startswith("/api/v1/betslips/"):
+            name = path.removeprefix("/api/v1/betslips/").strip("/")
+            if name and name not in ("parse", "delete"):
+                self._handle_get_betslip(name)
+                return
         if path.startswith("/mockup/"):
             rel = path.removeprefix("/mockup/").lstrip("/")
             target = (self.mockup_dir / rel).resolve()
@@ -176,6 +188,9 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/v1/betslips/parse":
             self._handle_parse_betslip()
+            return
+        if path == "/api/v1/betslips/delete":
+            self._handle_delete_betslips_batch()
             return
         if path == "/api/v1/betslips":
             self._handle_save_betslip()
@@ -223,6 +238,11 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             expert_id = path.removeprefix("/api/v1/experts/").strip("/")
             if expert_id and expert_id != "reset":
                 self._handle_delete_expert(expert_id)
+                return
+        if path.startswith("/api/v1/betslips/"):
+            name = path.removeprefix("/api/v1/betslips/").strip("/")
+            if name and name not in ("parse", "delete"):
+                self._handle_delete_betslip(name)
                 return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
@@ -846,6 +866,68 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             response["hit_summary"] = hit_summary
         self._send_json(HTTPStatus.OK, response)
 
+    def _betslips_dir(self) -> Path:
+        out_dir = type(self).betslips_dir
+        if not out_dir:
+            out_dir = default_betslips_dir(self.repo_root)
+        return Path(out_dir)
+
+    def _handle_list_betslips(self, query: str) -> None:
+        qs = parse_qs(query)
+        date = (qs.get("date") or [None])[0]
+        track = (qs.get("track") or [None])[0]
+        items = list_betslips(self._betslips_dir(), date=date, track=track)
+        self._send_json(HTTPStatus.OK, {"betslips": items})
+
+    def _handle_get_betslip(self, filename: str) -> None:
+        try:
+            path, payload, yaml_text = load_betslip_file(self._betslips_dir(), filename)
+        except BetslipValidationError as exc:
+            status = HTTPStatus.NOT_FOUND if exc.code == "NOT_FOUND" else HTTPStatus.BAD_REQUEST
+            self._send_json(status, {"error": {"code": exc.code, "message": str(exc)}})
+            return
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "filename": path.name,
+                "yaml": yaml_text,
+                "betslip": payload,
+            },
+        )
+
+    def _handle_delete_betslip(self, filename: str) -> None:
+        try:
+            path = delete_betslip_file(self._betslips_dir(), filename)
+        except BetslipValidationError as exc:
+            status = HTTPStatus.NOT_FOUND if exc.code == "NOT_FOUND" else HTTPStatus.BAD_REQUEST
+            self._send_json(status, {"error": {"code": exc.code, "message": str(exc)}})
+            return
+        self._send_json(HTTPStatus.OK, {"deleted": path.name})
+
+    def _handle_delete_betslips_batch(self) -> None:
+        try:
+            body = self._read_json_body()
+        except json.JSONDecodeError as exc:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_JSON", "message": str(exc)}},
+            )
+            return
+        filenames = body.get("filenames")
+        if not isinstance(filenames, list):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {
+                    "error": {
+                        "code": "INVALID_BODY",
+                        "message": "Expected {filenames: string[]}",
+                    }
+                },
+            )
+            return
+        result = delete_betslip_files(self._betslips_dir(), [str(f) for f in filenames])
+        self._send_json(HTTPStatus.OK, result)
+
     def _handle_parse_betslip(self) -> None:
         """Parse YAML (or JSON object) betslip text into validated JSON."""
         length = int(self.headers.get("Content-Length", "0"))
@@ -906,10 +988,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 payload = validate_betslip_payload(body["betslip"])
             else:
                 payload = validate_betslip_payload(body)
-            out_dir = type(self).betslips_dir
-            if not out_dir:
-                out_dir = default_betslips_dir(self.repo_root)
-            path = save_betslip_file(payload, directory=out_dir)
+            path = save_betslip_file(payload, directory=self._betslips_dir())
             yaml_text = path.read_text(encoding="utf-8")
             # Re-parse so response betslip matches written file (incl. saved_at).
             payload = parse_betslip_yaml(yaml_text)

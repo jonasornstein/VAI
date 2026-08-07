@@ -9,9 +9,14 @@ import pytest
 from vai.io.betslip import (
     BetslipValidationError,
     betslip_basename,
+    delete_betslip_file,
+    delete_betslip_files,
     dump_betslip_yaml,
+    list_betslips,
+    load_betslip_file,
     next_available_path,
     parse_betslip_yaml,
+    safe_betslip_path,
     save_betslip_file,
     validate_betslip_payload,
 )
@@ -118,3 +123,53 @@ def test_yaml_parse_error() -> None:
     with pytest.raises(BetslipValidationError) as exc:
         parse_betslip_yaml("[unterminated")
     assert exc.value.code in ("YAML_ERROR", "INVALID_BETSLIP", "MISSING_DATE")
+
+
+def test_list_load_delete_betslips(tmp_path: Path) -> None:
+    (tmp_path / "ignore-me.pdf").write_bytes(b"%PDF")
+    p1 = save_betslip_file(_sample(date="2026-07-18", track="Axevalla"), directory=tmp_path)
+    p2 = save_betslip_file(_sample(date="2026-07-11", track="Årjäng"), directory=tmp_path)
+
+    listed = list_betslips(tmp_path)
+    names = {item["filename"] for item in listed}
+    assert p1.name in names
+    assert p2.name in names
+    assert all(item["filename"].endswith((".yaml", ".yml")) for item in listed)
+
+    filtered = list_betslips(tmp_path, date="2026-07-18")
+    assert len(filtered) == 1
+    assert filtered[0]["track"] == "Axevalla"
+
+    path, payload, text = load_betslip_file(tmp_path, p1.name)
+    assert path == p1
+    assert payload["track"] == "Axevalla"
+    assert "vai_betslip_version" in text
+
+    deleted = delete_betslip_file(tmp_path, p1.name)
+    assert deleted.name == p1.name
+    assert not p1.exists()
+    with pytest.raises(BetslipValidationError) as exc:
+        load_betslip_file(tmp_path, p1.name)
+    assert exc.value.code == "NOT_FOUND"
+
+
+def test_safe_betslip_path_rejects_traversal(tmp_path: Path) -> None:
+    with pytest.raises(BetslipValidationError) as exc:
+        safe_betslip_path(tmp_path, "../secrets.yaml")
+    assert exc.value.code == "INVALID_FILENAME"
+    with pytest.raises(BetslipValidationError):
+        safe_betslip_path(tmp_path, "/etc/passwd.yaml")
+    with pytest.raises(BetslipValidationError):
+        safe_betslip_path(tmp_path, "not-yaml.txt")
+
+
+def test_delete_betslip_files_batch(tmp_path: Path) -> None:
+    p1 = save_betslip_file(_sample(), directory=tmp_path)
+    p2 = save_betslip_file(_sample(), directory=tmp_path)
+    result = delete_betslip_files(tmp_path, [p1.name, p2.name, "missing.yaml", "../x.yaml"])
+    assert p1.name in result["deleted"]
+    assert p2.name in result["deleted"]
+    assert not p1.exists() and not p2.exists()
+    failed_names = {f["filename"] for f in result["failed"]}
+    assert "missing.yaml" in failed_names
+    assert "../x.yaml" in failed_names

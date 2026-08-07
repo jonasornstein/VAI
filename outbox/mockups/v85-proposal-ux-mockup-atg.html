@@ -1527,8 +1527,30 @@
         <div class="slip-actions" aria-label="Spelkvitto">
           <button class="button" id="btn-print-slip" type="button" disabled>Skriv ut spelkvitto</button>
           <button class="button button--secondary" id="btn-save-slip" type="button" disabled title="Spara spelkvitto som YAML-fil">SPARA</button>
-          <button class="button button--secondary" id="btn-load-slip" type="button" title="Ladda upp sparad spelkvittofil">LADDA UPP</button>
+          <button class="button button--secondary" id="btn-load-slip" type="button" title="Ladda spelkvitto från server eller fil">LADDA UPP</button>
           <input id="input-load-slip" type="file" accept=".yaml,.yml,text/yaml,application/x-yaml" hidden />
+          <span class="stake-hint" id="slip-save-status" aria-live="polite" style="margin:0;align-self:center"></span>
+        </div>
+
+        <div id="betslip-load-modal" class="expert-tip-modal" hidden role="dialog" aria-modal="true" aria-labelledby="betslip-load-modal-title">
+          <div class="expert-tip-modal__panel" style="width:min(560px,100%)">
+            <h3 id="betslip-load-modal-title">Ladda spelkvitto</h3>
+            <p class="expert-tip-modal__meta">
+              Välj sparade YAML på servern (<code>betslips/</code>), eller ladda upp en lokal fil.
+            </p>
+            <div class="expert-visibility-toolbar">
+              <button type="button" class="button--small" id="betslip-select-all">Markera alla</button>
+              <button type="button" class="button--small" id="betslip-deselect-all">Avmarkera alla</button>
+              <button type="button" class="button--small" id="betslip-from-file" style="margin-left:auto">Från fil…</button>
+            </div>
+            <div id="betslip-server-list" class="expert-visibility-list" role="list" aria-label="Sparade spelkvitton"></div>
+            <p class="expert-tip-modal__error" id="betslip-load-error" aria-live="polite"></p>
+            <div class="expert-tip-modal__actions">
+              <button type="button" class="button button--danger" id="betslip-delete-selected" disabled title="Radera markerade på servern">Radera</button>
+              <button type="button" class="button" id="betslip-load-cancel">Stäng</button>
+              <button type="button" class="button button--primary" id="betslip-open-selected" disabled title="Öppna markerat spelkvitto">Öppna</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -3357,6 +3379,11 @@
         if (saveBtn) saveBtn.disabled = !canSaveSlip();
       }
 
+      function setSlipSaveStatus(text) {
+        var el = document.getElementById("slip-save-status");
+        if (el) el.textContent = text || "";
+      }
+
       function saveSlip() {
         if (!canSaveSlip()) {
           alert("Välj datum och bana först.");
@@ -3364,6 +3391,7 @@
         }
         var payload = buildBetslipPayload();
         var base = betslipBaseName(getSlipMeta());
+        setSlipSaveStatus("Sparar…");
         fetch(API + "/api/v1/betslips", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -3383,11 +3411,217 @@
             var filename = res.j.filename || base + ".yaml";
             bumpSessionBetslipFromFilename(filename);
             downloadTextFile(filename, res.j.yaml || dumpBetslipYamlClient(payload));
+            setSlipSaveStatus("Sparad: " + filename);
           })
           .catch(function (err) {
             console.warn("Server save failed, client-only download:", err);
             var filename = nextSessionBetslipFilename(base || "spelkvitto");
             downloadTextFile(filename, dumpBetslipYamlClient(payload));
+            setSlipSaveStatus("Nedladdad (ej server): " + filename);
+          });
+      }
+
+      function getSelectedBetslipFilenames() {
+        var list = document.getElementById("betslip-server-list");
+        if (!list) return [];
+        return Array.prototype.slice
+          .call(list.querySelectorAll('input[type="checkbox"][data-filename]:checked'))
+          .map(function (cb) {
+            return cb.getAttribute("data-filename");
+          })
+          .filter(Boolean);
+      }
+
+      function updateBetslipModalActions() {
+        var selected = getSelectedBetslipFilenames();
+        var openBtn = document.getElementById("betslip-open-selected");
+        var delBtn = document.getElementById("betslip-delete-selected");
+        if (openBtn) openBtn.disabled = selected.length !== 1;
+        if (delBtn) delBtn.disabled = selected.length < 1;
+      }
+
+      function setBetslipLoadError(msg) {
+        var el = document.getElementById("betslip-load-error");
+        if (el) el.textContent = msg || "";
+      }
+
+      function renderBetslipServerList(items) {
+        var list = document.getElementById("betslip-server-list");
+        if (!list) return;
+        list.innerHTML = "";
+        if (!items || !items.length) {
+          list.innerHTML =
+            '<p class="stake-hint" style="margin:0.5rem 0">Inga sparade spelkvitton på servern.</p>';
+          updateBetslipModalActions();
+          return;
+        }
+        items.forEach(function (item) {
+          var filename = item.filename || "";
+          var row = document.createElement("label");
+          row.className = "expert-visibility-row";
+          row.setAttribute("role", "listitem");
+          var cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.setAttribute("data-filename", filename);
+          cb.addEventListener("change", updateBetslipModalActions);
+          var body = document.createElement("div");
+          body.style.flex = "1";
+          body.style.minWidth = "0";
+          var title = document.createElement("div");
+          title.style.fontWeight = "700";
+          title.style.wordBreak = "break-all";
+          title.textContent = filename;
+          var meta = document.createElement("div");
+          meta.className = "stake-hint";
+          meta.style.margin = "0.15rem 0 0";
+          var parts = [];
+          if (item.date) parts.push(item.date);
+          if (item.track) parts.push(item.track);
+          if (item.game) parts.push(item.game);
+          if (item.mode) parts.push(item.mode);
+          if (item.saved_at) parts.push(item.saved_at);
+          if (item.cost_sek != null) parts.push(item.cost_sek + " kr");
+          meta.textContent = parts.join(" · ");
+          body.appendChild(title);
+          body.appendChild(meta);
+          row.appendChild(cb);
+          row.appendChild(body);
+          list.appendChild(row);
+        });
+        updateBetslipModalActions();
+      }
+
+      function openBetslipLoadModal() {
+        var modal = document.getElementById("betslip-load-modal");
+        if (!modal) return;
+        setBetslipLoadError("");
+        renderBetslipServerList([]);
+        modal.hidden = false;
+        fetch(API + "/api/v1/betslips")
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) {
+              var msg =
+                (res.j && res.j.error && res.j.error.message) || "Kunde inte lista";
+              setBetslipLoadError(msg);
+              return;
+            }
+            renderBetslipServerList(res.j.betslips || []);
+          })
+          .catch(function (err) {
+            console.error(err);
+            setBetslipLoadError("Kunde inte nå servern.");
+          });
+      }
+
+      function closeBetslipLoadModal() {
+        var modal = document.getElementById("betslip-load-modal");
+        if (modal) modal.hidden = true;
+        setBetslipLoadError("");
+      }
+
+      function setAllBetslipChecks(checked) {
+        var list = document.getElementById("betslip-server-list");
+        if (!list) return;
+        list.querySelectorAll('input[type="checkbox"][data-filename]').forEach(function (cb) {
+          cb.checked = !!checked;
+        });
+        updateBetslipModalActions();
+      }
+
+      function openSelectedBetslip() {
+        var selected = getSelectedBetslipFilenames();
+        if (selected.length !== 1) {
+          setBetslipLoadError("Markera exakt ett spelkvitto att öppna.");
+          return;
+        }
+        var filename = selected[0];
+        setBetslipLoadError("");
+        fetch(API + "/api/v1/betslips/" + encodeURIComponent(filename))
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) {
+              var msg =
+                (res.j && res.j.error && res.j.error.message) || "Kunde inte öppna";
+              setBetslipLoadError(msg);
+              return;
+            }
+            closeBetslipLoadModal();
+            return applyBetslipToUi(res.j.betslip || res.j);
+          })
+          .catch(function (err) {
+            console.error(err);
+            setBetslipLoadError("Kunde inte öppna spelkvitto.");
+          });
+      }
+
+      function deleteSelectedBetslips() {
+        var selected = getSelectedBetslipFilenames();
+        if (!selected.length) {
+          setBetslipLoadError("Markera minst ett spelkvitto att radera.");
+          return;
+        }
+        var n = selected.length;
+        if (
+          !confirm(
+            "Radera " +
+              n +
+              " spelkvitto" +
+              (n === 1 ? "" : "n") +
+              " från servern?\n\n" +
+              selected.join("\n")
+          )
+        ) {
+          return;
+        }
+        setBetslipLoadError("");
+        fetch(API + "/api/v1/betslips/delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filenames: selected })
+        })
+          .then(function (r) {
+            return r.json().then(function (j) {
+              return { ok: r.ok, j: j };
+            });
+          })
+          .then(function (res) {
+            if (!res.ok) {
+              var msg =
+                (res.j && res.j.error && res.j.error.message) || "Kunde inte radera";
+              setBetslipLoadError(msg);
+              return;
+            }
+            var failed = (res.j && res.j.failed) || [];
+            if (failed.length) {
+              setBetslipLoadError(
+                "Delvis raderat. Fel: " +
+                  failed
+                    .map(function (f) {
+                      return f.filename + " (" + (f.message || f.code) + ")";
+                    })
+                    .join("; ")
+              );
+            }
+            return fetch(API + "/api/v1/betslips")
+              .then(function (r2) {
+                return r2.json();
+              })
+              .then(function (j2) {
+                renderBetslipServerList((j2 && j2.betslips) || []);
+              });
+          })
+          .catch(function (err) {
+            console.error(err);
+            setBetslipLoadError("Kunde inte radera.");
           });
       }
 
@@ -4013,17 +4247,48 @@
       document.getElementById("btn-deselect-all").addEventListener("click", deselectAllLegs);
       document.getElementById("btn-print-slip").addEventListener("click", printSlip);
       document.getElementById("btn-save-slip").addEventListener("click", saveSlip);
-      document.getElementById("btn-load-slip").addEventListener("click", function () {
-        var input = document.getElementById("input-load-slip");
-        if (input) {
-          input.value = "";
-          input.click();
-        }
-      });
+      document.getElementById("btn-load-slip").addEventListener("click", openBetslipLoadModal);
       document.getElementById("input-load-slip").addEventListener("change", function (ev) {
         var file = ev.target.files && ev.target.files[0];
-        if (file) loadSlipFromFile(file);
+        if (file) {
+          closeBetslipLoadModal();
+          loadSlipFromFile(file);
+        }
       });
+      var betslipCancel = document.getElementById("betslip-load-cancel");
+      if (betslipCancel) betslipCancel.addEventListener("click", closeBetslipLoadModal);
+      var betslipSelectAll = document.getElementById("betslip-select-all");
+      if (betslipSelectAll) {
+        betslipSelectAll.addEventListener("click", function () {
+          setAllBetslipChecks(true);
+        });
+      }
+      var betslipDeselectAll = document.getElementById("betslip-deselect-all");
+      if (betslipDeselectAll) {
+        betslipDeselectAll.addEventListener("click", function () {
+          setAllBetslipChecks(false);
+        });
+      }
+      var betslipFromFile = document.getElementById("betslip-from-file");
+      if (betslipFromFile) {
+        betslipFromFile.addEventListener("click", function () {
+          var input = document.getElementById("input-load-slip");
+          if (input) {
+            input.value = "";
+            input.click();
+          }
+        });
+      }
+      var betslipOpen = document.getElementById("betslip-open-selected");
+      if (betslipOpen) betslipOpen.addEventListener("click", openSelectedBetslip);
+      var betslipDelete = document.getElementById("betslip-delete-selected");
+      if (betslipDelete) betslipDelete.addEventListener("click", deleteSelectedBetslips);
+      var betslipModal = document.getElementById("betslip-load-modal");
+      if (betslipModal) {
+        betslipModal.addEventListener("click", function (ev) {
+          if (ev.target === betslipModal) closeBetslipLoadModal();
+        });
+      }
       document.getElementById("btn-open-atg").addEventListener("click", openAtg);
       document.getElementById("spelform").addEventListener("change", function () {
         updateAppTitle();
