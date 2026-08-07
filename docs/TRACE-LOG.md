@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | P | Assistant | **Commit + push expert auto-slip + mode isolation** — `23cad2c` on `origin/master`; remove UPPDATERA SPELKVITTO; horse select/deselect recalcs slip; Hari/Expert independent state; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; mockup `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
+| 2026-08-07 | U | Assistant | **Expert live slip + mode isolation** — auto recompute on every horse mark; drop update button; `modeStates` keep RANDOM/EXPERT grids, freezes, tips separate | `23cad2c` |
 | 2026-08-07 | P | ornstein | **End of session (O&O)** — server betslip list/open/delete + readable saved-at tested & approved; session closed | See [§ End of session — 2026-08-07 (server betslip archive)](#end-of-session--2026-08-07-server-betslip-archive) |
 | 2026-08-07 | P | Assistant | **Commit + push readable betslip saved-at** — `0813046` on `origin/master`; LADDA UPP list shows local `sparad YYYY-MM-DD  HH:MM`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; mockup |
 | 2026-08-07 | P | Assistant | **Commit + push server betslip list/open/delete** — `51b50e7` on `origin/master`; GET list/get, DELETE + batch delete, LADDA UPP modal; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; [betslip.py](../../src/vai/io/betslip.py) |
