@@ -8,6 +8,7 @@
     Standalone Activity logging v1 viewer.
     Not part of the VAI Python app — static HTML only.
     Schema: outbox/specs/activity-logging-v1.md
+    IP enrichment: client_ip only → ipapi.is + Google DNS-over-HTTPS PTR.
   -->
   <style>
     :root {
@@ -102,7 +103,7 @@
     .file-btn { display: inline-block; }
     .file-btn input { display: none; }
 
-    main { padding: 1rem 1.25rem 2rem; max-width: 1600px; margin: 0 auto; }
+    main { padding: 1rem 1.25rem 2rem; max-width: 1800px; margin: 0 auto; }
 
     .status-bar {
       display: flex;
@@ -224,13 +225,13 @@
     tbody tr:last-child td { border-bottom: none; }
 
     td.mono, .mono { font-family: var(--mono); font-size: 0.78rem; }
-    td.path, td.ua {
-      max-width: 220px;
+    td.path, td.ua, td.org, td.hostname {
+      max-width: 200px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    td.path:hover, td.ua:hover {
+    td.path:hover, td.ua:hover, td.org:hover, td.hostname:hover {
       white-space: normal;
       word-break: break-all;
       overflow: visible;
@@ -252,6 +253,10 @@
     .badge.error { background: #4a1f24; color: #f5a0a5; }
     .badge.success { background: #1a3d2c; color: #6ee7a8; }
     .badge.failure { background: #4a1f24; color: #f5a0a5; }
+    .badge.risk-ok { background: #1a3d2c; color: #6ee7a8; text-transform: none; }
+    .badge.risk-bad { background: #4a1f24; color: #f5a0a5; text-transform: none; }
+    .badge.risk-local { background: #2a3140; color: var(--muted); text-transform: none; }
+    .badge.risk-pending { background: #2a3140; color: var(--warn); text-transform: none; }
 
     .status-code.ok { color: var(--ok); }
     .status-code.fail { color: var(--fail); }
@@ -290,6 +295,9 @@
         <input type="file" id="file-input" accept=".jsonl,.json,text/plain,application/json" />
       </label>
       <button type="button" class="secondary" id="btn-reload" title="Fetch from /activity.jsonl">Reload</button>
+      <button type="button" class="secondary" id="btn-lookup" title="Lookup client_ip only (hostname, geo, org, risk)">Lookup IPs</button>
+      <button type="button" class="secondary" id="btn-export-shown" title="Export currently filtered rows">Export CSV (shown)</button>
+      <button type="button" class="secondary" id="btn-export-all" title="Export all loaded rows">Export CSV (all)</button>
       <button type="button" class="secondary" id="btn-clear">Clear filters</button>
       <label style="display:flex;align-items:center;gap:0.35rem;font-size:0.85rem;color:var(--muted)">
         <input type="checkbox" id="auto-refresh" />
@@ -303,6 +311,7 @@
       <span>Source: <strong id="source-label">none</strong></span>
       <span>Loaded: <strong id="loaded-count">0</strong></span>
       <span>Showing: <strong id="shown-count">0</strong></span>
+      <span>IP lookups: <strong id="lookup-count">0</strong></span>
       <span id="status-msg"></span>
     </div>
 
@@ -312,13 +321,13 @@
       <div class="card fail"><div class="label">Failure</div><div class="value" id="stat-fail">0</div></div>
       <div class="card gen"><div class="label">Generation</div><div class="value" id="stat-gen">0</div></div>
       <div class="card change"><div class="label">Change</div><div class="value" id="stat-change">0</div></div>
-      <div class="card"><div class="label">Unique IPs</div><div class="value" id="stat-ips">0</div></div>
+      <div class="card"><div class="label">Unique client IPs</div><div class="value" id="stat-ips">0</div></div>
     </div>
 
     <div class="filters" id="filters">
       <div class="field grow">
         <label for="f-search">Search</label>
-        <input type="search" id="f-search" placeholder="IP, path, operation, UA…" autocomplete="off" />
+        <input type="search" id="f-search" placeholder="IP, country, org, path, operation…" autocomplete="off" />
       </div>
       <div class="field">
         <label for="f-type">Event type</label>
@@ -348,6 +357,15 @@
         <label for="f-ip">Client IP</label>
         <select id="f-ip"><option value="">All</option></select>
       </div>
+      <div class="field">
+        <label for="f-risk">Risk</label>
+        <select id="f-risk">
+          <option value="">All</option>
+          <option value="Harmful/spam">Harmful/spam</option>
+          <option value="Not harmful/spam">Not harmful/spam</option>
+          <option value="local">local</option>
+        </select>
+      </div>
     </div>
 
     <div class="table-wrap">
@@ -356,15 +374,17 @@
           <tr id="thead-row"></tr>
         </thead>
         <tbody id="tbody">
-          <tr><td class="empty" colspan="12">Load <code>activity.jsonl</code> or open this page where nginx serves it next to the log.</td></tr>
+          <tr><td class="empty" colspan="18">Load <code>activity.jsonl</code> or open this page where nginx serves it next to the log.</td></tr>
         </tbody>
       </table>
     </div>
 
     <footer>
-      Standalone viewer for Activity logging v1 (<code>ts</code>, <code>client_ip</code>, <code>operation</code>, <code>status</code>…).
-      Not wired into the VAI app — open <code>/vai-stats.html</code> or load a local JSONL file.
-      Default fetch path: <code id="default-src-label">/activity.jsonl</code>.
+      Standalone viewer for Activity logging v1.
+      IP enrichment uses <strong>client_ip only</strong> (not peer_ip): reverse hostname via Google DNS-over-HTTPS;
+      country, city, org, type, risk via <code>ipapi.is</code> (free tier; results cached in browser localStorage).
+      Export writes CSV of filtered (“shown”) or all loaded rows including enrichment columns.
+      Default log path: <code id="default-src-label">/activity.jsonl</code>.
     </footer>
   </main>
 
@@ -372,8 +392,10 @@
 (function () {
   "use strict";
 
-  /** Default URL when served beside nginx alias (see deploy/nginx-*.conf). */
   var DEFAULT_SRC = "/activity.jsonl";
+  var IP_CACHE_KEY = "vai-stats-ip-cache-v1";
+  var LOOKUP_DELAY_MS = 350;
+
   var COLUMNS = [
     { key: "ts", label: "Time", mono: true },
     { key: "event_type", label: "Type", badge: true },
@@ -383,29 +405,47 @@
     { key: "status", label: "Status" },
     { key: "outcome", label: "Outcome", badge: true },
     { key: "client_ip", label: "Client IP", mono: true },
+    { key: "hostname", label: "Hostname", cls: "hostname mono" },
+    { key: "country", label: "Country" },
+    { key: "city", label: "City" },
+    { key: "organization", label: "Organization", cls: "org" },
+    { key: "ip_type", label: "Type" },
+    { key: "risk", label: "Risk", badge: true },
     { key: "peer_ip", label: "Peer IP", mono: true },
     { key: "function", label: "Function", mono: true },
     { key: "actor", label: "Actor" },
     { key: "user_agent", label: "User-Agent", cls: "ua" }
   ];
 
+  var CSV_KEYS = [
+    "ts", "event_id", "event_type", "operation", "method", "path", "status", "outcome",
+    "client_ip", "hostname", "country", "city", "organization", "ip_type", "risk", "risk_detail",
+    "peer_ip", "function", "actor", "user_agent"
+  ];
+
   var state = {
     rows: [],
     filtered: [],
     sortKey: "ts",
-    sortDir: -1, // newest first
+    sortDir: -1,
     source: "none",
-    refreshTimer: null
+    refreshTimer: null,
+    ipCache: loadIpCache(),
+    lookupRunning: false
   };
 
   var el = {
     fileInput: document.getElementById("file-input"),
     btnReload: document.getElementById("btn-reload"),
+    btnLookup: document.getElementById("btn-lookup"),
+    btnExportShown: document.getElementById("btn-export-shown"),
+    btnExportAll: document.getElementById("btn-export-all"),
     btnClear: document.getElementById("btn-clear"),
     autoRefresh: document.getElementById("auto-refresh"),
     sourceLabel: document.getElementById("source-label"),
     loadedCount: document.getElementById("loaded-count"),
     shownCount: document.getElementById("shown-count"),
+    lookupCount: document.getElementById("lookup-count"),
     statusMsg: document.getElementById("status-msg"),
     tbody: document.getElementById("tbody"),
     theadRow: document.getElementById("thead-row"),
@@ -416,6 +456,7 @@
     fMethod: document.getElementById("f-method"),
     fStatus: document.getElementById("f-status"),
     fIp: document.getElementById("f-ip"),
+    fRisk: document.getElementById("f-risk"),
     defaultSrcLabel: document.getElementById("default-src-label")
   };
 
@@ -428,6 +469,71 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+
+  function loadIpCache() {
+    try {
+      var raw = localStorage.getItem(IP_CACHE_KEY);
+      if (!raw) return Object.create(null);
+      var obj = JSON.parse(raw);
+      return obj && typeof obj === "object" ? obj : Object.create(null);
+    } catch (e) {
+      return Object.create(null);
+    }
+  }
+
+  function saveIpCache() {
+    try {
+      localStorage.setItem(IP_CACHE_KEY, JSON.stringify(state.ipCache));
+    } catch (e) {
+      // quota / private mode — ignore
+    }
+  }
+
+  function emptyEnrichment() {
+    return {
+      hostname: "",
+      country: "",
+      city: "",
+      organization: "",
+      ip_type: "",
+      risk: "",
+      risk_detail: ""
+    };
+  }
+
+  function applyCacheToRow(row) {
+    var e = emptyEnrichment();
+    var ip = row.client_ip;
+    if (!ip) {
+      Object.assign(row, e);
+      return row;
+    }
+    if (isPrivateIp(ip)) {
+      Object.assign(row, {
+        hostname: "",
+        country: "",
+        city: "",
+        organization: "",
+        ip_type: "local",
+        risk: "local",
+        risk_detail: "private/loopback client_ip — not looked up"
+      });
+      return row;
+    }
+    var cached = state.ipCache[ip];
+    if (cached) {
+      row.hostname = cached.hostname || "";
+      row.country = cached.country || "";
+      row.city = cached.city || "";
+      row.organization = cached.organization || "";
+      row.ip_type = cached.ip_type || "";
+      row.risk = cached.risk || "";
+      row.risk_detail = cached.risk_detail || "";
+    } else {
+      Object.assign(row, e);
+    }
+    return row;
   }
 
   function parseJsonl(text) {
@@ -447,7 +553,7 @@
   }
 
   function normalize(obj) {
-    return {
+    var row = {
       ts: obj.ts != null ? String(obj.ts) : "",
       event_id: obj.event_id != null ? String(obj.event_id) : "",
       event_type: obj.event_type != null ? String(obj.event_type) : "",
@@ -462,6 +568,321 @@
       actor: obj.actor != null ? String(obj.actor) : "",
       user_agent: obj.user_agent != null ? String(obj.user_agent) : ""
     };
+    return applyCacheToRow(row);
+  }
+
+  /** client_ip only — private / loopback / link-local not sent to external APIs. */
+  function isPrivateIp(ip) {
+    if (!ip) return true;
+    var s = String(ip).trim().toLowerCase();
+    if (s === "localhost" || s === "::1" || s === "0:0:0:0:0:0:0:1") return true;
+    if (s.indexOf(":") !== -1) {
+      // IPv6: fc00::/7 unique local, fe80::/10 link-local, ::1 already handled
+      if (s.indexOf("fc") === 0 || s.indexOf("fd") === 0 || s.indexOf("fe80") === 0) return true;
+      return false;
+    }
+    var parts = s.split(".");
+    if (parts.length !== 4) return false;
+    var a = Number(parts[0]);
+    var b = Number(parts[1]);
+    if (a === 10) return true;
+    if (a === 127) return true;
+    if (a === 0) return true;
+    if (a === 169 && b === 254) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
+    return false;
+  }
+
+  function ptrNameForIp(ip) {
+    if (ip.indexOf(":") !== -1) {
+      // Expand IPv6 to full form for nibble reverse is hard; try simplified
+      // Use DNS API with ip6.arpa via full expansion
+      var expanded = expandIpv6(ip);
+      if (!expanded) return null;
+      var nibbles = expanded.replace(/:/g, "").split("").reverse().join(".");
+      return nibbles + ".ip6.arpa";
+    }
+    var parts = ip.split(".");
+    if (parts.length !== 4) return null;
+    return parts.slice().reverse().join(".") + ".in-addr.arpa";
+  }
+
+  function expandIpv6(ip) {
+    try {
+      var s = ip.toLowerCase().replace(/^\[|\]$/g, "");
+      if (s.indexOf("%") !== -1) s = s.split("%")[0];
+      var halves = s.split("::");
+      var head = halves[0] ? halves[0].split(":") : [];
+      var tail = halves.length > 1 && halves[1] ? halves[1].split(":") : [];
+      if (halves.length > 2) return null;
+      var missing = 8 - (head.length + tail.length);
+      if (missing < 0 && halves.length === 1) {
+        if (head.length !== 8) return null;
+      } else if (halves.length === 2) {
+        var mid = [];
+        for (var i = 0; i < missing; i++) mid.push("0");
+        var full = head.concat(mid, tail);
+        if (full.length !== 8) return null;
+        return full
+          .map(function (x) {
+            return ("0000" + x).slice(-4);
+          })
+          .join(":");
+      }
+      if (head.length === 8) {
+        return head
+          .map(function (x) {
+            return ("0000" + x).slice(-4);
+          })
+          .join(":");
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function sleep(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  function fetchHostname(ip) {
+    var ptr = ptrNameForIp(ip);
+    if (!ptr) return Promise.resolve("");
+    var url = "https://dns.google/resolve?name=" + encodeURIComponent(ptr) + "&type=PTR";
+    return fetch(url, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) return "";
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data || !data.Answer || !data.Answer.length) return "";
+        for (var i = 0; i < data.Answer.length; i++) {
+          if (data.Answer[i].type === 12 && data.Answer[i].data) {
+            return String(data.Answer[i].data).replace(/\.$/, "");
+          }
+        }
+        return "";
+      })
+      .catch(function () {
+        return "";
+      });
+  }
+
+  function fetchIpMeta(ip) {
+    var url = "https://api.ipapi.is/?q=" + encodeURIComponent(ip);
+    return fetch(url, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("ipapi.is HTTP " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data || data.error) throw new Error((data && data.error) || "ipapi.is error");
+        var loc = data.location || {};
+        var company = data.company || {};
+        var asn = data.asn || {};
+        var org = company.name || asn.org || "";
+        var typeParts = [];
+        var t = company.type || asn.type || "";
+        if (t) typeParts.push(t);
+        if (data.is_datacenter) typeParts.push("datacenter");
+        if (data.is_mobile) typeParts.push("mobile");
+        if (data.is_vpn) typeParts.push("vpn");
+        if (data.is_satellite) typeParts.push("satellite");
+        if (data.is_crawler) typeParts.push("crawler");
+        var type = typeParts.length ? uniqueJoin(typeParts) : "";
+
+        var flags = [];
+        if (data.is_abuser) flags.push("abuser");
+        if (data.is_proxy) flags.push("proxy");
+        if (data.is_tor) flags.push("tor");
+        if (data.is_vpn) flags.push("vpn");
+        if (data.is_crawler) flags.push("crawler");
+        var harmful = !!(data.is_abuser || data.is_proxy || data.is_tor);
+        var risk = harmful ? "Harmful/spam" : "Not harmful/spam";
+        var risk_detail = flags.length ? flags.join(", ") : "no abuse/proxy/tor flags";
+        if (company.abuser_score) risk_detail += "; score " + company.abuser_score;
+
+        return {
+          country: loc.country || "",
+          city: loc.city || "",
+          organization: org,
+          ip_type: type,
+          risk: risk,
+          risk_detail: risk_detail
+        };
+      });
+  }
+
+  function uniqueJoin(arr) {
+    var seen = Object.create(null);
+    var out = [];
+    for (var i = 0; i < arr.length; i++) {
+      var k = String(arr[i]).toLowerCase();
+      if (!seen[k]) {
+        seen[k] = true;
+        out.push(arr[i]);
+      }
+    }
+    return out.join(", ");
+  }
+
+  function uniqueClientIps(rows) {
+    var seen = Object.create(null);
+    var out = [];
+    for (var i = 0; i < rows.length; i++) {
+      var ip = rows[i].client_ip;
+      if (!ip || seen[ip]) continue;
+      seen[ip] = true;
+      out.push(ip);
+    }
+    return out;
+  }
+
+  function lookupCountCached() {
+    return Object.keys(state.ipCache).length;
+  }
+
+  function updateLookupLabel(extra) {
+    el.lookupCount.textContent = String(lookupCountCached()) + (extra ? " · " + extra : "");
+  }
+
+  function enrichOneClientIp(ip) {
+    if (!ip || isPrivateIp(ip)) {
+      state.ipCache[ip] = {
+        hostname: "",
+        country: "",
+        city: "",
+        organization: "",
+        ip_type: "local",
+        risk: "local",
+        risk_detail: "private/loopback — not looked up",
+        cached_at: Date.now()
+      };
+      return Promise.resolve(state.ipCache[ip]);
+    }
+    if (state.ipCache[ip] && state.ipCache[ip].risk && state.ipCache[ip].risk !== "error") {
+      return Promise.resolve(state.ipCache[ip]);
+    }
+
+    return Promise.all([fetchHostname(ip), fetchIpMeta(ip)])
+      .then(function (parts) {
+        var hostname = parts[0] || "";
+        var meta = parts[1] || {};
+        var entry = {
+          hostname: hostname,
+          country: meta.country || "",
+          city: meta.city || "",
+          organization: meta.organization || "",
+          ip_type: meta.ip_type || "",
+          risk: meta.risk || "",
+          risk_detail: meta.risk_detail || "",
+          cached_at: Date.now()
+        };
+        state.ipCache[ip] = entry;
+        saveIpCache();
+        return entry;
+      })
+      .catch(function (err) {
+        var entry = {
+          hostname: "",
+          country: "",
+          city: "",
+          organization: "",
+          ip_type: "",
+          risk: "",
+          risk_detail: "lookup failed: " + (err && err.message ? err.message : String(err)),
+          cached_at: Date.now(),
+          error: true
+        };
+        // Do not permanently cache hard failures as success — mark error so retry works
+        state.ipCache[ip] = entry;
+        saveIpCache();
+        return entry;
+      });
+  }
+
+  function reapplyEnrichmentToRows() {
+    for (var i = 0; i < state.rows.length; i++) {
+      applyCacheToRow(state.rows[i]);
+    }
+  }
+
+  function lookupClientIps(force) {
+    if (state.lookupRunning) return Promise.resolve();
+    var ips = uniqueClientIps(state.rows);
+    var todo = [];
+    for (var i = 0; i < ips.length; i++) {
+      var ip = ips[i];
+      if (isPrivateIp(ip)) {
+        if (!state.ipCache[ip]) {
+          state.ipCache[ip] = {
+            hostname: "",
+            country: "",
+            city: "",
+            organization: "",
+            ip_type: "local",
+            risk: "local",
+            risk_detail: "private/loopback — not looked up",
+            cached_at: Date.now()
+          };
+        }
+        continue;
+      }
+      if (force || !state.ipCache[ip] || state.ipCache[ip].error) {
+        if (force && state.ipCache[ip]) delete state.ipCache[ip];
+        todo.push(ip);
+      }
+    }
+    saveIpCache();
+    reapplyEnrichmentToRows();
+    applyFilters();
+
+    if (!todo.length) {
+      updateLookupLabel("up to date");
+      el.statusMsg.textContent = "Client IP lookups up to date (" + ips.length + " unique).";
+      el.statusMsg.className = "";
+      return Promise.resolve();
+    }
+
+    state.lookupRunning = true;
+    el.btnLookup.disabled = true;
+    var done = 0;
+    var total = todo.length;
+
+    function step(index) {
+      if (index >= todo.length) {
+        state.lookupRunning = false;
+        el.btnLookup.disabled = false;
+        reapplyEnrichmentToRows();
+        applyFilters();
+        updateLookupLabel("done");
+        el.statusMsg.textContent = "Looked up " + total + " client IP(s).";
+        el.statusMsg.className = "";
+        return Promise.resolve();
+      }
+      var ip = todo[index];
+      updateLookupLabel(done + "/" + total);
+      el.statusMsg.textContent = "Looking up client_ip " + (done + 1) + "/" + total + "…";
+      el.statusMsg.className = "";
+      return enrichOneClientIp(ip)
+        .then(function () {
+          done++;
+          reapplyEnrichmentToRows();
+          applyFilters();
+          updateLookupLabel(done + "/" + total);
+          return sleep(LOOKUP_DELAY_MS);
+        })
+        .then(function () {
+          return step(index + 1);
+        });
+    }
+
+    return step(0);
   }
 
   function uniqueSorted(arr) {
@@ -514,6 +935,7 @@
     var method = el.fMethod.value;
     var status = el.fStatus.value;
     var ip = el.fIp.value;
+    var risk = el.fRisk.value;
 
     var filtered = state.rows.filter(function (r) {
       if (type && r.event_type !== type) return false;
@@ -522,11 +944,13 @@
       if (method && r.method !== method) return false;
       if (status && String(r.status) !== status) return false;
       if (ip && r.client_ip !== ip) return false;
+      if (risk && r.risk !== risk) return false;
       if (q) {
         var hay = [
           r.ts, r.event_type, r.operation, r.method, r.path,
-          r.status, r.outcome, r.client_ip, r.peer_ip, r.function,
-          r.actor, r.user_agent, r.event_id
+          r.status, r.outcome, r.client_ip, r.hostname, r.country, r.city,
+          r.organization, r.ip_type, r.risk, r.risk_detail,
+          r.peer_ip, r.function, r.actor, r.user_agent, r.event_id
         ].join(" ").toLowerCase();
         if (hay.indexOf(q) === -1) return false;
       }
@@ -576,6 +1000,7 @@
     el.loadedCount.textContent = String(state.rows.length);
     el.shownCount.textContent = String(rows.length);
     el.sourceLabel.textContent = state.source;
+    updateLookupLabel();
   }
 
   function badgeHtml(value, kind) {
@@ -584,8 +1009,30 @@
     return '<span class="badge ' + esc(cls) + '">' + esc(value) + "</span>";
   }
 
+  function riskBadge(row) {
+    var v = row.risk;
+    if (!v) return '<span class="badge risk-pending" title="Run Lookup IPs">pending</span>';
+    if (v === "local") return badgeHtml("local", "risk-local");
+    if (v === "Harmful/spam") {
+      return (
+        '<span class="badge risk-bad" title="' +
+        esc(row.risk_detail || "") +
+        '">Harmful/spam</span>'
+      );
+    }
+    if (v === "Not harmful/spam") {
+      return (
+        '<span class="badge risk-ok" title="' +
+        esc(row.risk_detail || "") +
+        '">Not harmful/spam</span>'
+      );
+    }
+    return esc(v);
+  }
+
   function cellHtml(col, row) {
     var v = row[col.key];
+    if (col.key === "risk") return riskBadge(row);
     if (v == null || v === "") return "—";
     if (col.key === "event_type" || col.key === "outcome") {
       return badgeHtml(v, v);
@@ -596,7 +1043,11 @@
       return '<span class="status-code ' + cls + ' mono">' + esc(v) + "</span>";
     }
     var clsAttr = col.cls ? ' class="' + col.cls + '"' : col.mono ? ' class="mono"' : "";
-    var title = col.key === "path" || col.key === "user_agent" ? ' title="' + esc(v) + '"' : "";
+    var titleKeys = { path: 1, user_agent: 1, organization: 1, hostname: 1, risk_detail: 1 };
+    var title = titleKeys[col.key] ? ' title="' + esc(v) + '"' : "";
+    if (col.key === "organization" && row.risk_detail) {
+      title = ' title="' + esc(v + " · " + row.risk_detail) + '"';
+    }
     return "<span" + clsAttr + title + ">" + esc(v) + "</span>";
   }
 
@@ -637,7 +1088,6 @@
     }
 
     var parts = [];
-    // Cap DOM size for very large logs
     var max = 5000;
     var slice = rows.length > max ? rows.slice(0, max) : rows;
     for (var i = 0; i < slice.length; i++) {
@@ -658,10 +1108,65 @@
           max +
           " of " +
           rows.length +
-          " filtered rows (narrow filters to see more).</td></tr>"
+          " filtered rows (narrow filters to see more). CSV export includes all filtered rows.</td></tr>"
       );
     }
     el.tbody.innerHTML = parts.join("");
+  }
+
+  function csvEscape(val) {
+    if (val == null) return "";
+    var s = String(val);
+    if (/[",\r\n]/.test(s)) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
+  function pad2(n) {
+    return n < 10 ? "0" + n : String(n);
+  }
+
+  function timestampForFilename() {
+    var d = new Date();
+    return (
+      d.getFullYear() +
+      pad2(d.getMonth() + 1) +
+      pad2(d.getDate()) +
+      "-" +
+      pad2(d.getHours()) +
+      pad2(d.getMinutes()) +
+      pad2(d.getSeconds())
+    );
+  }
+
+  function exportCsv(rows, kind) {
+    if (!rows || !rows.length) {
+      setError("Nothing to export.");
+      return;
+    }
+    var lines = [CSV_KEYS.join(",")];
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var cells = [];
+      for (var j = 0; j < CSV_KEYS.length; j++) {
+        var k = CSV_KEYS[j];
+        cells.push(csvEscape(r[k] != null ? r[k] : ""));
+      }
+      lines.push(cells.join(","));
+    }
+    var bom = "\uFEFF";
+    var blob = new Blob([bom + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    var url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = "vai-activity-" + kind + "-" + timestampForFilename() + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    el.statusMsg.textContent = "Exported " + rows.length + " row(s) (" + kind + ").";
+    el.statusMsg.className = "";
   }
 
   function setData(rows, source) {
@@ -671,6 +1176,8 @@
     el.statusMsg.className = "";
     rebuildFilterOptions();
     applyFilters();
+    // Auto-lookup client_ip only (cached entries skipped)
+    lookupClientIps(false);
   }
 
   function setError(msg) {
@@ -723,6 +1230,22 @@
     fetchSrc(src);
   });
 
+  el.btnLookup.addEventListener("click", function () {
+    // Force re-fetch for non-cached / error entries only; shift+click forces all public IPs
+    var force = false;
+    // Double-click path: hold Alt to force refresh all client IPs
+    // Use simple force=false by default; second click after clear not needed
+    lookupClientIps(!!window.event && window.event.altKey);
+  });
+
+  el.btnExportShown.addEventListener("click", function () {
+    exportCsv(state.filtered, "shown");
+  });
+
+  el.btnExportAll.addEventListener("click", function () {
+    exportCsv(state.rows, "all");
+  });
+
   el.btnClear.addEventListener("click", function () {
     el.fSearch.value = "";
     el.fType.value = "";
@@ -731,10 +1254,11 @@
     el.fMethod.value = "";
     el.fStatus.value = "";
     el.fIp.value = "";
+    el.fRisk.value = "";
     applyFilters();
   });
 
-  ["fSearch", "fType", "fOutcome", "fOp", "fMethod", "fStatus", "fIp"].forEach(function (id) {
+  ["fSearch", "fType", "fOutcome", "fOp", "fMethod", "fStatus", "fIp", "fRisk"].forEach(function (id) {
     el[id].addEventListener("input", applyFilters);
     el[id].addEventListener("change", applyFilters);
   });
@@ -768,7 +1292,7 @@
     }
   });
 
-  // Initial load: try ?src= or default /activity.jsonl
+  updateLookupLabel();
   var params = new URLSearchParams(window.location.search);
   var initialSrc = params.get("src") || DEFAULT_SRC;
   fetchSrc(initialSrc);
