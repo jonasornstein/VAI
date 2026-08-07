@@ -256,6 +256,39 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 ---
 
+## End of session — 2026-08-07 (activity stats)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `4e9c572` / `dbe8ab9` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/vai-stats.html — **live** (prod git `dbe8ab9`; app serves stats + activity JSONL)
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| IP lookup columns (client_ip only) | Done | Hostname, country, city, org, type, risk via ipapi.is + DoH PTR |
+| CSV export shown / all | Done | `vai-stats.html` |
+| Stats page part of app | Done | `server.py` GET `/vai-stats.html`, `/activity.jsonl` |
+| Nginx no static alias (no stale file) | Done | `deploy/nginx-*.conf`, `fix-nginx-https.sh` |
+| Deploy verify Lookup IPs | Done | `deploy/update-server.sh` |
+| Tests | Done | `test_server` stats + JSONL; classify `serve_stats` |
+| Commit + push | Done | `467a2f0`, `4e9c572`, `dbe8ab9` → origin |
+| Prod deploy | **Live** | Operator sudo after agent blocked; app 200 + Lookup IPs |
+
+### Operator notes
+
+- URL: **https://vai.ornstein.work/vai-stats.html** (also `/activity.jsonl`)
+- Enrichment: **client_ip only** (not peer_ip); private IPs → local; cache in browser localStorage
+- Future deploys: `sudo bash /opt/vai/deploy/update-server.sh` — fails if Lookup IPs viewer missing
+
+### Carry-over
+
+- None for activity stats.
+- Next race-day: V85 Hari/Expert entry (UC-22) as usual.
+
+---
+
 ## End of session — 2026-08-07 (andelsspel scrape research)
 
 **Session owner:** ornstein  
