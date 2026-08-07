@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | P | Assistant | **Commit + push readable betslip saved-at** — `0813046` on `origin/master`; LADDA UPP list shows local `sparad YYYY-MM-DD  HH:MM`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; mockup |
 | 2026-08-07 | P | Assistant | **Commit + push server betslip list/open/delete** — `51b50e7` on `origin/master`; GET list/get, DELETE + batch delete, LADDA UPP modal; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; [betslip.py](../../src/vai/io/betslip.py) |
 | 2026-08-07 | U | Assistant | **Server betslip list/open/delete** — `GET /api/v1/betslips`, get one, DELETE + batch delete; LADDA UPP modal (select all/none, Öppna, Radera, Från fil); `betslips/*.yaml` gitignored | [betslip.py](../../src/vai/io/betslip.py), mockup, tests |
 | 2026-08-07 | P | ornstein | **End of session (O&O)** — betslip SPARA/LADDA UPP + named print/save shipped; session closed | See [§ End of session — 2026-08-07 (betslip SPARA/LADDA UPP)](#end-of-session--2026-08-07-betslip-sparaladda-upp) |
