@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | P | ornstein | **End of session (O&O)** — andelsspel scrape research logged; no ATG tip scraper; session closed | See [§ End of session — 2026-08-07 (andelsspel scrape research)](#end-of-session--2026-08-07-andelsspel-scrape-research) |
+| 2026-08-07 | I | Assistant | **Deep research: ATG andelsspel scrape** — `gameId=V85_2026-08-08_33_5` SPA shell only; no usable V85 systems; butik pages also SPA; ToS forbid scrape; Expert remains manual YAML | [2026-08-07-deep-research-andelsspel-scrape.md](../../inbox/research/2026-08-07-deep-research-andelsspel-scrape.md) |
 | 2026-08-07 | P | ornstein | **End of session (O&O)** — Hari live betslip + Rensa alla clear shipped; session closed | See [§ End of session — 2026-08-07 (Hari live betslip)](#end-of-session--2026-08-07-hari-live-betslip) |
 | 2026-08-07 | P | Assistant | **Commit + push Hari live betslip** — `4c5e4eb` on `origin/master`; horse select/deselect updates spelkvitto + cost under Hari; **Rensa alla** fully clears slip; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; mockup `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
 | 2026-08-07 | U | Assistant | **Hari betslip live update** — RANDOM matches Expert: `onHorseGridChanged` → `refreshSlipFromGrid`; cost = ∏×0.50; clearSlip on Rensa alla / empty grid | `4c5e4eb` |
@@ -248,6 +250,46 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-08-07 (andelsspel scrape research)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` (+ this TRACE-LOG close-out)  
+**Production:** unchanged — research/docs only
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Deep research: scrape V85 from andelsspel gameId URL | Done | No usable systems via unauthenticated fetch |
+| Inbox research note | Done | [2026-08-07-deep-research-andelsspel-scrape.md](../../inbox/research/2026-08-07-deep-research-andelsspel-scrape.md) |
+| Policy reaffirmed | Done | Expert v1 = manual YAML only; no ATG tip scraper |
+| Aligns with prior research | Confirmed | [2026-07-27-deep-research-screen-scrape.md](../../inbox/research/2026-07-27-deep-research-screen-scrape.md) |
+
+### Decision
+
+**Do not screen-scrape** `https://www.atg.se/andelsspel?gameId=…` (or butik SPA detail pages) for Expert tips.
+
+| Why | Detail |
+|-----|--------|
+| Technical | SPA shell; listings lack Avd/Hästar grids; full rads only on butik/spel (also non-JS shell) |
+| API | racinginfo games JSON = race card only, not andel systems |
+| Legal | ATG Allmänna Villkor fr.o.m. 2026-01-01 forbid automated scraping |
+| Product | UC-12 / expert-v1 non-goal; manual `inbox/expert-tips/` remains the path |
+
+### Operator notes
+
+- Target checked: `V85_2026-08-08_33_5` andelsspel listing.
+- Free or visible systems: open in browser → transcribe to YAML (as today).
+- Carry-over from earlier close-out still open: `sudo bash /opt/vai/deploy/update-server.sh` (Hari live betslip).
+
+### Carry-over
+
+- No code change required.
+- Optional later: ToS-gated marketplace research only if product scope expands (out of v1).
 
 ---
 
