@@ -259,6 +259,46 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 ---
 
+## End of session — 2026-08-07 (betslip SPARA/LADDA UPP)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `8705fd5` / `b0d8ca4` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **deploy blocked** (agent shell has no sudo password)
+
+### Completed this session
+
+| Item | Status | Artifact |
+|------|--------|----------|
+| Betslip file naming | Done | `{Datum}-{bana-slug}-{Spelform}[-n].yaml` (e.g. `2026-07-18-axevalla-V85.yaml`) |
+| Print default title | Done | Document title = Datum + Bana + Spelform before print |
+| **SPARA** (save anytime) | Done | YAML download + optional archive under `betslips/` |
+| **LADDA UPP** (upload) | Done | Restore date/track/horses/freezes/budget/seed/mode |
+| API | Done | `POST /api/v1/betslips`, `POST /api/v1/betslips/parse` |
+| Module + tests | Done | `src/vai/io/betslip.py`, `tests/test_betslip_io.py`, server tests |
+| UI | Done | Buttons beside **Skriv ut spelkvitto** in mockup |
+| Commit + push `master` | Done | `8705fd5`, `b0d8ca4` → origin |
+| Prod deploy | **Blocked** (sudo password) | Operator: see below |
+
+### Operator notes
+
+- UI: `outbox/mockups/v85-proposal-ux-mockup-atg.html` (served at `/`)
+- **SPARA** enabled when Datum + Bana are set (does not require a full 8-leg slip)
+- **Skriv ut** still requires a ready slip; PDF name follows Datum + Bana + Spelform
+- Saved YAML is portable across sessions; server copies land in repo `betslips/` when API save succeeds
+
+### Carry-over
+
+```bash
+sudo bash /opt/vai/deploy/update-server.sh
+curl -sI https://vai.ornstein.work/ | head -5
+```
+
+- Deploy when convenient so prod gets SPARA / LADDA UPP and print naming.
+- Next race-day: V85 Hari/Expert entry (UC-22); optional save mid-build with SPARA.
+
+---
+
 ## End of session — 2026-08-07 (activity stats)
 
 **Session owner:** ornstein  
