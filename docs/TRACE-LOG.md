@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-07 | P | Assistant | **Release v1.3.1** — `c5d635e` + tag `v1.3.1` on `origin/master`; multi-tip per expert, Senast sparad, tips wording; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; tag `v1.3.1` |
+| 2026-08-07 | U | Assistant | **v1.3.1 multi-tip expert + copy** — allocate unique tip_ids; form switcher + product name; `Senast sparad:`; expert hint “tips och/eller”; package 1.3.1 | `c5d635e`, mockup, `expert_tips.py` |
 | 2026-08-07 | P | Assistant | **Commit + push expert auto-slip + mode isolation** — `23cad2c` on `origin/master`; remove UPPDATERA SPELKVITTO; horse select/deselect recalcs slip; Hari/Expert independent state; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/ ; mockup `outbox/mockups/v85-proposal-ux-mockup-atg.html` |
 | 2026-08-07 | U | Assistant | **Expert live slip + mode isolation** — auto recompute on every horse mark; drop update button; `modeStates` keep RANDOM/EXPERT grids, freezes, tips separate | `23cad2c` |
 | 2026-08-07 | P | ornstein | **End of session (O&O)** — server betslip list/open/delete + readable saved-at tested & approved; session closed | See [§ End of session — 2026-08-07 (server betslip archive)](#end-of-session--2026-08-07-server-betslip-archive) |
@@ -846,6 +848,27 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 - Tips listed by Expert mode via `GET /api/v1/expert-tips?date=2026-07-25&track=Bollnäs`.
 - Production: ship with `sudo bash /opt/vai/deploy/update-server.sh` after each push (Björnkollen verified live earlier; remaining tips on `master` @ `32d8cbc`).
 - No code change — inbox YAML only. Cost formula: ∏(horses per leg) × 0.50 SEK.
+
+---
+
+## Release v1.3.1 — 2026-08-07
+
+**Product line:** Expert multi-tip + slip UX polish on Hari/Expert v1.3.
+
+### Shipped
+
+| Area | Change |
+|------|--------|
+| Expert tips | Multiple systems per expert/date/track; unique `tip_id` allocation |
+| Form UX | Tip switcher chips, **+ Nytt tips**, editable product/system name |
+| Roster | Badge **N tips** when count &gt; 1; lookup returns `tips[]` + count |
+| Slip copy | **Senast sparad:** after SPARA; expert hint “tips och/eller” |
+| Package | `pyproject.toml` / `vai.__version__` / UI → **1.3.1** |
+
+### Commit / deploy
+
+- Commit: `c5d635e` · tag `v1.3.1`
+- Prod deploy: **blocked** (sudo) — run `sudo bash /opt/vai/deploy/update-server.sh`
 
 ---
 
