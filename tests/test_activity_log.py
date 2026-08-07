@@ -107,6 +107,17 @@ def test_classify_generate_random() -> None:
     assert fn == "_handle_generate_random"
 
 
+def test_classify_serve_stats_and_activity_log() -> None:
+    op, etype, fn = classify_request("GET", "/vai-stats.html")
+    assert op == "serve_stats"
+    assert etype == "access"
+    assert fn == "_serve_file"
+    op2, etype2, fn2 = classify_request("GET", "/activity.jsonl")
+    assert op2 == "serve_activity_log"
+    assert etype2 == "access"
+    assert fn2 == "_serve_activity_jsonl"
+
+
 def test_classify_race_card() -> None:
     op, etype, _ = classify_request("GET", "/api/v1/race-cards/V85_2026-07-11_31_5")
     assert op == "get_race_card"

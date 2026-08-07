@@ -111,6 +111,17 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path == "/" or path == "/index.html":
             self._serve_file(self.mockup_dir / "v85-proposal-ux-mockup-atg.html")
             return
+        # Activity stats viewer — always from repo tree (same file git deploy updates).
+        if path == "/vai-stats.html":
+            self._serve_file(
+                self.repo_root / "vai-stats.html",
+                content_type="text/html; charset=utf-8",
+                cache_control="no-cache",
+            )
+            return
+        if path == "/activity.jsonl":
+            self._serve_activity_jsonl()
+            return
         if path == "/api/v1/schedule/v85":
             self._handle_get_schedule_v85()
             return
@@ -924,15 +935,48 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             raise json.JSONDecodeError("Expected object", raw.decode("utf-8"), 0)
         return data
 
-    def _serve_file(self, path: Path) -> None:
+    def _serve_activity_jsonl(self) -> None:
+        """Serve the live activity log for vai-stats.html (operator tool)."""
+        logger = type(self).activity_logger
+        log_path = logger.path if logger is not None and logger.enabled else None
+        if log_path is None or not log_path.is_file():
+            self._send_json(
+                HTTPStatus.NOT_FOUND,
+                {
+                    "error": {
+                        "code": "NOT_FOUND",
+                        "message": "Activity log not available (disabled or empty path)",
+                    }
+                },
+            )
+            return
+        self._serve_file(
+            log_path,
+            content_type="application/x-ndjson; charset=utf-8",
+            cache_control="no-cache",
+        )
+
+    def _serve_file(
+        self,
+        path: Path,
+        *,
+        content_type: str | None = None,
+        cache_control: str | None = None,
+    ) -> None:
         if not path.is_file():
             self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": str(path)}})
             return
         content = path.read_bytes()
-        mime, _ = mimetypes.guess_type(path.name)
+        if content_type:
+            mime = content_type
+        else:
+            guessed, _ = mimetypes.guess_type(path.name)
+            mime = guessed or "application/octet-stream"
         self.send_response(HTTPStatus.OK)
         self._set_cors_headers()
-        self.send_header("Content-Type", mime or "application/octet-stream")
+        self.send_header("Content-Type", mime)
+        if cache_control:
+            self.send_header("Cache-Control", cache_control)
         self.send_header("Content-Length", str(len(content)))
         self.end_headers()
         if not getattr(self, "_head_only", False):
@@ -1000,10 +1044,12 @@ def serve(
         raise SystemExit(1) from exc
     print(f"VAI local UI: http://{host}:{port}/")
     print(f"  Experts API: http://{host}:{port}/api/v1/experts")
+    print(f"  Activity stats: http://{host}:{port}/vai-stats.html")
     if log_path is None:
         print("  Activity log: disabled")
     else:
         print(f"  Activity log: {log_path}")
+        print(f"  Activity log URL: http://{host}:{port}/activity.jsonl")
     if port != 8765:
         print("  Production (if deployed): https://vai.ornstein.work/  (port 8765)")
     print("Press Ctrl+C to stop.")

@@ -74,6 +74,8 @@ Each line is one object:
 | operation | Methods | Path pattern | event_type |
 |-----------|---------|--------------|------------|
 | `serve_index` | GET, HEAD | `/`, `/index.html` | access |
+| `serve_stats` | GET, HEAD | `/vai-stats.html` | access |
+| `serve_activity_log` | GET, HEAD | `/activity.jsonl` | access |
 | `serve_mockup` | GET, HEAD | `/mockup/*` | access |
 | `get_schedule_v85` | GET | `/api/v1/schedule/v85` | access |
 | `list_race_cards` | GET | `/api/v1/race-cards` | access |
@@ -128,7 +130,7 @@ Do **not** treat leftmost XFF as authoritative without a trusted peer.
 
 On `serve` start, print log destination (or “activity log disabled”).
 
-**Viewing:** no in-app UI — operators use `tail -f logs/activity.jsonl` (or path under service `WorkingDirectory` on deploy).
+**Viewing:** operator UI at **`/vai-stats.html`** (repo-root HTML, served by the HTTP server after git deploy). Raw log also at **`/activity.jsonl`**. CLI: `tail -f logs/activity.jsonl`.
 
 ---
 

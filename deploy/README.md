@@ -90,14 +90,20 @@ bash /opt/vai/deploy/setup-domain.sh
 
 Opens **https://vai.ornstein.work/** with automatic HTTP→HTTPS redirect.
 
-### Activity stats (standalone)
+### Activity stats (part of the app)
 
-`vai-stats.html` is a static page (not part of the Python app). After nginx is updated:
+`vai-stats.html` lives at the **repo root** and is served by **`python -m vai serve`**:
 
-- **https://vai.ornstein.work/vai-stats.html** — sort/filter activity log
-- **https://vai.ornstein.work/activity.jsonl** — raw JSONL (nginx alias to `logs/activity.jsonl`)
+| URL | Source |
+|-----|--------|
+| `/vai-stats.html` | `{repo}/vai-stats.html` (git-deployed) |
+| `/activity.jsonl` | live activity log file (default `logs/activity.jsonl`) |
 
-Apply nginx locations with `sudo bash /opt/vai/deploy/fix-nginx-https.sh` (or copy from `deploy/nginx-vai-https.conf`).
+Nginx proxies these like the rest of the site (no separate static alias — avoids stale HTML).  
+`update-server.sh` verifies the IP-lookup viewer is present after deploy.
+
+- **https://vai.ornstein.work/vai-stats.html**
+- **https://vai.ornstein.work/activity.jsonl**
 
 Manual certbot alternative:
 

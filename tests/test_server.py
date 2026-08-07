@@ -98,6 +98,48 @@ def test_head_index_returns_200_without_body() -> None:
         VaiRequestHandler.activity_logger = None
 
 
+def test_vai_stats_html_served_from_repo() -> None:
+    """Activity stats page is part of the app; git deploy keeps it current."""
+    root = find_repo_root()
+    stats_path = root / "vai-stats.html"
+    assert stats_path.is_file(), "vai-stats.html must exist at repo root"
+    assert "Lookup IPs" in stats_path.read_text(encoding="utf-8")
+
+    server, base = _start_test_server()
+    try:
+        with urlopen(f"{base}/vai-stats.html") as response:
+            assert response.status == 200
+            body = response.read().decode("utf-8")
+            assert "Lookup IPs" in body
+            assert "ipapi.is" in body or "client_ip" in body
+            assert "no-cache" in (response.headers.get("Cache-Control") or "")
+    finally:
+        server.shutdown()
+        server.server_close()
+        VaiRequestHandler.activity_logger = None
+
+
+def test_activity_jsonl_served_when_logging_enabled(tmp_path: Path) -> None:
+    log_path = tmp_path / "activity.jsonl"
+    log_path.write_text(
+        '{"ts":"2026-08-07T00:00:00.000Z","event_id":"x","event_type":"access",'
+        '"operation":"serve_index","method":"GET","path":"/","status":200,'
+        '"outcome":"success","client_ip":"203.0.113.1","peer_ip":"127.0.0.1"}\n',
+        encoding="utf-8",
+    )
+    server, base = _start_test_server(activity_log=log_path)
+    try:
+        with urlopen(f"{base}/activity.jsonl") as response:
+            assert response.status == 200
+            body = response.read().decode("utf-8")
+            assert "203.0.113.1" in body
+            assert "serve_index" in body
+    finally:
+        server.shutdown()
+        server.server_close()
+        VaiRequestHandler.activity_logger = None
+
+
 def test_activity_log_records_request_with_xff(tmp_path: Path) -> None:
     log_path = tmp_path / "activity.jsonl"
     server, base = _start_test_server(activity_log=log_path)
