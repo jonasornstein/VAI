@@ -233,10 +233,22 @@
         <li><a href="#kom-igang">Kom igång</a></li>
         <li><a href="#speldag">Välj speldag</a></li>
         <li><a href="#hari">Läge: Hari (slump)</a></li>
-        <li><a href="#expert">Läge: Expert</a></li>
-        <li><a href="#spelkvitto">Spelkvitto och export</a></li>
+        <li><a href="#expert">Läge: Expert</a>
+          <ol>
+            <li><a href="#expert-roster">Experter (roster)</a></li>
+            <li><a href="#expert-tips-edit">Lägga till / ändra / radera tips</a></li>
+            <li><a href="#expert-select">Välja ett tips</a></li>
+          </ol>
+        </li>
+        <li><a href="#spelkvitto">Spelkvitto och export</a>
+          <ol>
+            <li><a href="#spelkvitto-spara">Spara (server + din dator)</a></li>
+            <li><a href="#spelkvitto-ladda">Ladda upp / öppna</a></li>
+            <li><a href="#spelkvitto-radera">Radera sparade kvitton</a></li>
+          </ol>
+        </li>
         <li><a href="#tema">Tema</a></li>
-        <li><a href="#tips">Tips och begräsningar</a></li>
+        <li><a href="#tips">Tips och begränsningar</a></li>
       </ol>
     </nav>
 
@@ -334,53 +346,152 @@
     <section id="expert">
       <h2>5. Läge: Expert</h2>
       <p>
-        Expert laddar sparade <strong>experttips</strong> (YAML) för valt datum/bana
-        och fyller hästurvalet enligt tipset.
+        I fliken <span class="ui">Expert</span> arbetar du med en <strong>roster av experter</strong>
+        och deras <strong>systemtips</strong> (hästar per avdelning) för valt datum och bana.
+        Tips lagras som YAML under <code>inbox/expert-tips/</code>; roster under
+        <code>inbox/experts/roster.yaml</code>.
       </p>
-      <ol>
-        <li>Öppna fliken <span class="ui">Expert</span>.</li>
-        <li>Välj expert / tips i listan (eller lägg till nytt tips i formuläret).</li>
-        <li>Tipset fyller avdelningarna; du kan justera hästar manuellt efteråt.</li>
-        <li>Systemkostnaden följer tipsets kombinationer (inte Hari-budgetfyllning).</li>
-      </ol>
       <p>
-        Använd <span class="ui">VISA EXPERTER</span> för att styra vilka experter som
-        visas i panelen. Flera tips per expert kan sparas.
+        Systemkostnaden blir tipsets kombinationer × 0,50&nbsp;SEK (ingen Hari-budgetfyllning).
+        Efter att ett tips laddats kan du fortfarande klicka i hästnätet — spelkvitto och
+        kostnad räknas om automatiskt.
       </p>
+
+      <h3 id="expert-roster">5.1 Experter — lägga till och visa</h3>
+      <p>
+        Panelens övre del visar <strong>synliga experter</strong>. Badgen
+        <span class="ui">Redo</span> / <span class="ui">N tips</span> betyder att det finns
+        sparade tips för den valda omgången. Filtrera med
+        <span class="ui">Visa bara gratis</span> om du vill dölja betalda/andelsprodukter.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Åtgärd</th><th>Så gör du</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="ui">Lägg till expert</span></td>
+            <td>
+              Öppnar formulär: namn, ID (slug, t.ex. <code>eddie-ostlund</code>), valfritt
+              produkt, outlet, källa, anteckning, fullt system, gratis. Sparar i den lokala
+              roster-filen. <em>Tips (hästar) anges separat</em> via formulärikonen på kortet.
+            </td>
+          </tr>
+          <tr>
+            <td><span class="ui">VISA EXPERTER</span></td>
+            <td>
+              Dialog där du kryssar vilka experter som ska visas i panelen.
+              Omarkerade <strong>döljs</strong> men raderas inte (soft-hide — de stannar i roster).
+              Använd <span class="ui">Markera alla</span> / <span class="ui">Avmarkera alla</span>
+              och ↑/↓ för visningsordning.
+            </td>
+          </tr>
+          <tr>
+            <td>Formulärikon (block-ikon) på expertkort</td>
+            <td>
+              Öppnar tipformuläret för den experten och aktuell DATUM+BANA
+              (se nedan).
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <div class="callout">
         <p>
-          <span class="ui">Kvantitativ</span> är ännu inte aktiverat
-          («Kommer senare»).
+          Experter tas inte bort hårt via UI:t — de döljs. Tips YAML raderas endast när
+          du aktivt raderar ett tips i tipformuläret.
+        </p>
+      </div>
+
+      <h3 id="expert-tips-edit">5.2 Tips — lägga till, ändra och radera</h3>
+      <ol>
+        <li>Välj rätt <span class="ui">DATUM</span> och <span class="ui">BANA</span>.</li>
+        <li>Klicka formulärikonen på expertens kort.</li>
+        <li>
+          Om experten redan har tips för omgången fylls formuläret med det första;
+          annars öppnas ett tomt nytt tips.
+        </li>
+        <li>
+          Fyll i hästar per avdelning (t.ex. <code>2, 3, 5</code>), valfritt produktnamn,
+          källa, anteckning och rationale.
+        </li>
+        <li>Tryck <span class="ui">Spara</span> — tipset skrivs till servern
+          (<code>inbox/expert-tips/</code>).</li>
+      </ol>
+      <p>
+        <strong>Flera systemtips per expert:</strong> i formulärets överkant finns chips
+        för sparade system plus <span class="ui">+ Nytt tips</span>. Byt chip för att
+        redigera ett annat tips, eller skapa ytterligare ett.
+      </p>
+      <p>
+        <strong>Ändra:</strong> öppna formuläret, välj rätt system-chip, redigera fälten,
+        <span class="ui">Spara</span> igen.
+      </p>
+      <p>
+        <strong>Radera:</strong> öppna det sparade tipset (så att <span class="ui">Radera</span>
+        är aktivt), bekräfta dialogen. YAML-filen tas bort från servern. Knappen är inaktiv
+        om tipset inte är sparat ännu.
+      </p>
+
+      <h3 id="expert-select">5.3 Så väljer du ett tips (läser in spelet)</h3>
+      <p>
+        Under <strong>Tips för omgången</strong> listar VAI alla sparade tips som matchar
+        valt datum (och bana). Varje rad visar expert, produkt, tip-id, kostnad, antal rader
+        och uppdelning.
+      </p>
+      <ol>
+        <li>
+          <strong>Klicka på en tiprad</strong> i listan (den markerade raden får aktiv stil).
+        </li>
+        <li>
+          VAI anropar expert-generering med startlistans id och <code>tip_id</code>.
+        </li>
+        <li>
+          Hästarna fylls i alla åtta avdelningar, spelkvitto och kostnad uppdateras,
+          och rationale visar expert + tip-id.
+        </li>
+        <li>
+          Justera gärna hästar manuellt efteråt — spelkvitto uppdateras vid varje klick.
+        </li>
+      </ol>
+      <div class="callout ok">
+        <p>
+          <strong>Skillnad:</strong> formulärikonen = <em>redigera/spara tipsdata</em>.
+          Tipraden i listan = <em>välj tips och ladda det in i spelet</em>.
+        </p>
+      </div>
+      <div class="callout">
+        <p>
+          <span class="ui">Kvantitativ</span> är ännu inte aktiverat («Kommer senare»).
         </p>
       </div>
     </section>
 
     <section id="spelkvitto">
       <h2>6. Spelkvitto och export</h2>
+      <p>
+        Spelkvittot (mitten/nedre ytan) visar aktuella hästar per avdelning, rader och kostnad.
+        Knapparna under kvittot hanterar utskrift och filer.
+      </p>
       <table>
         <thead>
           <tr><th>Knapp / yta</th><th>Funktion</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td>Spelkvitto (höger)</td>
-            <td>Visar valda hästar per avdelning, kostnad och uppdelning.</td>
-          </tr>
-          <tr>
             <td><span class="ui">Skriv ut spelkvitto</span></td>
             <td>Skriv ut / spara som PDF via webbläsaren (endast kvittot).</td>
           </tr>
           <tr>
             <td><span class="ui">SPARA</span></td>
-            <td>Sparar spelkvitto som YAML på servern under <code>betslips/</code>.</td>
+            <td>Spara YAML på servern och ladda ner en kopia till din dator (se nedan).</td>
           </tr>
           <tr>
             <td><span class="ui">LADDA UPP</span></td>
-            <td>Öppna sparade kvitton från servern eller en lokal fil.</td>
+            <td>Öppna dialog: serverlista, radera, eller ladda en lokal YAML-fil.</td>
           </tr>
           <tr>
             <td><span class="ui">Innan spel</span></td>
-            <td>Checklista innan du går till ATG (ben, kostnad, strukna m.m.).</td>
+            <td>Checklista innan ATG (ben, kostnad, strukna m.m.).</td>
           </tr>
           <tr>
             <td><span class="ui">Öppna ATG/V85</span></td>
@@ -392,6 +503,77 @@
           </tr>
         </tbody>
       </table>
+
+      <h3 id="spelkvitto-spara">6.1 Spara spelkvitto (server och klient)</h3>
+      <p>
+        Kräver att datum och bana är valda och att det finns ett genererat/ifylld spel.
+        Filnamn byggs som <code>{datum}-{bana}-{spelform}.yaml</code>
+        (t.ex. <code>2026-08-08-solvalla-V85.yaml</code>). Om namnet redan finns får nästa
+        fil suffix <code>-2</code>, <code>-3</code>, …
+      </p>
+      <ol>
+        <li>Tryck <span class="ui">SPARA</span>.</li>
+        <li>
+          <strong>På servern:</strong> YAML skrivs under mappen <code>betslips/</code>
+          via API. Statusraden visar t.ex. «Senast sparad: …».
+        </li>
+        <li>
+          <strong>På din dator (klient):</strong> webbläsaren laddar samtidigt ner samma
+          YAML-fil (så du har en lokal kopia).
+        </li>
+        <li>
+          Om serversparningen misslyckas görs en <strong>klient-only nedladdning</strong>
+          ändå; status visar «Nedladdad (ej server): …».
+        </li>
+      </ol>
+
+      <h3 id="spelkvitto-ladda">6.2 Ladda upp / öppna spelkvitto</h3>
+      <p>Tryck <span class="ui">LADDA UPP</span>. Dialogen «Ladda spelkvitto» har två vägar:</p>
+      <table>
+        <thead>
+          <tr><th>Källa</th><th>Så gör du</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Server</strong> (<code>betslips/</code>)</td>
+            <td>
+              Listan visar sparade filer med datum, bana, spelform, läge, sparad tid och kostnad.
+              Kryssa <strong>exakt ett</strong> kvitto och tryck <span class="ui">Öppna</span>.
+              UI:t fylls med hästar, läge, kostnad m.m. från filen.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Din dator (klient)</strong></td>
+            <td>
+              Tryck <span class="ui">Från fil…</span> och välj en lokal <code>.yaml</code> /
+              <code>.yml</code>. Samma inläsning som från servern, men filen skickas/läses
+              från din maskin (behöver inte finnas i serverns <code>betslips/</code>).
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <span class="ui">Markera alla</span> / <span class="ui">Avmarkera alla</span> gäller
+        kryssrutorna i serverlistan (användbart inför radering).
+      </p>
+
+      <h3 id="spelkvitto-radera">6.3 Radera sparade spelkvitton</h3>
+      <ol>
+        <li>Öppna <span class="ui">LADDA UPP</span>.</li>
+        <li>Kryssa ett eller flera kvitton i serverlistan.</li>
+        <li>Tryck <span class="ui">Radera</span> och bekräfta dialogen.</li>
+      </ol>
+      <p>
+        Det tar bort filerna <strong>på servern</strong> under <code>betslips/</code>.
+        Kopior som du tidigare laddat ner till din egen dator raderas inte automatiskt —
+        dem tar du bort manuellt i filhanteraren om du vill.
+      </p>
+      <div class="callout">
+        <p>
+          <span class="ui">Öppna</span> kräver exakt <strong>ett</strong> markerat kvitto.
+          <span class="ui">Radera</span> kräver minst ett.
+        </p>
+      </div>
     </section>
 
     <section id="tema">
@@ -403,12 +585,14 @@
     </section>
 
     <section id="tips">
-      <h2>8. Tips och begräsningar</h2>
+      <h2>8. Tips och begränsningar</h2>
       <ul>
         <li><strong>Strukna hästar</strong> kan inte väljas; kontrollera startlistan innan ATG-inmatning.</li>
         <li><strong>Ingen automatisk spelplacering</strong> — VAI genererar förslag och kvitton endast.</li>
         <li><strong>Ingen ekonomisk rådgivning</strong> — träffsiffror och modeller är hjälpmedel, inte garantier.</li>
         <li><strong>Hari vs Expert</strong> har separata lägen: byter du flik behålls respektive markeringar.</li>
+        <li><strong>Spelkvitton på server</strong> ligger i <code>betslips/</code>; experttips i
+          <code>inbox/expert-tips/</code>; roster i <code>inbox/experts/roster.yaml</code>.</li>
         <li>Vid problem: kontrollera API-status i banner-raden och att servern körs
           (<code>python -m vai serve</code>).</li>
       </ul>
