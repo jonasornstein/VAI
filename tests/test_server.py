@@ -127,6 +127,37 @@ def test_vai_stats_html_served_from_repo() -> None:
         VaiRequestHandler.activity_logger = None
 
 
+def test_guide_html_served_from_repo() -> None:
+    """Operator user guide is part of the app; logo opens /guide.html in a new tab."""
+    root = find_repo_root()
+    guide_path = root / "vai-guide.html"
+    assert guide_path.is_file(), "vai-guide.html must exist at repo root"
+    guide_text = guide_path.read_text(encoding="utf-8")
+    assert "Användarguide" in guide_text
+    assert "Placerar inte" in guide_text or "placerar inte" in guide_text
+
+    mockup = (root / "outbox" / "mockups" / "v85-proposal-ux-mockup-atg.html").read_text(
+        encoding="utf-8"
+    )
+    assert 'href="/guide.html"' in mockup
+    assert 'target="_blank"' in mockup
+    assert 'id="app-logo"' in mockup
+
+    server, base = _start_test_server()
+    try:
+        for path in ("/guide.html", "/vai-guide.html"):
+            with urlopen(f"{base}{path}") as response:
+                assert response.status == 200
+                body = response.read().decode("utf-8")
+                assert "Användarguide" in body
+                assert "text/html" in (response.headers.get("Content-Type") or "")
+                assert "no-cache" in (response.headers.get("Cache-Control") or "")
+    finally:
+        server.shutdown()
+        server.server_close()
+        VaiRequestHandler.activity_logger = None
+
+
 def test_activity_jsonl_served_when_logging_enabled(tmp_path: Path) -> None:
     log_path = tmp_path / "activity.jsonl"
     log_path.write_text(

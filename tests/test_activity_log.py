@@ -118,6 +118,16 @@ def test_classify_serve_stats_and_activity_log() -> None:
     assert fn2 == "_serve_activity_jsonl"
 
 
+def test_classify_serve_guide() -> None:
+    for path in ("/guide.html", "/vai-guide.html"):
+        op, etype, fn = classify_request("GET", path)
+        assert op == "serve_guide"
+        assert etype == "access"
+        assert fn == "_serve_file"
+        op_h, etype_h, fn_h = classify_request("HEAD", path)
+        assert (op_h, etype_h, fn_h) == (op, etype, fn)
+
+
 def test_classify_race_card() -> None:
     op, etype, _ = classify_request("GET", "/api/v1/race-cards/V85_2026-07-11_31_5")
     assert op == "get_race_card"

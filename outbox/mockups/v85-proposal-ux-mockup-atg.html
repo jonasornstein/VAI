@@ -126,6 +126,7 @@
       padding: 12px 20px;
     }
     .game-header__logo {
+      display: block;
       width: 56px;
       height: 56px;
       flex-shrink: 0;
@@ -134,8 +135,15 @@
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
       border: 2px solid rgba(255, 255, 255, 0.4);
       transition: transform 0.15s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
     }
     .game-header__logo:hover { transform: rotate(-3deg) scale(1.04); }
+    .game-header__logo:focus-visible {
+      outline: 3px solid #f39332;
+      outline-offset: 2px;
+    }
     .game-header__logo svg { display: block; width: 100%; height: 100%; }
     .game-header__title .vai-headline {
       color: #fff;
@@ -1342,7 +1350,7 @@
   <div class="app active-game-type-v85">
     <header class="game-header">
       <div class="game-header__brand">
-        <div class="game-header__logo" id="app-logo" title="VAI V85">
+        <a class="game-header__logo" id="app-logo" href="/guide.html" target="_blank" rel="noopener noreferrer" title="VAI V85 — Användarguide (öppnas i ny flik)" aria-label="Öppna användarguide i ny flik">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
             <defs>
               <linearGradient id="logo-bg" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -1365,7 +1373,7 @@
             <text x="23" y="18" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="8" font-weight="900" fill="#fff">VAI</text>
             <path d="M52 12l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z" fill="#79bae5"/>
           </svg>
-        </div>
+        </a>
         <div class="game-header__title">
           <div class="vai-headline" id="app-headline">VAI V85</div>
           <div class="game-header__sub">Hämtar startlista från ATG · du väljer hästar · modellen bygger spelet</div>
@@ -2379,7 +2387,10 @@
         if (headline) headline.textContent = title;
         document.title = title + " — Local UI v1.3.1";
         var logo = document.getElementById("app-logo");
-        if (logo) logo.setAttribute("title", title);
+        if (logo) {
+          logo.setAttribute("title", title + " — Användarguide (öppnas i ny flik)");
+          logo.setAttribute("aria-label", "Öppna användarguide i ny flik (" + title + ")");
+        }
         updateOpenAtgButton();
       }
 

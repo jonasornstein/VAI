@@ -131,6 +131,14 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 cache_control="no-cache",
             )
             return
+        # Operator user guide — opened from header logo in a new tab.
+        if path in ("/guide.html", "/vai-guide.html"):
+            self._serve_file(
+                self.repo_root / "vai-guide.html",
+                content_type="text/html; charset=utf-8",
+                cache_control="no-cache",
+            )
+            return
         if path == "/activity.jsonl":
             self._serve_activity_jsonl()
             return

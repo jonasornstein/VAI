@@ -90,18 +90,20 @@ bash /opt/vai/deploy/setup-domain.sh
 
 Opens **https://vai.ornstein.work/** with automatic HTTP→HTTPS redirect.
 
-### Activity stats (part of the app)
+### Activity stats and user guide (part of the app)
 
-`vai-stats.html` lives at the **repo root** and is served by **`python -m vai serve`**:
+Static HTML at the **repo root** is served by **`python -m vai serve`**:
 
 | URL | Source |
 |-----|--------|
 | `/vai-stats.html` | `{repo}/vai-stats.html` (git-deployed) |
+| `/guide.html` (alias `/vai-guide.html`) | `{repo}/vai-guide.html` — opened from header logo |
 | `/activity.jsonl` | live activity log file (default `logs/activity.jsonl`) |
 
 Nginx proxies these like the rest of the site (no separate static alias — avoids stale HTML).  
-`update-server.sh` verifies the IP-lookup viewer is present after deploy.
+`update-server.sh` verifies stats and guide after deploy.
 
+- **https://vai.ornstein.work/guide.html**
 - **https://vai.ornstein.work/vai-stats.html**
 - **https://vai.ornstein.work/activity.jsonl**
 

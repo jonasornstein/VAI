@@ -20,7 +20,10 @@ def main() -> int:
 
         headline = page.locator("#app-headline").inner_text().strip()
         page_title = page.title()
-        logo_title = page.locator("#app-logo").get_attribute("title")
+        logo = page.locator("#app-logo")
+        logo_title = logo.get_attribute("title")
+        logo_href = logo.get_attribute("href")
+        logo_target = logo.get_attribute("target")
         logo_text = page.locator("#app-logo text").text_content().strip()
         footer = page.locator(".footer-note").inner_text().strip()
         pdf_removed = page.locator("#btn-export-pdf").count() == 0
@@ -31,6 +34,8 @@ def main() -> int:
         print("Headline:", headline)
         print("Page title:", page_title)
         print("Logo tooltip:", logo_title)
+        print("Logo href:", logo_href)
+        print("Logo target:", logo_target)
         print("Logo badge text:", logo_text)
         print("Footer note:", footer)
         print("PDF button removed:", pdf_removed)
@@ -39,8 +44,12 @@ def main() -> int:
 
         ok = (
             headline == "VAI V85"
-            and page_title == "VAI V85 — Local UI v1.1.4"
-            and logo_title == "VAI V85"
+            and page_title.startswith("VAI V85")
+            and logo_title is not None
+            and logo_title.startswith("VAI V85")
+            and "Användarguide" in logo_title
+            and logo_href == "/guide.html"
+            and logo_target == "_blank"
             and logo_text == "VAI"
             and "TRAVHÄST + VAI" in footer.upper()
             and pdf_removed

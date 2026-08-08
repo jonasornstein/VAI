@@ -46,4 +46,25 @@ fi
 rm -f /tmp/vai-stats-check.html
 echo "    OK — activity stats via app (IP lookup viewer)"
 
-echo "==> Done — https://vai.ornstein.work/  (stats: https://vai.ornstein.work/vai-stats.html)"
+echo "==> Verify user guide (git-deployed HTML)"
+if [[ ! -f "$APP_DIR/vai-guide.html" ]]; then
+  echo "ERROR: $APP_DIR/vai-guide.html missing after git reset" >&2
+  exit 1
+fi
+if ! grep -q 'Användarguide' "$APP_DIR/vai-guide.html"; then
+  echo "ERROR: $APP_DIR/vai-guide.html does not look like the operator guide" >&2
+  exit 1
+fi
+guide_code="$(curl -sS -o /tmp/vai-guide-check.html -w '%{http_code}' http://127.0.0.1:8765/guide.html || true)"
+if [[ "$guide_code" != "200" ]]; then
+  echo "ERROR: GET /guide.html via app returned HTTP $guide_code (expected 200)" >&2
+  exit 1
+fi
+if ! grep -q 'Användarguide' /tmp/vai-guide-check.html; then
+  echo "ERROR: app-served /guide.html missing 'Användarguide'" >&2
+  exit 1
+fi
+rm -f /tmp/vai-guide-check.html
+echo "    OK — user guide via app (/guide.html)"
+
+echo "==> Done — https://vai.ornstein.work/  (guide: /guide.html · stats: /vai-stats.html)"

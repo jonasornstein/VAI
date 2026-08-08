@@ -6,7 +6,7 @@
 | **Status** | APPROVED |
 | **Reviewer** | Povl (math), ornstein (operator) |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-07-31 |
+| **Last updated** | 2026-08-08 |
 | **Owner** | ornstein (M-004) |
 | **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md), [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
 
@@ -134,6 +134,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | F-090 | `export_pdf` | Generate PDF from proposal *(deferred v1.2; v1.1 uses browser print slip)* | Proposal path | PDF file | UC-23 |
 | F-091 | `open_atg_link` | Open atg.se/v85 (browser; no automation) | — | URL opened | UC-22, UC-23 |
 | F-092 | `toggle_display_theme` | Switch light/dark UI theme | Theme choice | UI state | UC-23 (mockup) |
+| F-093 | `open_user_guide` | Open operator user guide in a new tab from header logo (`/guide.html`) | — | Guide HTML | Local UI ops |
 
 ---
 
@@ -165,7 +166,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | **Shipped (v1.1 — local UI + ATG)** | F-006–007, F-025–028, F-052 (basic), F-071, F-091 | `python -m vai serve`; see [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
 | **Shipped (v1.2 — race info)** | F-029 | Leg header metadata; [race-info-v1](../../outbox/specs/race-info-v1.md) |
 | **Partial** | F-009 | V85 `betDistribution` only; no `inbox/odds/` archive |
-| **UX / mockup only** | F-070, F-090, F-092 | Print slip (not PDF export); theme toggle in mockup variants |
+| **UX / mockup only** | F-070, F-090, F-092, F-093 | Print slip (not PDF export); theme toggle; logo opens user guide |
 | **Agent / manual (AIRUP)** | F-002–003, F-010–014, F-072–073, F-080–081 | Skills and operator workflow; not automated in `src/` |
 | **Shipped (v1.3 — Expert betslips)** | F-040–043 | Tip catalog YAML; list/select/load; no scraper |
 | **Shipped (v1.3.x — Expert roster manage)** | F-044–048 | Add/update/delete/reset working roster (`inbox/experts/roster.yaml`) |
