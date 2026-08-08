@@ -14,7 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
-| 2026-08-08 | P | Assistant | **User guide from logo** — Swedish operator guide at `/guide.html` (`vai-guide.html`); header logo opens guide in new tab; activity op `serve_guide`; tests + F-093 | [vai-guide.html](../../vai-guide.html); mockup; [server.py](../../src/vai/server.py) |
+| 2026-08-08 | P | Assistant | **Commit + push user guide from logo** — `2e6d934` on `origin/master`; `/guide.html` + logo `target=_blank`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/guide.html ; [vai-guide.html](../../vai-guide.html) |
+| 2026-08-08 | U | Assistant | **User guide from logo** — Swedish operator guide at `/guide.html` (`vai-guide.html`); header logo opens guide in new tab; activity op `serve_guide`; tests + F-093 | [vai-guide.html](../../vai-guide.html); mockup; [server.py](../../src/vai/server.py) |
 | 2026-08-07 | P | ornstein | **End of session (O&O)** — v1.3.1 live on prod (multi-tip expert, mode isolation, slip auto-update, copy tweaks); tested & approved; session closed | See [§ End of session — 2026-08-07 (v1.3.1)](#end-of-session--2026-08-07-v131) |
 | 2026-08-07 | P | Assistant | **Release v1.3.1** — `c5d635e` + tag `v1.3.1` on `origin/master`; multi-tip per expert, Senast sparad, tips wording; **prod later live** (operator deploy + O&O approve) | https://vai.ornstein.work/ ; tag `v1.3.1` |
 | 2026-08-07 | U | Assistant | **v1.3.1 multi-tip expert + copy** — allocate unique tip_ids; form switcher + product name; `Senast sparad:`; expert hint “tips och/eller”; package 1.3.1 | `c5d635e`, mockup, `expert_tips.py` |
