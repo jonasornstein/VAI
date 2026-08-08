@@ -272,6 +272,40 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 
 ---
 
+## End of session — 2026-08-08 (user guide)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `e70c9c5` / close-out TRACE-LOG  
+
+**Production:** https://vai.ornstein.work/ — operator **tested & approved** (logo → guide; content OK). If prod lagged agent sudo, run: `sudo bash /opt/vai/deploy/update-server.sh`
+
+### Delivered
+
+| Item | Detail |
+|------|--------|
+| User guide | `vai-guide.html` served at `/guide.html` (alias `/vai-guide.html`) |
+| Logo affordance | Header logo → new tab (`target="_blank"`); tooltip/aria guide hint |
+| Guide content | Swedish operator guide: Hari, Expert (roster, tips CRUD, tip select), spelkvitto SPARA/LADDA UPP/radera (server + client) |
+| Activity | `serve_guide` classification |
+| Catalog | F-093 `open_user_guide` |
+| Deploy verify | `update-server.sh` checks `/guide.html` |
+
+### Commits (origin/master)
+
+| SHA | Summary |
+|-----|---------|
+| `2e6d934` | feat: user guide opened from header logo |
+| `258ae34` | docs: TRACE-LOG user guide push; deploy blocked |
+| `e70c9c5` | docs: expand user guide for betslips and experts |
+| `d7f4680` | docs: TRACE-LOG guide betslips/experts push; deploy blocked |
+
+### Approval
+
+- **O&O (ornstein):** all looks good — **APPROVED**; session closed 2026-08-08.
+
+---
+
 ## End of session — 2026-08-07 (server betslip archive)
 
 **Session owner:** ornstein  
