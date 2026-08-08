@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-08-08 | P | ornstein | **End of session (O&O)** — user guide from logo + betslips/experts sections tested & approved; session closed | See [§ End of session — 2026-08-08 (user guide)](#end-of-session--2026-08-08-user-guide) |
 | 2026-08-08 | P | Assistant | **Commit + push guide betslips/experts** — `e70c9c5` on `origin/master`; expanded `/guide.html`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/guide.html ; [vai-guide.html](../../vai-guide.html) |
 | 2026-08-08 | P | Assistant | **Commit + push user guide from logo** — `2e6d934` on `origin/master`; `/guide.html` + logo `target=_blank`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/guide.html ; [vai-guide.html](../../vai-guide.html) |
 | 2026-08-08 | U | Assistant | **User guide from logo** — Swedish operator guide at `/guide.html` (`vai-guide.html`); header logo opens guide in new tab; activity op `serve_guide`; tests + F-093 | [vai-guide.html](../../vai-guide.html); mockup; [server.py](../../src/vai/server.py) |
