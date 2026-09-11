@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-09-11 | P | ornstein | **End of session (O&O)** — Expert STATS v1.3.2 (F-049) + button next to Rensa alla; session closed | See [§ End of session — 2026-09-11 (Expert STATS)](#end-of-session--2026-09-11-expert-stats) |
+| 2026-09-11 | P | Assistant | **Commit + push STATS placement** — `89089cd` on `origin/master`; STATS right of Rensa alla; **prod deploy blocked** (sudo). Run: `sudo bash /home/ornstein/grok/vai/deploy/update-server.sh` | https://vai.ornstein.work/ |
+| 2026-09-11 | P | Assistant | **Commit + push deploy wait** — `02f0ac9`; wait for :8765 before health checks (HTTP 000 race) | [update-server.sh](../../deploy/update-server.sh) |
 | 2026-09-11 | P | Assistant | **Commit + push v1.3.2** — `35ec772` + tag `v1.3.2` on `origin/master`; Expert STATS F-049; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.2` |
 | 2026-09-11 | P | ornstein, Povl | **expert-stats-v1 APPROVED** — F-049 horse frequency (`k/N` + %); published spec, UC-12 v1.6, functions catalog 1.5 | [expert-stats-v1.md](../../outbox/specs/expert-stats-v1.md), [REVIEW_expert-stats-v1.md](../../outbox/reviews/REVIEW_expert-stats-v1.md) |
 | 2026-08-08 | P | ornstein | **End of session (O&O)** — user guide from logo + betslips/experts sections tested & approved; session closed | See [§ End of session — 2026-08-08 (user guide)](#end-of-session--2026-08-08-user-guide) |
@@ -271,6 +274,39 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-09-11 (Expert STATS)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `89089cd` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **v1.3.2** was live (pill + `/guide.html`). If STATS placement (`89089cd`) or deploy wait (`02f0ac9`) lagged sudo: `sudo bash /home/ornstein/grok/vai/deploy/update-server.sh`
+
+### Delivered
+
+| Item | Detail |
+|------|--------|
+| Expert STATS (F-049) | Per-leg horse frequency: `k/N` + % overlay, heat, consensus strip |
+| Spec | [expert-stats-v1.md](../../outbox/specs/expert-stats-v1.md) **APPROVED** (ornstein + Povl) |
+| UC-12 | v1.6 alternate view STATS |
+| Package | **v1.3.2** (`pyproject.toml`, `__version__`, UI pill, tag `v1.3.2`) |
+| Placement | **STATS** to the right of **Rensa alla avdelningar** (Expert-only) |
+| Deploy script | Wait up to 10s for :8765 before stats/guide curls |
+
+### Commits (origin/master)
+
+| SHA | Summary |
+|-----|---------|
+| `35ec772` | release: v1.3.2 Expert STATS (F-049) · tag `v1.3.2` |
+| `0be7770` | docs: TRACE-LOG v1.3.2 push; deploy blocked |
+| `02f0ac9` | fix: wait for app bind before deploy health checks |
+| `89089cd` | fix: move Expert STATS next to Rensa alla avdelningar |
+
+### Approval
+
+- **O&O (ornstein):** spec + Povl math sign-off; session closed 2026-09-11.
 
 ---
 
