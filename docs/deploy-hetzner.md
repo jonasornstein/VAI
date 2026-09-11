@@ -129,6 +129,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://vai.ornstein.work/
 | `Need to specify how to reconcile divergent branches` | `sudo -u vai git -C /opt/vai reset --hard origin/master` |
 | HTTPS **403**, HTTP **200** | `bash /opt/vai/deploy/fix-nginx-https.sh` |
 | App not responding | `journalctl -u vai -n 30 --no-pager` then `systemctl restart vai` |
+| `GET /vai-stats.html` HTTP **000** / curl connect fail right after restart | Race: systemd `Type=simple` is “started” before the socket binds. Re-run `update-server.sh` (it now waits up to 10s). Check `curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8765/` |
 | nginx config test | `nginx -t && systemctl reload nginx` |
 | TLS renewal | Automatic via certbot timer; manual: `certbot renew` |
 

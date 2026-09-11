@@ -24,6 +24,25 @@ echo "==> Restart service"
 systemctl restart vai
 systemctl status vai --no-pager
 
+# Type=simple: systemd reports "started" as soon as the process is forked,
+# before Python has bound 127.0.0.1:8765. Wait until HTTP answers.
+echo "==> Wait for 127.0.0.1:8765"
+ready=""
+for _ in $(seq 1 50); do
+  code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 1 http://127.0.0.1:8765/ || true)"
+  if [[ "$code" == "200" ]]; then
+    ready=1
+    break
+  fi
+  sleep 0.2
+done
+if [[ -z "$ready" ]]; then
+  echo "ERROR: vai.service did not accept HTTP on 127.0.0.1:8765 within 10s" >&2
+  journalctl -u vai -n 40 --no-pager >&2 || true
+  exit 1
+fi
+echo "    OK — app is listening"
+
 echo "==> Verify activity stats page (git-deployed HTML)"
 if [[ ! -f "$APP_DIR/vai-stats.html" ]]; then
   echo "ERROR: $APP_DIR/vai-stats.html missing after git reset" >&2
