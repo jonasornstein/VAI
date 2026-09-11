@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.1 |
+| **Version** | 0.2 |
 | **Status** | APPROVED |
 | **AIRUP phase** | P |
 | **Reviewer** | ornstein (UX), Povl (count / percentage rules) |
@@ -27,7 +27,7 @@ Observation only: STATS does not mark horses, change the slip, or invent picks.
 
 | ID | Topic | Decision |
 |----|-------|----------|
-| ES-001 | Control | Toolbar button **STATS** (next to **VISA EXPERTER**); Expert-only |
+| ES-001 | Control | Toolbar button **STATS** (to the right of **Rensa alla avdelningar**); Expert-only |
 | ES-002 | Interaction | Toggle (`aria-pressed`); not a blocking modal |
 | ES-003 | Grid | When on, horse meta lines show `k/N` and `%` instead of V85 pool % / odds |
 | ES-004 | Heat | Background tint by percentage; selected horses keep pool-selected yellow |
@@ -101,7 +101,7 @@ Default: visible-only, not free-only. `--all-visible` sets `visible_only=false`.
 
 ## 6. Operator UX
 
-1. Expert tab → **STATS**.
+1. Expert tab → **STATS** (right of **Rensa alla avdelningar**).
 2. Horse buttons: number, `k/N`, `%`; heat by `%`.
 3. Strip: `Avd n` then chips `num k/N pct%`; max (and ties) highlighted.
 4. Header: `N tips · M experter · {track} {date}`.
@@ -125,4 +125,5 @@ Default: visible-only, not free-only. `--all-visible` sets `visible_only=false`.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2 | 2026-09-11 | STATS moved to the right of **Rensa alla avdelningar** (ornstein) |
 | 0.1 | 2026-09-11 | APPROVED — numeric `k/N` + percentage overlay; F-049 |

@@ -358,15 +358,6 @@
       border-color: var(--v85-light);
       color: #fff;
     }
-    .expert-roster-toolbar .button--small[aria-pressed="true"] {
-      background-image: var(--v85-gradient);
-      border-color: var(--v85-light);
-      color: #fff;
-    }
-    .expert-roster-toolbar .button--small:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
     .expert-visibility-list {
       display: flex;
       flex-direction: column;
@@ -1065,6 +1056,16 @@
       border-color: var(--atg-link);
       background: var(--atg-muted-bg);
     }
+    #btn-expert-stats[aria-pressed="true"],
+    #btn-expert-stats[aria-pressed="true"]:hover {
+      background-image: var(--v85-gradient);
+      border-color: var(--v85-light);
+      color: #fff;
+    }
+    #btn-expert-stats:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
     .selection-legend {
       display: flex;
       flex-wrap: wrap;
@@ -1538,7 +1539,6 @@
             <span class="expert-roster-actions">
               <button type="button" class="button--small button--primary" id="expert-roster-add">Lägg till expert</button>
               <button type="button" class="button--small" id="expert-roster-visibility" title="Välj vilka experter som visas i Expert-panelen">VISA EXPERTER</button>
-              <button type="button" class="button--small" id="btn-expert-stats" title="Räkna hur ofta varje häst valts i experttipsen" aria-pressed="false">STATS</button>
             </span>
           </div>
           <div id="expert-roster-list" class="expert-roster-list" aria-label="Experter"></div>
@@ -1673,6 +1673,7 @@
         </div>
         <div class="legs-toolbar">
           <button class="btn-deselect-all" id="btn-deselect-all" type="button">Rensa alla avdelningar</button>
+          <button class="btn-deselect-all" id="btn-expert-stats" type="button" title="Räkna hur ofta varje häst valts i experttipsen" aria-pressed="false" hidden>STATS</button>
         </div>
         <div class="expert-stats-strip" id="expert-stats-strip" hidden>
           <div class="expert-stats-strip__head" id="expert-stats-strip-head"></div>
@@ -2758,6 +2759,8 @@
         document.querySelectorAll(".leg-freeze-btn").forEach(function (btn) {
           btn.hidden = isExpert;
         });
+        var statsBtn = document.getElementById("btn-expert-stats");
+        if (statsBtn) statsBtn.hidden = !isExpert;
         if (title) {
           title.textContent = isExpert
             ? "Experttips och hästar"

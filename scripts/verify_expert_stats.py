@@ -55,6 +55,14 @@ def main() -> int:
             page.wait_for_selector("#legs-grid .horse", timeout=25000)
             checks.append(("stats_visible_in_expert", stats_btn.is_visible()))
             checks.append(("stats_label", stats_btn.inner_text().strip() == "STATS"))
+            after_clear = page.evaluate(
+                """() => {
+                  var clear = document.getElementById('btn-deselect-all');
+                  var stats = document.getElementById('btn-expert-stats');
+                  return !!(clear && stats && clear.nextElementSibling === stats);
+                }"""
+            )
+            checks.append(("stats_right_of_rensa_alla", after_clear))
 
             stats = payload
             page.evaluate("(stats) => window.__vaiApplyExpertStats(stats)", stats)
