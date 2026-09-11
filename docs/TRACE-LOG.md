@@ -14,7 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
-| 2026-09-11 | P | Assistant | **Release v1.3.2** — Expert STATS (F-049) count + % overlay; package **1.3.2**; tag `v1.3.2` | https://vai.ornstein.work/ ; [expert-stats-v1.md](../../outbox/specs/expert-stats-v1.md) |
+| 2026-09-11 | P | Assistant | **Commit + push v1.3.2** — `35ec772` + tag `v1.3.2` on `origin/master`; Expert STATS F-049; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.2` |
 | 2026-09-11 | P | ornstein, Povl | **expert-stats-v1 APPROVED** — F-049 horse frequency (`k/N` + %); published spec, UC-12 v1.6, functions catalog 1.5 | [expert-stats-v1.md](../../outbox/specs/expert-stats-v1.md), [REVIEW_expert-stats-v1.md](../../outbox/reviews/REVIEW_expert-stats-v1.md) |
 | 2026-08-08 | P | ornstein | **End of session (O&O)** — user guide from logo + betslips/experts sections tested & approved; session closed | See [§ End of session — 2026-08-08 (user guide)](#end-of-session--2026-08-08-user-guide) |
 | 2026-08-08 | P | Assistant | **Commit + push guide betslips/experts** — `e70c9c5` on `origin/master`; expanded `/guide.html`; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://vai.ornstein.work/guide.html ; [vai-guide.html](../../vai-guide.html) |
