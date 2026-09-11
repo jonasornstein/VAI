@@ -5,14 +5,15 @@
 | **Mode** | `expert` |
 | **Owner** | Nisse (roster / tip fidelity), ornstein (operator UX), Povl (cost) |
 | **Status** | APPROVED |
-| **Version** | 0.4 |
-| **Last updated** | 2026-07-28 |
+| **Version** | 0.5 |
+| **Last updated** | 2026-09-11 |
 | **Spec** | [expert-v1.md](../../outbox/specs/expert-v1.md) |
 | **Use case** | [UC-12](../requirements/use-cases/UC-12-expert-mode.md) |
 | **Research** | [2026-07-15-experts-travet.md](../../inbox/research/2026-07-15-experts-travet.md) |
 | **Machine roster (defaults)** | [experts.yaml](../../src/vai/strategies/experts.yaml) |
 | **Working roster (operator)** | [inbox/experts/roster.yaml](../../inbox/experts/) — full editable copy; reset restores defaults |
 | **Roster manage spec** | [expert-roster-manage-v1.md](../../outbox/specs/expert-roster-manage-v1.md) (**APPROVED**) |
+| **STATS spec** | [expert-stats-v1.md](../../outbox/specs/expert-stats-v1.md) (**APPROVED**) — F-049 |
 
 ---
 
@@ -176,6 +177,7 @@ source_note: …
 
 - [x] Expand roster from Travet experts research (2026-07-15)
 - [x] `GET /api/v1/experts` + Expert UI roster (free filter, has_tip for date)
+- [x] STATS overlay — count `k/N` + % per horse per leg (F-049, 2026-09-11)
 - [ ] Optional UI filter by outlet
 - [ ] Optional future ATG tips fetch (ToS review)
 - [ ] Andelssystem / reduced-row tips (if experts publish non-full matrix)
@@ -186,6 +188,7 @@ source_note: …
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5 | 2026-09-11 | STATS (F-049) — horse frequency overlay; [expert-stats-v1](../../outbox/specs/expert-stats-v1.md) |
 | 0.3 | 2026-07-15 | Roster from [experts-travet research](../../inbox/research/2026-07-15-experts-travet.md); free outlets + named spelläggare |
 | 0.2 | 2026-07-15 | Redefined as expert betslip catalog (supersedes pattern templates) |
 | 0.1 | 2026-07-06 | Initial draft (pattern templates — obsolete) |

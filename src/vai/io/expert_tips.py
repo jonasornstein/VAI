@@ -127,18 +127,19 @@ def parse_expert_tip(data: dict[str, Any], *, path: str | None = None) -> Expert
     )
 
 
-def list_expert_tips(
+def iter_expert_tips(
     tips_dir: str | Path,
     *,
     date: str | None = None,
     track: str | None = None,
     expert_id: str | None = None,
-) -> list[ExpertTipSummary]:
+) -> list[ExpertTip]:
+    """Load valid tip YAML files (full objects, including legs). Invalid files skipped."""
     root = Path(tips_dir)
     if not root.is_dir():
         return []
 
-    summaries: list[ExpertTipSummary] = []
+    tips: list[ExpertTip] = []
     for path in sorted(root.rglob("*.yaml")):
         if path.name.startswith("."):
             continue
@@ -152,24 +153,19 @@ def list_expert_tips(
             continue
         if expert_id is not None and tip.expert_id != expert_id:
             continue
-        combinations, cost_sek = compute_cost_sek(tip.legs)
-        summaries.append(
-            ExpertTipSummary(
-                tip_id=tip.tip_id,
-                expert_id=tip.expert_id,
-                expert_name=tip.expert_name,
-                date=tip.date,
-                track=tip.track,
-                combinations=combinations,
-                cost_sek=cost_sek,
-                cost_breakdown=format_cost_breakdown(tip.legs),
-                product_name=tip.product_name,
-                source_url=tip.source_url,
-                status=tip.status,
-            )
-        )
-    summaries.sort(key=lambda s: (s.date, s.track, s.expert_name, s.tip_id))
-    return summaries
+        tips.append(tip)
+    tips.sort(key=lambda t: (t.date, t.track, t.expert_name, t.tip_id))
+    return tips
+
+
+def list_expert_tips(
+    tips_dir: str | Path,
+    *,
+    date: str | None = None,
+    track: str | None = None,
+    expert_id: str | None = None,
+) -> list[ExpertTipSummary]:
+    return [tip_to_summary(t) for t in iter_expert_tips(tips_dir, date=date, track=track, expert_id=expert_id)]
 
 
 def find_expert_tip(tips_dir: str | Path, tip_id: str) -> ExpertTip:

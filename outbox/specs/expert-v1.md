@@ -134,6 +134,7 @@ python -m vai expert apply --tip TIP_ID --race-card PATH --out PATH [--overrides
 | Select tip | Loads horses into grid + slip |
 | Generera / Ladda | POST generate/expert (or load on select) |
 | Hari controls | Seed, Frys, exact budget fill hidden/disabled in Expert |
+| STATS | Toggle F-049 horse frequency (`k/N` + %); see [expert-stats-v1.md](./expert-stats-v1.md) |
 | Rationale | Expert name + product + tip_id |
 | Kvantitativ | Still disabled |
 
@@ -152,4 +153,5 @@ python -m vai expert apply --tip TIP_ID --race-card PATH --out PATH [--overrides
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.1 | 2026-09-11 | Operator UX: STATS toggle → [expert-stats-v1.md](./expert-stats-v1.md) |
 | 0.1 | 2026-07-15 | Initial expert betslip spec |

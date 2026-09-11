@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.3.1</title>
+  <title>VAI V85 — Local UI v1.3.2</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -45,6 +45,13 @@
       --atg-step-done-border: #a7d4b8;
       --atg-step-current-bg: linear-gradient(180deg, #fff 0%, #dbe4ef 100%);
       --atg-shadow: 0 2px 8px rgba(0, 79, 159, 0.08);
+      --stats-heat-1: rgba(33, 143, 11, 0.10);
+      --stats-heat-2: rgba(33, 143, 11, 0.18);
+      --stats-heat-3: rgba(33, 143, 11, 0.28);
+      --stats-heat-4: rgba(33, 143, 11, 0.40);
+      --stats-heat-5: rgba(33, 143, 11, 0.55);
+      --stats-chip-max-bg: #e8f5ee;
+      --stats-chip-max-border: #218f0b;
     }
 
     [data-theme="dark"] {
@@ -76,6 +83,13 @@
       --atg-step-done-border: #2a724e;
       --atg-step-current-bg: linear-gradient(180deg, #2a3f55 0%, #1e3448 100%);
       --atg-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+      --stats-heat-1: rgba(78, 187, 53, 0.16);
+      --stats-heat-2: rgba(78, 187, 53, 0.26);
+      --stats-heat-3: rgba(78, 187, 53, 0.38);
+      --stats-heat-4: rgba(78, 187, 53, 0.52);
+      --stats-heat-5: rgba(78, 187, 53, 0.68);
+      --stats-chip-max-bg: #1a3d22;
+      --stats-chip-max-border: #4ebb35;
     }
 
     * { box-sizing: border-box; }
@@ -343,6 +357,15 @@
       background-image: var(--v85-gradient);
       border-color: var(--v85-light);
       color: #fff;
+    }
+    .expert-roster-toolbar .button--small[aria-pressed="true"] {
+      background-image: var(--v85-gradient);
+      border-color: var(--v85-light);
+      color: #fff;
+    }
+    .expert-roster-toolbar .button--small:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
     .expert-visibility-list {
       display: flex;
@@ -909,7 +932,26 @@
       box-shadow: inset 0 0 0 1px var(--atg-horse-pool-border);
     }
     .horse.pool-selected .meta .pool,
-    .horse.pool-selected .meta .odds { color: var(--horse-meta-selected); }
+    .horse.pool-selected .meta .odds,
+    .horse.pool-selected .meta .count,
+    .horse.pool-selected .meta .pct { color: var(--horse-meta-selected); }
+    .horse .meta .count { font-weight: 800; letter-spacing: 0.01em; }
+    .horse .meta .pct { color: var(--horse-pool-pct); font-weight: 700; }
+    #legs-grid.stats-mode .horse.stats-heat-1:not(.pool-selected):not(.scratched) {
+      background-image: none; background-color: var(--stats-heat-1);
+    }
+    #legs-grid.stats-mode .horse.stats-heat-2:not(.pool-selected):not(.scratched) {
+      background-image: none; background-color: var(--stats-heat-2);
+    }
+    #legs-grid.stats-mode .horse.stats-heat-3:not(.pool-selected):not(.scratched) {
+      background-image: none; background-color: var(--stats-heat-3);
+    }
+    #legs-grid.stats-mode .horse.stats-heat-4:not(.pool-selected):not(.scratched) {
+      background-image: none; background-color: var(--stats-heat-4);
+    }
+    #legs-grid.stats-mode .horse.stats-heat-5:not(.pool-selected):not(.scratched) {
+      background-image: none; background-color: var(--stats-heat-5);
+    }
     .horse.random-selected {
       border: 2px solid #e85d04;
       box-shadow: 0 0 0 1px #e85d04;
@@ -933,6 +975,63 @@
       transform: none;
     }
     .reserves { margin-top: 6px; font-size: 10px; color: var(--atg-text); }
+    .expert-stats-strip {
+      margin: 0 0 10px;
+      padding: 0.65rem 0.75rem 0.7rem;
+      border: 1px solid var(--atg-border);
+      background: var(--atg-muted-bg);
+      border-radius: 4px;
+    }
+    .expert-stats-strip[hidden] { display: none; }
+    .expert-stats-strip__head {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--atg-text);
+      margin: 0 0 0.45rem;
+    }
+    .expert-stats-strip__empty {
+      margin: 0;
+      font-size: 12px;
+      color: var(--atg-text);
+    }
+    .expert-stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.28rem 0.4rem;
+      margin: 0.2rem 0;
+      font-size: 11px;
+    }
+    .expert-stats-leg {
+      font-weight: 800;
+      min-width: 3.1rem;
+      color: var(--v85-headline);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .expert-stats-chip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.22rem;
+      border: 1px solid var(--atg-border);
+      background: var(--atg-surface);
+      color: var(--atg-text);
+      border-radius: 3px;
+      padding: 0.12rem 0.35rem;
+      cursor: pointer;
+      font-family: Roboto, sans-serif;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    .expert-stats-chip:hover { border-color: var(--v85-light); }
+    .expert-stats-chip.is-max {
+      background: var(--stats-chip-max-bg);
+      border-color: var(--stats-chip-max-border);
+      font-weight: 800;
+    }
+    .expert-stats-chip .hn { font-weight: 900; }
+    .expert-stats-chip .frac { font-variant-numeric: tabular-nums; }
+    .expert-stats-chip .pct { color: var(--horse-pool-pct); font-weight: 700; }
     .legs-toolbar {
       display: flex;
       align-items: center;
@@ -1345,7 +1444,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.3.1 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.2 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -1385,7 +1484,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.3.1</span>
+        <span class="game-header__pill">v1.3.2</span>
       </div>
     </header>
 
@@ -1439,6 +1538,7 @@
             <span class="expert-roster-actions">
               <button type="button" class="button--small button--primary" id="expert-roster-add">Lägg till expert</button>
               <button type="button" class="button--small" id="expert-roster-visibility" title="Välj vilka experter som visas i Expert-panelen">VISA EXPERTER</button>
+              <button type="button" class="button--small" id="btn-expert-stats" title="Räkna hur ofta varje häst valts i experttipsen" aria-pressed="false">STATS</button>
             </span>
           </div>
           <div id="expert-roster-list" class="expert-roster-list" aria-label="Experter"></div>
@@ -1574,6 +1674,10 @@
         <div class="legs-toolbar">
           <button class="btn-deselect-all" id="btn-deselect-all" type="button">Rensa alla avdelningar</button>
         </div>
+        <div class="expert-stats-strip" id="expert-stats-strip" hidden>
+          <div class="expert-stats-strip__head" id="expert-stats-strip-head"></div>
+          <div id="expert-stats-strip-body"></div>
+        </div>
         <div class="legs-grid" id="legs-grid"></div>
 
         <div class="slip-preview" id="slip-preview">
@@ -1682,7 +1786,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.3.1 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.2 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -1702,6 +1806,8 @@
       var selectedTipId = null;
       var expertTipsCache = [];
       var expertsRosterCache = [];
+      var statsMode = false;
+      var expertStatsCache = null;
       var expertTipMeta = null;
       var expertBaseSelections = null;
       var randomBaseSelections = null;
@@ -1791,7 +1897,51 @@
         return s.replace(".", ",");
       }
 
+      function statsModeActive() {
+        return statsMode && activeMode === "expert";
+      }
+
+      function lookupExpertHorseStat(leg, num) {
+        if (!expertStatsCache || !expertStatsCache.legs) return null;
+        var rows = expertStatsCache.legs[String(leg)] || expertStatsCache.legs[leg] || [];
+        var target = Number(num);
+        for (var i = 0; i < rows.length; i++) {
+          if (Number(rows[i].horse) === target) return rows[i];
+        }
+        return null;
+      }
+
+      function formatStatsCount(count, n) {
+        return String(count) + "/" + String(n);
+      }
+
+      function formatStatsPct(pct) {
+        if (pct == null || isNaN(pct)) return "0%";
+        return String(Math.round(pct)) + "%";
+      }
+
+      function statsHeatClass(pct) {
+        if (pct == null || pct <= 0) return "";
+        if (pct < 20) return "stats-heat-1";
+        if (pct < 40) return "stats-heat-2";
+        if (pct < 60) return "stats-heat-3";
+        if (pct < 80) return "stats-heat-4";
+        return "stats-heat-5";
+      }
+
       function horseMetaHtml(leg, num) {
+        if (statsModeActive()) {
+          var n = expertStatsCache ? (expertStatsCache.tip_count || 0) : 0;
+          var st = lookupExpertHorseStat(leg, num);
+          var count = st ? st.count : 0;
+          var pct = st ? st.pct : 0;
+          return (
+            '<span class="meta">' +
+            '<span class="count">' + formatStatsCount(count, n) + "</span>" +
+            '<span class="pct">' + formatStatsPct(pct) + "</span>" +
+            "</span>"
+          );
+        }
         var pool = lookupLegMap(currentCard && currentCard.leg_distributions, leg, num);
         var odds = lookupLegMap(currentCard && currentCard.leg_odds, leg, num);
         return (
@@ -1803,10 +1953,176 @@
       }
 
       function horseAriaLabel(leg, num, scratched) {
+        if (statsModeActive()) {
+          var n = expertStatsCache ? (expertStatsCache.tip_count || 0) : 0;
+          var st = lookupExpertHorseStat(leg, num);
+          var count = st ? st.count : 0;
+          var pct = st ? st.pct : 0;
+          var base = "Häst " + num + ", " + count + " av " + n + " tips, " + formatStatsPct(pct);
+          return scratched ? base + ", struken" : base;
+        }
         var pool = formatPoolPct(lookupLegMap(currentCard && currentCard.leg_distributions, leg, num));
         var odds = formatOdds(lookupLegMap(currentCard && currentCard.leg_odds, leg, num));
         var base = "Häst " + num + ", V85 " + pool + ", odds " + odds;
         return scratched ? base + ", struken" : base;
+      }
+
+      function applyStatsHeat() {
+        var grid = document.getElementById("legs-grid");
+        if (!grid) return;
+        var on = statsModeActive();
+        grid.classList.toggle("stats-mode", on);
+        var heats = ["stats-heat-1", "stats-heat-2", "stats-heat-3", "stats-heat-4", "stats-heat-5"];
+        grid.querySelectorAll(".horse").forEach(function (btn) {
+          heats.forEach(function (cls) { btn.classList.remove(cls); });
+          if (!on) return;
+          var st = lookupExpertHorseStat(btn.getAttribute("data-leg"), btn.getAttribute("data-horse"));
+          var heat = statsHeatClass(st ? st.pct : 0);
+          if (heat) btn.classList.add(heat);
+        });
+      }
+
+      function refreshHorseButtonsMeta() {
+        document.querySelectorAll("#legs-grid .horse").forEach(function (btn) {
+          var leg = Number(btn.getAttribute("data-leg"));
+          var num = Number(btn.getAttribute("data-horse"));
+          var scratched = btn.classList.contains("scratched");
+          var metaEl = btn.querySelector(".meta");
+          var tmp = document.createElement("div");
+          tmp.innerHTML = horseMetaHtml(leg, num);
+          if (metaEl && tmp.firstChild) metaEl.replaceWith(tmp.firstChild);
+          btn.setAttribute("aria-label", horseAriaLabel(leg, num, scratched));
+          if (statsModeActive()) {
+            var n = expertStatsCache ? (expertStatsCache.tip_count || 0) : 0;
+            var st = lookupExpertHorseStat(leg, num);
+            var names = st && st.expert_names ? st.expert_names.join(", ") : "";
+            var count = st ? st.count : 0;
+            var pct = st ? st.pct : 0;
+            var title = "Häst " + num + " · " + count + " av " + n + " tips (" + formatStatsPct(pct) + ")";
+            if (names) title += " — " + names;
+            if (scratched) title += " · struken";
+            btn.setAttribute("title", title);
+          } else if (scratched) {
+            btn.setAttribute("title", "Struken");
+          } else {
+            btn.removeAttribute("title");
+          }
+        });
+        applyStatsHeat();
+      }
+
+      function updateStatsButtonState() {
+        var btn = document.getElementById("btn-expert-stats");
+        if (!btn) return;
+        var ready = expertsRosterCache.filter(function (e) { return e.has_tip; }).length;
+        btn.disabled = ready === 0;
+        btn.title = ready === 0
+          ? "Inga tips att räkna"
+          : "Räkna hur ofta varje häst valts i experttipsen";
+      }
+
+      function renderExpertStatsStrip(stats) {
+        var wrap = document.getElementById("expert-stats-strip");
+        var head = document.getElementById("expert-stats-strip-head");
+        var body = document.getElementById("expert-stats-strip-body");
+        if (!wrap || !head || !body) return;
+        if (!statsModeActive()) {
+          wrap.hidden = true;
+          return;
+        }
+        wrap.hidden = false;
+        var n = stats ? (stats.tip_count || 0) : 0;
+        var m = stats ? (stats.expert_count || 0) : 0;
+        var date = stats && stats.date ? stats.date : "";
+        var track = stats && stats.track ? stats.track : "";
+        head.textContent = n + " tips · " + m + " experter" + (track ? " · " + track : "") + (date ? " " + date : "");
+        if (!stats || n === 0) {
+          body.innerHTML = '<p class="expert-stats-strip__empty">Inga tips att räkna — öppna VISA EXPERTER eller ange tips för omgången.</p>';
+          return;
+        }
+        var html = "";
+        for (var leg = 1; leg <= 8; leg++) {
+          var rows = (stats.legs && (stats.legs[String(leg)] || stats.legs[leg])) || [];
+          var maxCount = 0;
+          rows.forEach(function (row) {
+            if (row.count > maxCount) maxCount = row.count;
+          });
+          html += '<div class="expert-stats-row"><span class="expert-stats-leg">Avd ' + leg + "</span>";
+          rows.forEach(function (row) {
+            var isMax = row.count === maxCount && maxCount > 0;
+            html +=
+              '<button type="button" class="expert-stats-chip' + (isMax ? " is-max" : "") +
+              '" data-leg="' + leg + '" data-horse="' + row.horse +
+              '" title="Fokusera häst ' + row.horse + ' på avdelning ' + leg + '">' +
+              '<span class="hn">' + row.horse + "</span>" +
+              '<span class="frac">' + formatStatsCount(row.count, n) + "</span>" +
+              '<span class="pct">' + formatStatsPct(row.pct) + "</span>" +
+              "</button>";
+          });
+          html += "</div>";
+        }
+        body.innerHTML = html;
+        body.querySelectorAll(".expert-stats-chip").forEach(function (chip) {
+          chip.addEventListener("click", function () {
+            var horseBtn = document.querySelector(
+              '.horse[data-leg="' + chip.getAttribute("data-leg") +
+              '"][data-horse="' + chip.getAttribute("data-horse") + '"]'
+            );
+            if (horseBtn) {
+              horseBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+              horseBtn.focus();
+            }
+          });
+        });
+      }
+
+      function loadExpertStats() {
+        if (!statsModeActive()) {
+          renderExpertStatsStrip(null);
+          refreshHorseButtonsMeta();
+          return;
+        }
+        var qs = expertDateTrackQuery();
+        qs.push("visible_only=1");
+        var freeOnly = document.getElementById("expert-free-only");
+        if (freeOnly && freeOnly.checked) qs.push("free_only=1");
+        var hasDate = qs.some(function (p) { return p.indexOf("date=") === 0; });
+        var hasTrack = qs.some(function (p) { return p.indexOf("track=") === 0; });
+        if (!hasDate || !hasTrack) {
+          expertStatsCache = null;
+          renderExpertStatsStrip(null);
+          refreshHorseButtonsMeta();
+          return;
+        }
+        var url = API + "/api/v1/expert-stats?" + qs.join("&");
+        fetch(url)
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            expertStatsCache = res.ok ? res.j : null;
+            renderExpertStatsStrip(expertStatsCache);
+            refreshHorseButtonsMeta();
+          })
+          .catch(function (e) {
+            console.error(e);
+            expertStatsCache = null;
+            renderExpertStatsStrip(null);
+            refreshHorseButtonsMeta();
+          });
+      }
+
+      function toggleExpertStats() {
+        if (activeMode !== "expert") return;
+        var btn = document.getElementById("btn-expert-stats");
+        if (btn && btn.disabled && !statsMode) return;
+        statsMode = !statsMode;
+        if (btn) btn.setAttribute("aria-pressed", statsMode ? "true" : "false");
+        if (statsMode) {
+          loadExpertStats();
+        } else {
+          expertStatsCache = null;
+          renderExpertStatsStrip(null);
+          refreshHorseButtonsMeta();
+        }
       }
 
       function clearHorseSelection(btn) {
@@ -2369,6 +2685,7 @@
         for (var legNum = 1; legNum <= 8; legNum++) {
           updateLegFreezeUi(legNum);
         }
+        refreshHorseButtonsMeta();
       }
 
       function hasSlip() {
@@ -2385,7 +2702,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.3.1";
+        document.title = title + " — Local UI v1.3.2";
         var logo = document.getElementById("app-logo");
         if (logo) {
           logo.setAttribute("title", title + " — Användarguide (öppnas i ny flik)");
@@ -2457,6 +2774,11 @@
         if (isExpert) {
           loadExpertsRoster();
           loadExpertTips();
+          if (statsMode) loadExpertStats();
+        } else {
+          var strip = document.getElementById("expert-stats-strip");
+          if (strip) strip.hidden = true;
+          refreshHorseButtonsMeta();
         }
         // Restore this mode's independent grid + slip (skip when caller applies payload itself).
         if (switching && !opts.skipRestore) {
@@ -2509,6 +2831,7 @@
               expertsRosterCache = [];
               expertsRosterTotalCount = 0;
               renderExpertsRoster([]);
+              updateStatsButtonState();
               return;
             }
             expertsRosterCache = res.j.experts || [];
@@ -2517,12 +2840,15 @@
                 ? res.j.counts.total
                 : expertsRosterCache.length;
             renderExpertsRoster(expertsRosterCache);
+            updateStatsButtonState();
+            if (statsMode && activeMode === "expert") loadExpertStats();
           })
           .catch(function (e) {
             console.error(e);
             expertsRosterCache = [];
             expertsRosterTotalCount = 0;
             renderExpertsRoster([]);
+            updateStatsButtonState();
           });
       }
 
@@ -3025,6 +3351,7 @@
             }
             expertTipsCache = res.j.tips || [];
             renderExpertTipsList(expertTipsCache);
+            if (statsMode && activeMode === "expert") loadExpertStats();
           })
           .catch(function (e) {
             console.error(e);
@@ -4701,6 +5028,12 @@
           if (activeMode === "expert") loadExpertsRoster();
         });
       }
+      var expertStatsBtn = document.getElementById("btn-expert-stats");
+      if (expertStatsBtn) {
+        expertStatsBtn.addEventListener("click", function () {
+          toggleExpertStats();
+        });
+      }
       var expertRosterAdd = document.getElementById("expert-roster-add");
       if (expertRosterAdd) {
         expertRosterAdd.addEventListener("click", openExpertRosterForm);
@@ -4831,6 +5164,18 @@
         .catch(function () {
           setApiStatus(false, "offline — kör python -m vai serve");
         });
+
+      window.__vaiApplyExpertStats = function (stats) {
+        expertStatsCache = stats || null;
+        statsMode = true;
+        var btn = document.getElementById("btn-expert-stats");
+        if (btn) {
+          btn.disabled = false;
+          btn.setAttribute("aria-pressed", "true");
+        }
+        renderExpertStatsStrip(expertStatsCache);
+        refreshHorseButtonsMeta();
+      };
     })();
   </script>
 </body>

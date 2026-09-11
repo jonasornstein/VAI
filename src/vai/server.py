@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert API (v1.3.1)."""
+"""Local HTTP server — mockup + random/expert API (v1.3.2)."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from urllib.parse import parse_qs, urlparse
 from vai.activity_log import ActivityLogger
 from vai.atg_fetch import AtgFetchError
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
+from vai.expert_stats import expert_horse_stats_for_round
 from vai.hit_summary import compute_hit_summary
 from vai.io.betslip import (
     BetslipValidationError,
@@ -154,6 +155,9 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/v1/expert-tips":
             self._handle_list_expert_tips(parsed.query)
+            return
+        if path == "/api/v1/expert-stats":
+            self._handle_expert_stats(parsed.query)
             return
         if path.startswith("/api/v1/expert-tips/"):
             tip_id = path.removeprefix("/api/v1/expert-tips/").strip("/")
@@ -623,6 +627,36 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             ]
         }
         self._send_json(HTTPStatus.OK, payload)
+
+    def _handle_expert_stats(self, query: str) -> None:
+        params = parse_qs(query)
+        date = (params.get("date") or [None])[0]
+        track = (params.get("track") or [None])[0]
+        if not date or not track:
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {
+                    "error": {
+                        "code": "MISSING_FIELD",
+                        "message": "date and track required",
+                    }
+                },
+            )
+            return
+        visible_raw = (params.get("visible_only") or params.get("visible") or ["1"])[0]
+        visible_only = str(visible_raw).lower() not in ("0", "false", "no")
+        free_raw = (params.get("free_only") or params.get("free") or ["0"])[0]
+        free_only = str(free_raw).lower() in ("1", "true", "yes")
+        stats = expert_horse_stats_for_round(
+            self.expert_tips_dir,
+            date=date,
+            track=track,
+            repo_root=self.repo_root,
+            visible_only=visible_only,
+            free_only=free_only,
+            exclude_fixture=True,
+        )
+        self._send_json(HTTPStatus.OK, stats.to_dict())
 
     def _handle_get_expert_tip(self, tip_id: str, query: str) -> None:
         """Full tip with legs. tip_id may be literal id, or use query expert_id+date+track via tip_id='lookup'."""
@@ -1256,6 +1290,7 @@ def serve(
         raise SystemExit(1) from exc
     print(f"VAI local UI: http://{host}:{port}/")
     print(f"  Experts API: http://{host}:{port}/api/v1/experts")
+    print(f"  Expert stats: http://{host}:{port}/api/v1/expert-stats")
     print(f"  Activity stats: http://{host}:{port}/vai-stats.html")
     if log_path is None:
         print("  Activity log: disabled")

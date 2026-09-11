@@ -2,15 +2,15 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 1.0 |
+| **Version** | 1.2 |
 | **Status** | APPROVED |
 | **Reviewer** | ornstein (operator) |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-07-15 |
+| **Last updated** | 2026-09-11 |
 | **Owner** | ornstein (M-004) |
 | **Use cases** | UC-09, UC-10, UC-11–13, UC-14 |
 | **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` (v1.3) |
-| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [expert-v1](../../outbox/specs/expert-v1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
+| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [expert-v1](../../outbox/specs/expert-v1.md), [expert-stats-v1](../../outbox/specs/expert-stats-v1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md) |
 
 End-to-end operator flow for race-day proposal generation.
 
@@ -68,6 +68,7 @@ flowchart TD
 3. Select a tip → `POST /api/v1/generate/expert` loads horses + tip cost.
 4. Optional manual horse edits after load.
 5. No SYSTEMKOSTNAD fill; cost is the tip’s ATG combination cost.
+6. Optional **STATS** (F-049) — toggle shows per-horse `k/N` and `%` across tips for the round; does not change the slip.
 
 Outputs (both modes): betting slip, cost (F-061), breakdown, optional hit bars (F-052 when ATG distributions exist).
 
@@ -82,6 +83,7 @@ Outputs (both modes): betting slip, cost (F-061), breakdown, optional hit bars (
 | SPELFORM | Game dropdown | V85 only (V75 discontinued at ATG) |
 | Läge | Hari / Expert / Kvantitativ | **Hari**; Expert enabled; Kvant disabled |
 | Experttips | UC-12 tip list | From inbox when Expert active |
+| STATS | F-049 horse frequency | Expert toggle; `k/N` + % |
 | Avdelningar | Leg grid; horse toggles | From race card / tip |
 | SYSTEMKOSTNAD | Operator budget SEK (Hari) | **500** |
 | Systemkostnad (computed) | Tip cost or exact Hari match | After generate/load |
@@ -94,6 +96,7 @@ Outputs (both modes): betting slip, cost (F-061), breakdown, optional hit bars (
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.2 | 2026-09-11 | Expert STATS (F-049) count + % overlay |
 | 1.1 | 2026-07-15 | Expert tab + tip list/select (UC-12 betslips) |
 | 1.0 | 2026-07-07 | APPROVED — v1.1 operator flow; matches shipped mockup and local UI |
 | 0.3 | 2026-07-07 | v1.1: ATG schedule/cards, Hari, exact budget, nearest stake, F-052 |

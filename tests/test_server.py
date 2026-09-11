@@ -4,6 +4,7 @@ from http.server import ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import patch
 from urllib.error import HTTPError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 from vai.activity_log import ActivityLogger
@@ -363,6 +364,38 @@ def test_api_experts_roster() -> None:
         fixture_listed = [e for e in with_day["experts"] if e["expert_id"] == "fixture"]
         assert len(fixture_listed) == 1
         assert fixture_listed[0]["has_tip"] is True
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_api_expert_stats_bollnas() -> None:
+    server, base = _start_test_server()
+    try:
+        missing_status, missing = _get_status(f"{base}/api/v1/expert-stats")
+        assert missing_status == 400
+        assert missing["error"]["code"] == "MISSING_FIELD"
+
+        data = _get(f"{base}/api/v1/expert-stats?date=2026-07-25&track={quote('Bollnäs')}")
+        assert data["tip_count"] == 5
+        assert data["expert_count"] == 5
+        assert data["date"] == "2026-07-25"
+        leg2 = {row["horse"]: row for row in data["legs"]["2"]}
+        assert leg2[2]["count"] == 5
+        assert leg2[2]["pct"] == 100.0
+        leg1 = {row["horse"]: row for row in data["legs"]["1"]}
+        assert leg1[3]["count"] == 5
+        assert 99 not in leg1
+
+        empty = _get(f"{base}/api/v1/expert-stats?date=2099-01-01&track=Nowhere")
+        assert empty["tip_count"] == 0
+        assert empty["legs"]["1"] == []
+
+        # Does not collide with GET /api/v1/expert-tips/{id}
+        tips = _get(f"{base}/api/v1/expert-tips?date=2026-07-18&track=Axevalla")
+        tip_id = tips["tips"][0]["tip_id"]
+        detail = _get(f"{base}/api/v1/expert-tips/{tip_id}")
+        assert detail["tip"]["tip_id"] == tip_id
     finally:
         server.shutdown()
         server.server_close()

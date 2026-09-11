@@ -182,6 +182,7 @@ def classify_request(method: str, path: str) -> tuple[str, str, str | None]:
         ("GET", "/api/v1/schedule/v85"): ("get_schedule_v85", "access", "_handle_get_schedule_v85"),
         ("GET", "/api/v1/race-cards"): ("list_race_cards", "access", "do_GET"),
         ("GET", "/api/v1/expert-tips"): ("list_expert_tips", "access", "_handle_list_expert_tips"),
+        ("GET", "/api/v1/expert-stats"): ("expert_stats", "access", "_handle_expert_stats"),
         ("POST", "/api/v1/expert-tips"): ("save_expert_tip", "change", "_handle_save_expert_tip"),
         ("PUT", "/api/v1/expert-tips"): ("save_expert_tip", "change", "_handle_save_expert_tip"),
         ("DELETE", "/api/v1/expert-tips"): ("delete_expert_tip", "change", "_handle_delete_expert_tip"),

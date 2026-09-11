@@ -3,14 +3,15 @@
 | Field | Value |
 |-------|-------|
 | **ID** | UC-12 |
-| **Status** | APPROVED (roster manage extension) |
-| **Version** | 1.5 |
-| **Reviewer** | Nisse (roster/fidelity), ornstein (operator UX) |
-| **Last updated** | 2026-07-29 |
+| **Status** | APPROVED (STATS extension) |
+| **Version** | 1.6 |
+| **Reviewer** | Nisse (roster/fidelity), ornstein (operator UX), Povl (F-049 math) |
+| **Last updated** | 2026-09-11 |
 | **Primary actor** | Operator |
-| **Implements** | F-040–F-048 (betslip catalog + roster manage) |
+| **Implements** | F-040–F-049 (betslip catalog + roster manage + horse stats) |
 | **Spec** | [expert-v1.md](../../../outbox/specs/expert-v1.md) |
 | **Roster manage** | [expert-roster-manage-v1.md](../../../outbox/specs/expert-roster-manage-v1.md) (**APPROVED**) |
+| **STATS** | [expert-stats-v1.md](../../../outbox/specs/expert-stats-v1.md) (**APPROVED**) |
 | **Supersedes** | v1.0 pattern-template narrative (spik/halvleg/öppen generator) |
 
 ## Brief description
@@ -18,6 +19,8 @@
 Operator **chooses among professional experts’ published system suggestions** (complete betslips / spelsystem) for the race day. VAI loads the selected tip into the proposal slip for review and manual ATG entry.
 
 This is **curated tip selection**, not algorithmic pattern generation.
+
+Optional **STATS** (F-049) counts how often each horse appears in transcribed tips for the round (numeric `k/N` and percentage) without changing the slip.
 
 ## Preconditions
 
@@ -51,17 +54,32 @@ This is **curated tip selection**, not algorithmic pattern generation.
 3. **VISA EXPERTER** popup lists all experts (roster order); uncheck sets `visible: false` (**F-046** / PUT) — expert leaves the main panel; row stays; tip YAML under `inbox/expert-tips/` is kept. No hard delete from working YAML. **Markera alla** / **Avmarkera alla** bulk-set visibility; **↑/↓** reorders display order (YAML array order).
 4. **Reset** (**F-047**) overwrites working roster with shipped defaults via API (full restore; customs removed; defaults visible) — not a toolbar button in current UX.
 
+## Alternate: view STATS (F-049)
+
+1. Operator opens Expert tab for a race day (date + track set).
+2. Operator presses **STATS** (toggle).
+3. **F-049** `compute_expert_horse_stats` counts, per leg, how many tips in the shown roster include each horse. Population `N` = those tips (visible roster; **Visa bara gratis** when checked; each tip one vote; fixture excluded).
+4. Horse buttons show `k/N` and `%` (replacing pool % / odds); consensus strip lists horses with `k ≥ 1` sorted by count. Unpicked horses show `0/N` `0%` on the grid.
+5. Press **STATS** again to restore pool % / odds. Selections and slip are unchanged.
+
+| Step | Condition | Action |
+|------|-----------|--------|
+| 3a | No tips in population | Empty stats (`tip_count` 0); STATS disabled or strip `Inga tips att räkna` |
+| 3b | Invalid tip YAML | Skip file (same as F-040) |
+
 ## Functions invoked
 
-F-040–F-048, F-060, F-061 (optional F-052 basic when distributions present)
+F-040–F-049, F-060, F-061 (optional F-052 basic when distributions present)
 
 ## Special requirements
 
 - [expert.md](../../strategies/expert.md) — roster, tip format, attribution
 - [expert-v1.md](../../../outbox/specs/expert-v1.md) — implementation (tips)
 - [expert-roster-manage-v1.md](../../../outbox/specs/expert-roster-manage-v1.md) — roster add / soft-hide / order (**APPROVED**)
+- [expert-stats-v1.md](../../../outbox/specs/expert-stats-v1.md) — horse frequency overlay (**APPROVED**)
 - Tips are for **private operator use**; always attribute source; no automated republication
 - Operator pools (F-026) are **not** required for Expert load
+- STATS does not auto-fill the slip from consensus
 
 ## Non-goals (v1.1)
 
@@ -69,6 +87,7 @@ F-040–F-048, F-060, F-061 (optional F-052 basic when distributions present)
 - Live scrape of ATG/media tips
 - Quantitative optimization of tips
 - Automated bet placement
+- Auto-build a majority system from STATS (v1.6)
 
 ---
 
@@ -76,6 +95,7 @@ F-040–F-048, F-060, F-061 (optional F-052 basic when distributions present)
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.6 | 2026-09-11 | STATS (F-049): per-leg horse counts and percentages across tips |
 | 1.5 | 2026-07-29 | Count `N synliga av M`; select/deselect all; ↑/↓ display order |
 | 1.4 | 2026-07-29 | Main panel = visible only; VISA EXPERTER popup for tick-boxes |
 | 1.3 | 2026-07-29 | Soft-hide: F-046 sets `visible=false` (row retained); Visa tick-box |

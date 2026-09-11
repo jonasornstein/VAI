@@ -6,6 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from vai.expert_stats import expert_horse_stats_for_round
 from vai.io.expert_tips import default_tips_dir, list_expert_tips
 from vai.io.pools import empty_operator_pools, load_operator_pools
 from vai.io.proposal import format_expert_proposal_markdown, format_proposal_markdown
@@ -63,6 +64,28 @@ def main(argv: list[str] | None = None) -> int:
         help="Tips directory when --tip is a tip_id",
     )
 
+    expert_stats = expert_sub.add_parser(
+        "stats", help="Count horse selections per leg across tips (F-049)"
+    )
+    expert_stats.add_argument("--date", required=True, help="ISO date")
+    expert_stats.add_argument("--track", required=True, help="Track name")
+    expert_stats.add_argument(
+        "--tips-dir",
+        type=Path,
+        default=None,
+        help="Tips directory (default: inbox/expert-tips)",
+    )
+    expert_stats.add_argument(
+        "--free-only",
+        action="store_true",
+        help="Count only tips from free experts",
+    )
+    expert_stats.add_argument(
+        "--all-visible",
+        action="store_true",
+        help="Include hidden roster experts (default: visible only)",
+    )
+
     serve_parser = subparsers.add_parser("serve", help="Run local UI server (mockup + API)")
     serve_parser.add_argument("--host", default="127.0.0.1", help="Bind host")
     serve_parser.add_argument(
@@ -103,6 +126,8 @@ def main(argv: list[str] | None = None) -> int:
             return _run_expert_list(args)
         if args.expert_command == "apply":
             return _run_expert_apply(args)
+        if args.expert_command == "stats":
+            return _run_expert_stats(args)
     if args.command == "serve":
         return _run_serve(args)
 
@@ -182,6 +207,36 @@ def _run_expert_list(args: argparse.Namespace) -> int:
             f"{tip.tip_id}\t{tip.expert_name}{product}\t"
             f"{tip.date} {tip.track}\t{tip.cost_sek:.2f} SEK\t{tip.combinations} rader"
         )
+    return 0
+
+
+def _run_expert_stats(args: argparse.Namespace) -> int:
+    from vai.server import find_repo_root
+
+    tips_dir = args.tips_dir or default_tips_dir()
+    stats = expert_horse_stats_for_round(
+        tips_dir,
+        date=args.date,
+        track=args.track,
+        repo_root=find_repo_root(),
+        visible_only=not args.all_visible,
+        free_only=args.free_only,
+    )
+    print(
+        f"{stats.date} {stats.track} · {stats.tip_count} tips · "
+        f"{stats.expert_count} experter"
+    )
+    if stats.tip_count == 0:
+        print("Inga tips att räkna.")
+        return 0
+    n = stats.tip_count
+    for leg in range(1, 9):
+        parts = []
+        for row in stats.legs[leg]:
+            pct = f"{row.pct:g}"
+            parts.append(f"{row.horse} {row.count}/{n} {pct}%")
+        line = "  ".join(parts) if parts else "—"
+        print(f"Avd {leg}:  {line}")
     return 0
 
 

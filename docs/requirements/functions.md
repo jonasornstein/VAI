@@ -2,13 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 1.4 |
+| **Version** | 1.5 |
 | **Status** | APPROVED |
 | **Reviewer** | Povl (math), ornstein (operator) |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-08-08 |
+| **Last updated** | 2026-09-11 |
 | **Owner** | ornstein (M-004) |
-| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md), [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
+| **Specs** | [random-v1.1](../../outbox/specs/random-v1.1.md), [local-ui-v1.1](../../outbox/specs/local-ui-v1.1.md), [atg-data-source](../../outbox/specs/atg-data-source.md), [activity-logging-v1](../../outbox/specs/activity-logging-v1.md), [expert-stats-v1](../../outbox/specs/expert-stats-v1.md) |
 
 Concrete system functions referenced by use-case steps (`F-*`). Implementation: `src/vai/` per [src/README.md](../../src/README.md).
 
@@ -89,6 +89,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | F-046 | `delete_expert` | Soft-hide expert (`visible=false`); row retained; tips kept | expert_id | Updated entry | UC-12 |
 | F-047 | `reset_experts_roster` | Overwrite working roster with shipped defaults | repo root | Default entries | UC-12 |
 | F-048 | `update_expert` | Edit metadata on working roster | expert_id, fields | Updated entry | UC-12 |
+| F-049 | `compute_expert_horse_stats` | Count/percentage of tips that include each horse per leg | date, track, visible/free roster filters | `k/N` + `pct` per horse per leg | UC-12 |
 
 ---
 
@@ -170,6 +171,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | **Agent / manual (AIRUP)** | F-002–003, F-010–014, F-072–073, F-080–081 | Skills and operator workflow; not automated in `src/` |
 | **Shipped (v1.3 — Expert betslips)** | F-040–043 | Tip catalog YAML; list/select/load; no scraper |
 | **Shipped (v1.3.x — Expert roster manage)** | F-044–048 | Add/update/delete/reset working roster (`inbox/experts/roster.yaml`) |
+| **Shipped (Expert STATS)** | F-049 | Per-leg horse frequency across tips; [expert-stats-v1](../../outbox/specs/expert-stats-v1.md) |
 | **Shipped (activity logging v1)** | F-110–F-111 | JSONL activity log on `serve`; [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
 | **Deferred** | F-008, F-050–051, F-053–054 | Scrape fallback; full quant model |
 | **Could (v1.2+)** | Reduced-stake cost variants (UC-14 §3a), F-054, F-090 (PDF) | α ∈ {0.30, 0.50, 0.70} |
@@ -188,6 +190,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 | `strategies/expert.py` | F-041–043 (load/select/override) |
 | `io/expert_tips.py` | F-040 list/load tip YAML |
 | `io/experts_roster.py` | F-044–048 effective roster load/add/update/delete/reset |
+| `expert_stats.py` | F-049 horse selection frequency (count + %) |
 | `cost.py` | F-060–062 |
 | `hit_summary.py` | F-052 (basic) |
 | `activity_log.py` | F-110, F-111 |
@@ -199,6 +202,7 @@ Concrete system functions referenced by use-case steps (`F-*`). Implementation: 
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.5 | 2026-09-11 | F-049 expert horse stats (count + %) — [expert-stats-v1](../../outbox/specs/expert-stats-v1.md) |
 | 1.4 | 2026-07-31 | F-110–F-111 activity logging (JSONL; trusted XFF) — [activity-logging-v1](../../outbox/specs/activity-logging-v1.md) |
 | 1.3 | 2026-07-28 | F-044–048 expert roster manage (working copy + reset) |
 | 1.2 | 2026-07-15 | F-040–043 Expert betslips (list/select/load); not pattern templates |

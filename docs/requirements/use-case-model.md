@@ -2,11 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.4 |
+| **Version** | 0.6 |
 | **Status** | APPROVED |
 | **Reviewer** | ornstein |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-07-07 |
+| **Last updated** | 2026-09-11 |
 | **Owner** | ornstein (M-004) |
 | **Supersedes** | SRS §3 (functional requirements) |
 
@@ -163,7 +163,7 @@ Full specifications: [functions.md](./functions.md). Race card schema: [race-car
 | AIRUP workflow | F-010 – F-014 | UC-02, UC-20, UC-21 |
 | Proposal core | F-020 – F-026 | UC-10 |
 | Random mode | F-030 – F-032 | UC-11 |
-| Expert mode | F-040 – F-043 | UC-12 |
+| Expert mode | F-040 – F-049 | UC-12 |
 | Quantitative mode | F-050 – F-054 | UC-13 |
 | Cost | F-060 – F-062 | UC-14 |
 | Review | F-070 – F-073 | UC-20 |
@@ -175,7 +175,7 @@ Full specifications: [functions.md](./functions.md). Race card schema: [race-car
 | Priority | Functions |
 |----------|-----------|
 | Must | F-001–005, F-020–024, F-030–032, F-060–062, F-070–073, F-080 |
-| Should | F-040–043, F-050–053, F-090, F-071 |
+| Should | F-040–049, F-050–053, F-090, F-071 |
 | Could | F-054, F-092 |
 
 ---
@@ -184,6 +184,7 @@ Full specifications: [functions.md](./functions.md). Race card schema: [race-car
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.6 | 2026-09-11 | UC-12 STATS F-049 (expert horse frequency) |
 | 0.5 | 2026-07-08 | UC-15 race info in leg headers |
 | 0.4 | 2026-07-07 | All use cases APPROVED v1.0; v1.1 Hari flow reflected |
 | 0.3 | 2026-07-06 | UC-09 ATG auto-fetch; operator horse pools; SYSTEMKOSTNAD 500 SEK |
