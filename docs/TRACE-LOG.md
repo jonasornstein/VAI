@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-09-12 | P | Assistant | **Commit + push v1.3.3** — `a11d301` + tag `v1.3.3` on `origin/master`; TRAVBANOR F-094; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.3` |
 | 2026-09-12 | U | Assistant | **v1.3.3 TRAVBANOR** — mode-row button opens `/travbanor.html` (33 Swedish tracks: name→homepage, Ort, Invigd, Ägare/Drivs av, Google Maps) | [travbanor.html](../../travbanor.html); mockup; [server.py](../../src/vai/server.py) |
 | 2026-09-11 | P | ornstein | **End of session (O&O)** — Expert STATS v1.3.2 (F-049) + button next to Rensa alla; session closed | See [§ End of session — 2026-09-11 (Expert STATS)](#end-of-session--2026-09-11-expert-stats) |
 | 2026-09-11 | P | Assistant | **Commit + push STATS placement** — `89089cd` on `origin/master`; STATS right of Rensa alla; **prod deploy blocked** (sudo). Run: `sudo bash /home/ornstein/grok/vai/deploy/update-server.sh` | https://vai.ornstein.work/ |
