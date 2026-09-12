@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-09-12 | P | ornstein | **End of session (O&O)** — TRAVBANOR v1.3.3 (F-094); session closed | See [§ End of session — 2026-09-12 (TRAVBANOR)](#end-of-session--2026-09-12-travbanor) |
 | 2026-09-12 | P | Assistant | **Commit + push v1.3.3** — `a11d301` + tag `v1.3.3` on `origin/master`; TRAVBANOR F-094; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.3` |
 | 2026-09-12 | U | Assistant | **v1.3.3 TRAVBANOR** — mode-row button opens `/travbanor.html` (33 Swedish tracks: name→homepage, Ort, Invigd, Ägare/Drivs av, Google Maps) | [travbanor.html](../../travbanor.html); mockup; [server.py](../../src/vai/server.py) |
 | 2026-09-11 | P | ornstein | **End of session (O&O)** — Expert STATS v1.3.2 (F-049) + button next to Rensa alla; session closed | See [§ End of session — 2026-09-11 (Expert STATS)](#end-of-session--2026-09-11-expert-stats) |
@@ -276,6 +277,35 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-09-12 (TRAVBANOR)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `096ca44` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **v1.3.2** still live until sudo deploy. Run: `sudo bash /opt/vai/deploy/update-server.sh`
+
+### Delivered
+
+| Item | Detail |
+|------|--------|
+| TRAVBANOR (F-094) | Mode-row button (right of Hari/Expert/Kvantitativ) opens `/travbanor.html` in a new window |
+| Page | Standalone [travbanor.html](../../travbanor.html): 33 licensed Swedish tracks |
+| Columns | Travbana (homepage link), Ort, Invigd, Ägare/Drivs av, Karta (Google Maps) |
+| Package | **v1.3.3** (`pyproject.toml`, `__version__`, UI pill, tag `v1.3.3`) |
+
+### Commits (origin/master)
+
+| SHA | Summary |
+|-----|---------|
+| `a11d301` | release: v1.3.3 TRAVBANOR tracks page (F-094) · tag `v1.3.3` |
+| `096ca44` | docs: TRACE-LOG v1.3.3 push; deploy blocked |
+
+### Approval
+
+- **O&O (ornstein):** session closed 2026-09-12. Prod deploy still needs sudo.
 
 ---
 
