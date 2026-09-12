@@ -128,6 +128,15 @@ def test_classify_serve_guide() -> None:
         assert (op_h, etype_h, fn_h) == (op, etype, fn)
 
 
+def test_classify_serve_travbanor() -> None:
+    op, etype, fn = classify_request("GET", "/travbanor.html")
+    assert op == "serve_travbanor"
+    assert etype == "access"
+    assert fn == "_serve_file"
+    op_h, etype_h, fn_h = classify_request("HEAD", "/travbanor.html")
+    assert (op_h, etype_h, fn_h) == (op, etype, fn)
+
+
 def test_classify_expert_stats() -> None:
     op, etype, fn = classify_request("GET", "/api/v1/expert-stats")
     assert op == "expert_stats"

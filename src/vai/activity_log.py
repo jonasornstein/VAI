@@ -177,6 +177,8 @@ def classify_request(method: str, path: str) -> tuple[str, str, str | None]:
         ("HEAD", "/guide.html"): ("serve_guide", "access", "_serve_file"),
         ("GET", "/vai-guide.html"): ("serve_guide", "access", "_serve_file"),
         ("HEAD", "/vai-guide.html"): ("serve_guide", "access", "_serve_file"),
+        ("GET", "/travbanor.html"): ("serve_travbanor", "access", "_serve_file"),
+        ("HEAD", "/travbanor.html"): ("serve_travbanor", "access", "_serve_file"),
         ("GET", "/activity.jsonl"): ("serve_activity_log", "access", "_serve_activity_jsonl"),
         ("HEAD", "/activity.jsonl"): ("serve_activity_log", "access", "_serve_activity_jsonl"),
         ("GET", "/api/v1/schedule/v85"): ("get_schedule_v85", "access", "_handle_get_schedule_v85"),

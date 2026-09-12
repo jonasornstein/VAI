@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.3.2</title>
+  <title>VAI V85 — Local UI v1.3.3</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -263,6 +263,11 @@
       margin-right: 4px;
       margin-bottom: -1px;
       min-width: 120px;
+    }
+    .mode-tabs #btn-travbanor {
+      margin-left: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
     .mode-tabs .button.button--toggle.active {
       background-image: var(--v85-gradient);
@@ -1445,7 +1450,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.3.2 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.3 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -1485,7 +1490,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.3.2</span>
+        <span class="game-header__pill">v1.3.3</span>
       </div>
     </header>
 
@@ -1518,6 +1523,7 @@
       <button class="button button--toggle active" type="button" role="tab" aria-selected="true" data-mode="random">Hari</button>
       <button class="button button--toggle" type="button" role="tab" aria-selected="false" data-mode="expert">Expert</button>
       <button class="button button--toggle" type="button" role="tab" aria-selected="false" aria-disabled="true" disabled title="Kommer senare">Kvantitativ</button>
+      <button class="button button--blue" type="button" id="btn-travbanor" title="Svenska travbanor (öppnas i nytt fönster)">TRAVBANOR</button>
     </div>
 
     <div class="content">
@@ -1787,7 +1793,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.3.2 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.3 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -2703,7 +2709,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.3.2";
+        document.title = title + " — Local UI v1.3.3";
         var logo = document.getElementById("app-logo");
         if (logo) {
           logo.setAttribute("title", title + " — Användarguide (öppnas i ny flik)");
@@ -4651,6 +4657,10 @@
         window.open(atgGameUrl(selectedGameType()), "_blank", "noopener,noreferrer");
       }
 
+      function openTravbanor() {
+        window.open("/travbanor.html", "travbanor", "noopener,noreferrer,width=1200,height=800");
+      }
+
       function formatHitPct(value) {
         return (value * 100).toFixed(2).replace(".", ",") + " %";
       }
@@ -5015,6 +5025,7 @@
         });
       }
       document.getElementById("btn-open-atg").addEventListener("click", openAtg);
+      document.getElementById("btn-travbanor").addEventListener("click", openTravbanor);
       document.getElementById("spelform").addEventListener("change", function () {
         updateAppTitle();
         updateSlipActions();

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svenska travbanor</title>
+  <!--
+    Standalone reference page — not part of Hari/Expert generation.
+    Served at GET /travbanor.html (https://vai.ornstein.work/travbanor.html).
+    Opened from the TRAVBANOR button in a new window.
+  -->
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1a2332;
+      --muted: #5a6a7e;
+      --border: #d0d8e4;
+      --v85: #006db6;
+      --v85-dark: #004f9f;
+      --accent: #ee7202;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --radius: 10px;
+      --shadow: 0 2px 10px rgba(0, 55, 108, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+      font-size: 16px;
+    }
+
+    .top {
+      background: linear-gradient(180deg, var(--v85) 0%, var(--v85-dark) 100%);
+      color: #fff;
+      padding: 20px 24px 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    }
+    .top-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      flex-shrink: 0;
+    }
+    .logo svg { display: block; width: 100%; height: 100%; }
+    .top h1 {
+      margin: 0;
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-shadow: 1px 1px rgba(0, 0, 0, 0.2);
+    }
+    .top p {
+      margin: 4px 0 0;
+      opacity: 0.92;
+      font-size: 0.95rem;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 20px 32px;
+    }
+
+    .intro {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      margin-bottom: 18px;
+      color: var(--muted);
+    }
+    .intro p { margin: 0; }
+    .intro strong { color: var(--text); }
+
+    .table-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+    }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 9px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #eef5fb;
+      color: var(--v85-dark);
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f7fbff; }
+    td.year { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+    a {
+      color: var(--v85);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    a:hover { text-decoration: underline; color: var(--accent); }
+    .map-link { font-weight: 600; }
+
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    footer p { margin: 0 0 8px; }
+    footer a { color: var(--v85); font-weight: 600; }
+
+    @media (max-width: 720px) {
+      th, td { padding: 8px 8px; font-size: 0.88rem; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .top { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .table-wrap { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <div class="logo" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+          <defs>
+            <linearGradient id="logo-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#006db6"/><stop offset="100%" stop-color="#004f9f"/>
+            </linearGradient>
+            <linearGradient id="logo-mane" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#f39332"/><stop offset="100%" stop-color="#ee7202"/>
+            </linearGradient>
+          </defs>
+          <rect width="64" height="64" rx="10" fill="url(#logo-bg)"/>
+          <ellipse cx="32" cy="52" rx="22" ry="4" fill="rgba(0,0,0,0.15)"/>
+          <path d="M14 38h28l4 8H10z" fill="#fff" opacity="0.95"/>
+          <circle cx="18" cy="46" r="3.5" fill="#dce0e7" stroke="#00366c" stroke-width="1"/>
+          <circle cx="46" cy="46" r="3.5" fill="#dce0e7" stroke="#00366c" stroke-width="1"/>
+          <path d="M22 36c2-8 8-14 16-14 6 0 10 4 11 10l-3 2c-1-4-4-6-8-6-5 0-9 4-10 9l-6-1z" fill="#fff"/>
+          <path d="M38 18c4 0 8 3 9 8-2 1-4 1-6 0-1-3-2-5-3-6-1-1 0-2 0-2z" fill="#fff"/>
+          <path d="M44 24c2 2 2 5 0 7" fill="none" stroke="url(#logo-mane)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M26 36v6M30 36v7" stroke="#00366c" stroke-width="2" stroke-linecap="round"/>
+          <rect x="8" y="8" width="30" height="14" rx="3" fill="#22ac07"/>
+          <text x="23" y="18" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="8" font-weight="900" fill="#fff">VAI</text>
+          <path d="M52 12l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z" fill="#79bae5"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Svenska travbanor</h1>
+        <p>33 licensierade banor · namn länkar till hemsidan · karta öppnar Google Maps</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="intro">
+      <p>
+        Fristående uppslag över Sveriges travbanor enligt
+        <strong>Svensk Travsport</strong>. Sidan ingår inte i Hari/Expert och
+        genererar inga system.
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Travbana</th>
+            <th>Ort</th>
+            <th>Invigd</th>
+            <th>Ägare/Drivs av</th>
+            <th>Karta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="https://www.arvikatravet.com/" target="_blank" rel="noopener noreferrer">Arvika</a></td>
+            <td>Arvika</td>
+            <td class="year">1954</td>
+            <td>Arvika Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Arvika+travbana" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.axevalla.se/" target="_blank" rel="noopener noreferrer">Axevalla</a></td>
+            <td>Skara</td>
+            <td class="year">1956</td>
+            <td>Västergötlands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Axevalla+travbana+Skara" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.bergsaker.com/" target="_blank" rel="noopener noreferrer">Bergsåker</a></td>
+            <td>Sundsvall</td>
+            <td class="year">1932</td>
+            <td>Sundsvalls Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Bergs%C3%A5ker+travbana+Sundsvall" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.bodentravet.com/" target="_blank" rel="noopener noreferrer">Boden</a></td>
+            <td>Boden</td>
+            <td class="year">1943</td>
+            <td>Norrbottens Travsällskap (Norrtrav)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Bodentravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.bollnastravet.com/" target="_blank" rel="noopener noreferrer">Bollnäs</a></td>
+            <td>Bollnäs</td>
+            <td class="year">1955</td>
+            <td>Bollnäs Travsällskap (Trav Gävleborg)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Bolln%C3%A4stravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.arenadannero.se/" target="_blank" rel="noopener noreferrer">Dannero</a></td>
+            <td>Kramfors</td>
+            <td class="year">1957</td>
+            <td>Ångermanlands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Arena+Dannero+Kramfors" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.sundbyholm.com/" target="_blank" rel="noopener noreferrer">Eskilstuna</a></td>
+            <td>Eskilstuna</td>
+            <td class="year">1955</td>
+            <td>Eskilstuna Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Sundbyholms+travbana+Eskilstuna" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.farjestadstravet.se/" target="_blank" rel="noopener noreferrer">Färjestad</a></td>
+            <td>Karlstad</td>
+            <td class="year">1936</td>
+            <td>Värmlands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=F%C3%A4rjestadstravet+Karlstad" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.gavletravet.se/" target="_blank" rel="noopener noreferrer">Gävle</a></td>
+            <td>Gävle</td>
+            <td class="year">1938</td>
+            <td>Gävle Travsällskap (Trav Gävleborg)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=G%C3%A4vletravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.hagmyren.se/" target="_blank" rel="noopener noreferrer">Hagmyren</a></td>
+            <td>Hudiksvall</td>
+            <td class="year">1956</td>
+            <td>Hälsinglands Travsällskap (Trav Gävleborg)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Hagmyren+travbana+Hudiksvall" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.halmstadtravet.com/" target="_blank" rel="noopener noreferrer">Halmstad</a></td>
+            <td>Halmstad</td>
+            <td class="year">1957</td>
+            <td>Hallands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Halmstadtravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.hotingtravet.com/" target="_blank" rel="noopener noreferrer">Hoting</a></td>
+            <td>Hoting</td>
+            <td class="year">1967</td>
+            <td>Hotings Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Hotingtravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.jagersro.se/" target="_blank" rel="noopener noreferrer">Jägersro</a></td>
+            <td>Malmö</td>
+            <td class="year">1907</td>
+            <td>Skånska Travsällskapet</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=J%C3%A4gersro+travbana+Malm%C3%B6" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.kalmartravet.nu/" target="_blank" rel="noopener noreferrer">Kalmar</a></td>
+            <td>Kalmar</td>
+            <td class="year">1965</td>
+            <td>Kalmar Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Kalmartravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.karlshamnstravet.se/" target="_blank" rel="noopener noreferrer">Karlshamn</a></td>
+            <td>Karlshamn</td>
+            <td class="year">1993</td>
+            <td>Blekinge Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Karlshamnstravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.lindetrav.se/" target="_blank" rel="noopener noreferrer">Lindesberg</a></td>
+            <td>Lindesberg</td>
+            <td class="year">1951</td>
+            <td>Lindes Travklubb</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Fornaboda+travbana+Lindesberg" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.lyckseletravet.com/" target="_blank" rel="noopener noreferrer">Lycksele</a></td>
+            <td>Lycksele</td>
+            <td class="year">1955</td>
+            <td>Lycksele Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Lyckseletravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.mantorphastsportarena.se/" target="_blank" rel="noopener noreferrer">Mantorp</a></td>
+            <td>Mantorp</td>
+            <td class="year">1965</td>
+            <td>Östergötlands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Mantorptravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.ovalla.se/" target="_blank" rel="noopener noreferrer">Oviken</a></td>
+            <td>Oviken</td>
+            <td class="year">1971</td>
+            <td>Ovikens Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Ovalla+Oviken+travbana" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.dalatravet.se/romme" target="_blank" rel="noopener noreferrer">Romme</a></td>
+            <td>Borlänge</td>
+            <td class="year">1955</td>
+            <td>Dalarnas Travsällskap (Dalatravet)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Romme+travbana+Borl%C3%A4nge" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.dalatravet.se/rattvik" target="_blank" rel="noopener noreferrer">Rättvik</a></td>
+            <td>Rättvik</td>
+            <td class="year">1955</td>
+            <td>Rättviks Travsällskap (Dalatravet)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=R%C3%A4ttviks+travbana" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.skellefteatravet.se/" target="_blank" rel="noopener noreferrer">Skellefteå</a></td>
+            <td>Skellefteå</td>
+            <td class="year">1952</td>
+            <td>Skellefteå Travsällskap (Norrtrav)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Skellefte%C3%A5travet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.solvalla.se/" target="_blank" rel="noopener noreferrer">Solvalla</a></td>
+            <td>Stockholm</td>
+            <td class="year">1927</td>
+            <td>Stockholms Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Solvalla+travbana+Stockholm" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.solangettrav.se/" target="_blank" rel="noopener noreferrer">Solänget</a></td>
+            <td>Örnsköldsvik</td>
+            <td class="year">1952</td>
+            <td>Örnsköldsviks Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Sol%C3%A4nget+travbana+%C3%96rnsk%C3%B6ldsvik" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.tingsrydtravet.com/" target="_blank" rel="noopener noreferrer">Tingsryd</a></td>
+            <td>Tingsryd</td>
+            <td class="year">2003</td>
+            <td>Tingsryds Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Tingsrydtravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.umaker.se/" target="_blank" rel="noopener noreferrer">Umåker</a></td>
+            <td>Umeå</td>
+            <td class="year">1944</td>
+            <td>Umeå Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Um%C3%A5kers+travbana+Ume%C3%A5" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.vaggerydstravet.se/" target="_blank" rel="noopener noreferrer">Vaggeryd</a></td>
+            <td>Vaggeryd</td>
+            <td class="year">1995</td>
+            <td>Jönköping-Vaggeryds Travsällskap (anläggning: Vaggeryds kommun)</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Vaggerydstravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.visbytravet.se/" target="_blank" rel="noopener noreferrer">Visby</a></td>
+            <td>Visby</td>
+            <td class="year">1948</td>
+            <td>Gotlands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Visbytravet+Skrubbs" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.abytravet.se/" target="_blank" rel="noopener noreferrer">Åby</a></td>
+            <td>Mölndal</td>
+            <td class="year">1936</td>
+            <td>Åby Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%C3%85bytravet+M%C3%B6lndal" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.amalstravet.se/" target="_blank" rel="noopener noreferrer">Åmål</a></td>
+            <td>Åmål</td>
+            <td class="year">1953</td>
+            <td>Dalslands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%C3%85m%C3%A5lstravet+M%C3%B6rtebol" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.arjangstravet.se/" target="_blank" rel="noopener noreferrer">Årjäng</a></td>
+            <td>Årjäng</td>
+            <td class="year">1936</td>
+            <td>Nordmarkens Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%C3%85rj%C3%A4ngstravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.orebrotravet.se/" target="_blank" rel="noopener noreferrer">Örebro</a></td>
+            <td>Örebro</td>
+            <td class="year">1954</td>
+            <td>Örebro Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%C3%96rebrotravet+Marieberg" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+          <tr>
+            <td><a href="https://www.ostersundstravet.com/" target="_blank" rel="noopener noreferrer">Östersund</a></td>
+            <td>Östersund</td>
+            <td class="year">1936</td>
+            <td>Jämtlands Travsällskap</td>
+            <td><a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%C3%96stersundstravet" target="_blank" rel="noopener noreferrer">Öppna karta</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <p>
+      Källor: <a href="https://www.travsport.se/svensk-travsport/travsporten-i-sverige/travbanorna/" target="_blank" rel="noopener noreferrer">Svensk Travsport — Travbanorna</a>
+      (33 banor);
+      Wikipedia <em>Travsport i Sverige</em> (invigd år);
+      respektive banas hemsida (ägare/drift).
+    </p>
+    <p>VAI Trotting Betting Systems · fristående referenssida · inte del av Hari/Expert.</p>
+  </footer>
+</body>
+</html>

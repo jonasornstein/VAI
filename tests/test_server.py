@@ -128,6 +128,46 @@ def test_vai_stats_html_served_from_repo() -> None:
         VaiRequestHandler.activity_logger = None
 
 
+def test_travbanor_html_served_from_repo() -> None:
+    """Standalone tracks page; TRAVBANOR opens /travbanor.html in a new window."""
+    root = find_repo_root()
+    page_path = root / "travbanor.html"
+    assert page_path.is_file(), "travbanor.html must exist at repo root"
+    page_text = page_path.read_text(encoding="utf-8")
+    assert "Svenska travbanor" in page_text
+    assert ">Travbana<" in page_text
+    assert ">Ort<" in page_text
+    assert ">Invigd<" in page_text
+    assert "Ägare/Drivs av" in page_text
+    assert ">Karta<" in page_text
+    assert "https://www.solvalla.se/" in page_text
+    assert "https://www.jagersro.se/" in page_text
+    assert "https://www.abytravet.se/" in page_text
+    assert "google.com/maps/search" in page_text
+    assert page_text.count("<tr>") == 34  # header + 33 tracks
+
+    mockup = (root / "outbox" / "mockups" / "v85-proposal-ux-mockup-atg.html").read_text(
+        encoding="utf-8"
+    )
+    assert "TRAVBANOR" in mockup
+    assert 'id="btn-travbanor"' in mockup
+    assert 'window.open("/travbanor.html"' in mockup
+
+    server, base = _start_test_server()
+    try:
+        with urlopen(f"{base}/travbanor.html") as response:
+            assert response.status == 200
+            body = response.read().decode("utf-8")
+            assert "Svenska travbanor" in body
+            assert "Solvalla" in body
+            assert "text/html" in (response.headers.get("Content-Type") or "")
+            assert "no-cache" in (response.headers.get("Cache-Control") or "")
+    finally:
+        server.shutdown()
+        server.server_close()
+        VaiRequestHandler.activity_logger = None
+
+
 def test_guide_html_served_from_repo() -> None:
     """Operator user guide is part of the app; logo opens /guide.html in a new tab."""
     root = find_repo_root()

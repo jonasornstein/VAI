@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert API (v1.3.2)."""
+"""Local HTTP server — mockup + random/expert API (v1.3.3)."""
 
 from __future__ import annotations
 
@@ -136,6 +136,14 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path in ("/guide.html", "/vai-guide.html"):
             self._serve_file(
                 self.repo_root / "vai-guide.html",
+                content_type="text/html; charset=utf-8",
+                cache_control="no-cache",
+            )
+            return
+        # Standalone Swedish tracks reference — opened from TRAVBANOR in a new window.
+        if path == "/travbanor.html":
+            self._serve_file(
+                self.repo_root / "travbanor.html",
                 content_type="text/html; charset=utf-8",
                 cache_control="no-cache",
             )
@@ -1292,6 +1300,7 @@ def serve(
     print(f"  Experts API: http://{host}:{port}/api/v1/experts")
     print(f"  Expert stats: http://{host}:{port}/api/v1/expert-stats")
     print(f"  Activity stats: http://{host}:{port}/vai-stats.html")
+    print(f"  Travbanor: http://{host}:{port}/travbanor.html")
     if log_path is None:
         print("  Activity log: disabled")
     else:
