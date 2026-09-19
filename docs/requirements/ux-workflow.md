@@ -2,11 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 1.2 |
+| **Version** | 1.3 |
 | **Status** | APPROVED |
 | **Reviewer** | ornstein (operator) |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-09-11 |
+| **Last updated** | 2026-09-19 |
 | **Owner** | ornstein (M-004) |
 | **Use cases** | UC-09, UC-10, UC-11–13, UC-14 |
 | **Mockup** | `outbox/mockups/v85-proposal-ux-mockup-atg.html` (v1.3) |
@@ -48,7 +48,7 @@ flowchart TD
 2. UX shows all 8 legs with race info header (UC-15: name, distance, start method, class) and eligible start numbers (scratches disabled).
 3. Operator **may mark** horses to lock before generate (F-026). Empty leg = slumpen väljer.
 4. **Frys avd.** fixes leg to marked horses only.
-5. **Läge:** **Hari** (default) or **Expert**; Kvantitativ disabled (*Kommer senare*).
+5. **Läge:** **Hari** (default), **Expert**, or **FUNDAMENTAL** (inspect tables, no generate); Kvantitativ disabled (*Kommer senare*).
 
 ---
 
@@ -81,7 +81,7 @@ Outputs (both modes): betting slip, cost (F-061), breakdown, optional hit bars (
 | DATUM | ISO date | ATG `default_date` |
 | BANA | Track / game_id | From schedule |
 | SPELFORM | Game dropdown | V85 only (V75 discontinued at ATG) |
-| Läge | Hari / Expert / Kvantitativ | **Hari**; Expert enabled; Kvant disabled |
+| Läge | Hari / Expert / Fundamental / Kvantitativ | **Hari**; Expert enabled; Fundamental inspect tables; Kvant disabled |
 | Experttips | UC-12 tip list | From inbox when Expert active |
 | STATS | F-049 horse frequency | Expert toggle; `k/N` + % |
 | Avdelningar | Leg grid; horse toggles | From race card / tip |
@@ -96,6 +96,7 @@ Outputs (both modes): betting slip, cost (F-061), breakdown, optional hit bars (
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.3 | 2026-09-19 | FUNDAMENTAL inspect mode (sortable AVD tables) |
 | 1.2 | 2026-09-11 | Expert STATS (F-049) count + % overlay |
 | 1.1 | 2026-07-15 | Expert tab + tip list/select (UC-12 betslips) |
 | 1.0 | 2026-07-07 | APPROVED — v1.1 operator flow; matches shipped mockup and local UI |

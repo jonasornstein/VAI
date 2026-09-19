@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-09-12 |
+| **Last updated** | 2026-09-19 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-09-19 | P | ornstein | **fundamental-v1 APPROVED** — FUNDAMENTAL läge on live UI; sortable AVD tables; refresh odds/V85 %/strykningar | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), [REVIEW_fundamental-v1.md](../../outbox/reviews/REVIEW_fundamental-v1.md) |
+| 2026-09-19 | R | Assistant | **Fundamental mode** — inspect läge FUNDAMENTAL (AVD1–8 sortable tables: last-5, kusk, estimated km); refresh odds/V85 %/strykningar; `GET /api/v1/start-info/{id}` | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), mockup, [start_info.py](../../src/vai/start_info.py) |
 | 2026-09-12 | P | ornstein | **End of session (O&O)** — TRAVBANOR v1.3.3 (F-094); session closed | See [§ End of session — 2026-09-12 (TRAVBANOR)](#end-of-session--2026-09-12-travbanor) |
 | 2026-09-12 | P | Assistant | **Commit + push v1.3.3** — `a11d301` + tag `v1.3.3` on `origin/master`; TRAVBANOR F-094; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.3` |
 | 2026-09-12 | U | Assistant | **v1.3.3 TRAVBANOR** — mode-row button opens `/travbanor.html` (33 Swedish tracks: name→homepage, Ort, Invigd, Ägare/Drivs av, Google Maps) | [travbanor.html](../../travbanor.html); mockup; [server.py](../../src/vai/server.py) |

@@ -9,6 +9,7 @@ from urllib.request import Request, urlopen
 
 ATG_PRODUCTS_V85_URL = "https://www.atg.se/services/racinginfo/v1/api/products/V85"
 ATG_GAME_URL_TEMPLATE = "https://www.atg.se/services/racinginfo/v1/api/games/{game_id}"
+ATG_HORSE_RESULTS_URL = "https://www.atg.se/services/racinginfo/v1/api/horses/{horse_id}/results"
 USER_AGENT = "ATG-Proposal-Toolkit/1.1.4 (read-only; local operator UI)"
 
 
@@ -39,3 +40,7 @@ def fetch_v85_products() -> dict[str, Any]:
 
 def fetch_v85_game(game_id: str) -> dict[str, Any]:
     return fetch_json(ATG_GAME_URL_TEMPLATE.format(game_id=game_id))
+
+
+def fetch_horse_results(horse_id: int) -> dict[str, Any]:
+    return fetch_json(ATG_HORSE_RESULTS_URL.format(horse_id=horse_id))

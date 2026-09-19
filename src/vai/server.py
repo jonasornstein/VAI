@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert API (v1.3.3)."""
+"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.4)."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import mimetypes
 import re
 import sys
 from dataclasses import asdict
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -53,6 +54,7 @@ from vai.io.race_card_json import list_race_card_ids, load_race_card_by_id, race
 from vai.models.expert_tip import ExpertError, ExpertResult
 from vai.models.proposal import RandomError, RandomResult
 from vai.schedule import fetch_atg_schedule, schedule_to_dict
+from vai.start_info import fetch_start_info, starts_from_yaml_card
 from vai.strategies.expert import generate_expert_v1
 from vai.strategies.random import generate_random_v1
 
@@ -160,6 +162,10 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path.startswith("/api/v1/race-cards/"):
             card_id = path.removeprefix("/api/v1/race-cards/").strip("/")
             self._handle_get_race_card(card_id)
+            return
+        if path.startswith("/api/v1/start-info/"):
+            card_id = path.removeprefix("/api/v1/start-info/").strip("/")
+            self._handle_get_start_info(card_id, parsed.query)
             return
         if path == "/api/v1/expert-tips":
             self._handle_list_expert_tips(parsed.query)
@@ -327,6 +333,64 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         payload = race_card_to_dict(card)
         payload["id"] = card_id
         self._send_json(HTTPStatus.OK, payload)
+
+    def _handle_get_start_info(self, card_id: str, query: str) -> None:
+        params = parse_qs(query)
+        include_form = (params.get("include_form") or ["1"])[0] not in ("0", "false", "no")
+        if is_atg_game_id(card_id):
+            if not ATG_GAME_ID_PATTERN.match(card_id):
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_ID", "message": card_id}})
+                return
+            try:
+                payload = fetch_start_info(card_id, include_form=include_form)
+            except AtgFetchError as exc:
+                self._send_json(
+                    HTTPStatus.BAD_GATEWAY,
+                    {"error": {"code": "ATG_UNAVAILABLE", "message": str(exc)}},
+                )
+                return
+            except ValueError as exc:
+                self._send_json(
+                    HTTPStatus.BAD_GATEWAY,
+                    {"error": {"code": "ATG_PARSE_ERROR", "message": str(exc)}},
+                )
+                return
+            self._send_json(HTTPStatus.OK, payload)
+            return
+
+        if not CARD_ID_PATTERN.match(card_id):
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_ID", "message": card_id}})
+            return
+        try:
+            card = load_race_card_by_id(self.race_cards_dir, card_id)
+        except FileNotFoundError:
+            self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": card_id}})
+            return
+        self._send_json(
+            HTTPStatus.OK,
+            {
+                "id": card_id,
+                "game": card.game,
+                "date": card.date,
+                "track": card.track,
+                "source": card.source,
+                "fetched_at": datetime.now(timezone.utc).isoformat(),
+                "km_note": "ESTIMATE — YAML cards have no kusk/form/km",
+                "include_form": False,
+                "starts_by_leg": {
+                    str(leg): rows for leg, rows in starts_from_yaml_card(card).items()
+                },
+                "legs": [
+                    {
+                        "leg": leg.leg,
+                        "race_label": leg.race_label,
+                        "start_time": leg.start_time,
+                        "race_info": None,
+                    }
+                    for leg in card.legs
+                ],
+            },
+        )
 
     def _load_race_card_bundle(self, card_id: str) -> tuple:
         if is_atg_game_id(card_id):

@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.3.3</title>
+  <title>VAI V85 — Local UI v1.3.4</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -253,6 +253,7 @@
 
     .mode-tabs {
       display: flex;
+      flex-wrap: wrap;
       gap: 0;
       padding: 12px 20px 0;
       background: var(--atg-muted-bg);
@@ -881,6 +882,81 @@
       margin-top: 2px;
     }
     .horses { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .fundamental-panel { margin-bottom: 12px; }
+    .fundamental-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .avd-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+    .avd-tabs .avd-tab {
+      min-width: 52px;
+      padding: 6px 8px;
+      font-weight: 800;
+      font-size: 12px;
+      border: 1px solid var(--atg-border);
+      background: var(--atg-surface);
+      color: var(--atg-text);
+      cursor: pointer;
+    }
+    .avd-tabs .avd-tab[aria-selected="true"] {
+      background-image: var(--v85-gradient);
+      color: #fff;
+      border-color: var(--v85-light);
+    }
+    .fundamental-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .fundamental-status { font-size: 12px; color: var(--atg-text); opacity: 0.85; }
+    .fundamental-race {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .fundamental-table-wrap { overflow-x: auto; border: 1px solid var(--atg-border); }
+    .fundamental-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .fundamental-table th,
+    .fundamental-table td {
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--atg-border);
+      white-space: nowrap;
+    }
+    .fundamental-table th {
+      cursor: pointer;
+      user-select: none;
+      background: var(--atg-muted-bg);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .fundamental-table th[aria-sort="ascending"]::after { content: " ▲"; }
+    .fundamental-table th[aria-sort="descending"]::after { content: " ▼"; }
+    .fundamental-table tbody tr.scratched td {
+      color: #c41e3a;
+      opacity: 0.75;
+    }
+    .fundamental-table tbody tr.scratched td.col-name { text-decoration: line-through; }
+    .fundamental-table .col-last5 { font-family: ui-monospace, monospace; font-weight: 700; }
+    body.mode-fundamental #legs-grid,
+    body.mode-fundamental .legs-toolbar,
+    body.mode-fundamental #expert-stats-strip,
+    body.mode-fundamental #slip-preview,
+    body.mode-fundamental .slip-actions,
+    body.mode-fundamental .sidebar .summary-card,
+    body.mode-fundamental #btn-generate,
+    body.mode-fundamental #expert-generate-hint { display: none; }
     /* Option A: stacked number + V85 pool% + win odds */
     .horse {
       min-width: 42px;
@@ -1417,6 +1493,7 @@
       body.print-slip-only .section-hint,
       body.print-slip-only .selection-legend,
       body.print-slip-only .legs-toolbar,
+      body.print-slip-only .fundamental-panel,
       body.print-slip-only .legs-grid,
       body.print-slip-only .slip-actions,
       body.print-slip-only .sidebar,
@@ -1450,7 +1527,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.3.3 Local UI · Hari + Expert · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.4 Local UI · Hari + Expert + Fundamental · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -1490,7 +1567,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.3.3</span>
+        <span class="game-header__pill">v1.3.4</span>
       </div>
     </header>
 
@@ -1522,6 +1599,7 @@
     <div class="mode-tabs" role="tablist" aria-label="Läge">
       <button class="button button--toggle active" type="button" role="tab" aria-selected="true" data-mode="random">Hari</button>
       <button class="button button--toggle" type="button" role="tab" aria-selected="false" data-mode="expert">Expert</button>
+      <button class="button button--toggle" type="button" role="tab" aria-selected="false" data-mode="fundamental">FUNDAMENTAL</button>
       <button class="button button--toggle" type="button" role="tab" aria-selected="false" aria-disabled="true" disabled title="Kommer senare">Kvantitativ</button>
       <button class="button button--blue" type="button" id="btn-travbanor" title="Svenska travbanor (öppnas i nytt fönster)">TRAVBANOR</button>
     </div>
@@ -1685,6 +1763,39 @@
           <div class="expert-stats-strip__head" id="expert-stats-strip-head"></div>
           <div id="expert-stats-strip-body"></div>
         </div>
+        <div class="fundamental-panel" id="fundamental-panel" hidden>
+          <div class="fundamental-toolbar">
+            <div class="avd-tabs" id="fundamental-avd-tabs" role="tablist" aria-label="Avdelning"></div>
+            <div class="fundamental-actions">
+              <span class="fundamental-status" id="fundamental-status" aria-live="polite"></span>
+              <button type="button" class="button button--small" id="btn-fundamental-refresh" title="Uppdatera odds, V85 % och strykningar">Uppdatera</button>
+            </div>
+          </div>
+          <div class="fundamental-race" id="fundamental-race"></div>
+          <div class="fundamental-table-wrap">
+            <table class="fundamental-table" id="fundamental-table">
+              <thead>
+                <tr>
+                  <th data-sort="number">Nr</th>
+                  <th data-sort="postPosition">Spår</th>
+                  <th data-sort="name">Häst</th>
+                  <th data-sort="kusk">Kusk</th>
+                  <th data-sort="last5">Last 5</th>
+                  <th data-sort="odds">Odds</th>
+                  <th data-sort="v85_pct">V85 %</th>
+                  <th data-sort="km_horse">Häst km</th>
+                  <th data-sort="km_kusk">Kusk km</th>
+                  <th data-sort="scratched">Anm</th>
+                </tr>
+              </thead>
+              <tbody id="fundamental-tbody"></tbody>
+            </table>
+          </div>
+          <p class="stake-hint" id="fundamental-legend">
+            Last 5: nyast först. <strong>d</strong> = diskad, <strong>o</strong> = osk!
+            Km är uppskattad körsträcka hemma→bana (ej ST avståndstabell).
+          </p>
+        </div>
         <div class="legs-grid" id="legs-grid"></div>
 
         <div class="slip-preview" id="slip-preview">
@@ -1793,7 +1904,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.3.3 Local UI · Hari + Expert · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.4 Local UI · Hari + Expert + Fundamental · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -1810,6 +1921,9 @@
       var frozenLegs = {};
       var slipReady = false;
       var activeMode = "random";
+      var fundamentalAvd = 1;
+      var fundamentalSort = { key: "number", dir: "asc" };
+      var fundamentalPayload = null;
       var selectedTipId = null;
       var expertTipsCache = [];
       var expertsRosterCache = [];
@@ -2709,7 +2823,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.3.3";
+        document.title = title + " — Local UI v1.3.4";
         var logo = document.getElementById("app-logo");
         if (logo) {
           logo.setAttribute("title", title + " — Användarguide (öppnas i ny flik)");
@@ -2725,19 +2839,202 @@
         if (banaSel && banaSel.selectedOptions.length) {
           track = banaSel.selectedOptions[0].textContent.trim();
         }
-        var modeLabel = activeMode === "expert" ? "Expert" : "Hari";
+        var modeLabel = activeMode === "expert" ? "Expert" : activeMode === "fundamental" ? "Fundamental" : "Hari";
         return { date: date, track: track, game: selectedGameType(), mode: modeLabel };
+      }
+
+      function fundamentalEscape(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function fundamentalDash(value) {
+        return value == null || value === "" ? "—" : value;
+      }
+
+      function formatFundamentalPct(frac) {
+        if (frac == null || isNaN(frac)) return "—";
+        return (frac * 100).toFixed(1).replace(".", ",") + "%";
+      }
+
+      function formatFundamentalKm(km) {
+        if (km == null || km === "") return "—";
+        if (Number(km) === 0) return "0";
+        return "~" + String(km);
+      }
+
+      function setFundamentalStatus(text) {
+        var el = document.getElementById("fundamental-status");
+        if (el) el.textContent = text || "";
+      }
+
+      function ensureFundamentalAvdTabs() {
+        var wrap = document.getElementById("fundamental-avd-tabs");
+        if (!wrap || wrap.children.length) return;
+        for (var i = 1; i <= 8; i++) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "avd-tab";
+          btn.setAttribute("role", "tab");
+          btn.setAttribute("data-avd", String(i));
+          btn.textContent = "AVD" + i;
+          btn.addEventListener("click", function () {
+            fundamentalAvd = Number(this.getAttribute("data-avd"));
+            renderFundamentalTable();
+          });
+          wrap.appendChild(btn);
+        }
+      }
+
+      function loadFundamentalStartInfo(opts) {
+        opts = opts || {};
+        if (activeMode !== "fundamental") return;
+        var id = document.getElementById("bana") && document.getElementById("bana").value;
+        if (!id) return;
+        var includeForm = opts.includeForm !== false;
+        var refreshBtn = document.getElementById("btn-fundamental-refresh");
+        if (refreshBtn) refreshBtn.disabled = true;
+        setFundamentalStatus(includeForm ? "Hämtar form…" : "Uppdaterar odds…");
+        var url = API + "/api/v1/start-info/" + encodeURIComponent(id) +
+          "?include_form=" + (includeForm ? "1" : "0");
+        fetch(url)
+          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            if (refreshBtn) refreshBtn.disabled = false;
+            if (!res.ok) {
+              var msg = (res.j && res.j.error && res.j.error.message) || "Kunde inte hämta startinfo";
+              setFundamentalStatus(msg);
+              return;
+            }
+            fundamentalPayload = res.j;
+            var src = (res.j.source || "").toLowerCase();
+            if (refreshBtn) {
+              refreshBtn.disabled = src !== "atg";
+              refreshBtn.title = src === "atg"
+                ? "Uppdatera odds, V85 % och strykningar"
+                : "YAML-kort har inga live-odds";
+            }
+            renderFundamentalTable();
+          })
+          .catch(function (err) {
+            if (refreshBtn) refreshBtn.disabled = false;
+            setFundamentalStatus("ATG otillgänglig");
+            console.error(err);
+          });
+      }
+
+      function sortFundamentalRows(rows) {
+        var key = fundamentalSort.key;
+        var dir = fundamentalSort.dir === "desc" ? -1 : 1;
+        var numeric = {
+          number: 1, postPosition: 1, odds: 1, v85_pct: 1, km_horse: 1, km_kusk: 1, scratched: 1
+        };
+        return rows.slice().sort(function (a, b) {
+          var av = a[key];
+          var bv = b[key];
+          var aNull = av == null || av === "";
+          var bNull = bv == null || bv === "";
+          if (aNull && bNull) return (a.number || 0) - (b.number || 0);
+          if (aNull) return 1;
+          if (bNull) return -1;
+          var cmp;
+          if (key === "scratched") {
+            cmp = (av ? 1 : 0) - (bv ? 1 : 0);
+          } else if (numeric[key]) {
+            cmp = Number(av) - Number(bv);
+          } else {
+            cmp = String(av).localeCompare(String(bv), "sv");
+          }
+          if (cmp === 0) cmp = (a.number || 0) - (b.number || 0);
+          return cmp * dir;
+        });
+      }
+
+      function renderFundamentalTable() {
+        ensureFundamentalAvdTabs();
+        var tabs = document.querySelectorAll("#fundamental-avd-tabs .avd-tab");
+        tabs.forEach(function (btn) {
+          var on = Number(btn.getAttribute("data-avd")) === fundamentalAvd;
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        document.querySelectorAll("#fundamental-table th[data-sort]").forEach(function (th) {
+          var key = th.getAttribute("data-sort");
+          if (key === fundamentalSort.key) {
+            th.setAttribute("aria-sort", fundamentalSort.dir === "desc" ? "descending" : "ascending");
+          } else {
+            th.removeAttribute("aria-sort");
+          }
+        });
+        var raceEl = document.getElementById("fundamental-race");
+        var tbody = document.getElementById("fundamental-tbody");
+        if (!tbody) return;
+        var payload = fundamentalPayload;
+        if (!payload) {
+          tbody.innerHTML = "";
+          if (raceEl) raceEl.textContent = "";
+          return;
+        }
+        var legMeta = null;
+        (payload.legs || []).forEach(function (leg) {
+          if (leg && leg.leg === fundamentalAvd) legMeta = leg;
+        });
+        var info = legMeta && legMeta.race_info ? legMeta.race_info : {};
+        var parts = [];
+        if (legMeta && legMeta.race_label) parts.push(legMeta.race_label);
+        else parts.push("V85-" + fundamentalAvd);
+        if (legMeta && legMeta.start_time) parts.push(legMeta.start_time);
+        if (info.distance_m) parts.push(info.distance_m + " m");
+        if (info.start_method) {
+          parts.push(info.start_method === "volt" ? "Volt" : info.start_method === "auto" ? "Autostart" : info.start_method);
+        }
+        if (info.race_name) parts.push(info.race_name);
+        if (raceEl) raceEl.textContent = parts.join(" · ");
+        var rows = (payload.starts_by_leg && payload.starts_by_leg[String(fundamentalAvd)]) || [];
+        var sorted = sortFundamentalRows(rows);
+        tbody.innerHTML = sorted.map(function (row) {
+          var cls = row.scratched ? "scratched" : "";
+          var anm = row.scratched ? "STRUKEN" : "";
+          return (
+            "<tr class=\"" + cls + "\">" +
+            "<td>" + fundamentalEscape(row.number) + "</td>" +
+            "<td>" + fundamentalEscape(row.postPosition) + "</td>" +
+            "<td class=\"col-name\">" + fundamentalEscape(fundamentalDash(row.name)) + "</td>" +
+            "<td>" + fundamentalEscape(fundamentalDash(row.kusk)) + "</td>" +
+            "<td class=\"col-last5\">" + fundamentalEscape(fundamentalDash(row.last5)) + "</td>" +
+            "<td>" + fundamentalEscape(row.odds == null ? "—" : formatOdds(row.odds)) + "</td>" +
+            "<td>" + fundamentalEscape(formatFundamentalPct(row.v85_pct)) + "</td>" +
+            "<td>" + fundamentalEscape(formatFundamentalKm(row.km_horse)) + "</td>" +
+            "<td>" + fundamentalEscape(formatFundamentalKm(row.km_kusk)) + "</td>" +
+            "<td>" + fundamentalEscape(anm) + "</td>" +
+            "</tr>"
+          );
+        }).join("");
+        var scratchCount = rows.filter(function (r) { return r.scratched; }).length;
+        var fetched = payload.fetched_at ? String(payload.fetched_at) : "";
+        var clock = "";
+        if (fetched.length >= 19) {
+          clock = fetched.slice(11, 19);
+        }
+        var bits = [];
+        if (clock) bits.push("Uppdaterad " + clock + " UTC");
+        if (scratchCount) bits.push(scratchCount + " strukna");
+        if (payload.km_note) bits.push("km ESTIMATE");
+        setFundamentalStatus(bits.join(" · "));
       }
 
       function setActiveMode(mode, opts) {
         opts = opts || {};
-        var next = mode === "expert" ? "expert" : "random";
+        var next = mode;
+        if (next !== "expert" && next !== "fundamental") next = "random";
         var switching = next !== activeMode;
         // Preserve current mode's grid/slip before leaving (unless bootstrap or forced wipe).
-        if (switching && !opts.skipCapture) {
+        if (switching && !opts.skipCapture && activeMode !== "fundamental") {
           captureModeState();
         }
         activeMode = next;
+        document.body.classList.toggle("mode-fundamental", activeMode === "fundamental");
         document.querySelectorAll(".mode-tabs [data-mode]").forEach(function (btn) {
           var on = btn.getAttribute("data-mode") === activeMode;
           btn.classList.toggle("active", on);
@@ -2752,35 +3049,53 @@
         var hint = document.getElementById("legs-section-hint");
         var rationaleH = document.getElementById("rationale-heading");
         var rationaleT = document.getElementById("rationale-text");
+        var fundPanel = document.getElementById("fundamental-panel");
         var isExpert = activeMode === "expert";
+        var isFund = activeMode === "fundamental";
         if (!isExpert) closeExpertTipForm();
         if (expertPanel) expertPanel.hidden = !isExpert;
-        if (hariBudget) hariBudget.hidden = isExpert;
-        if (hariSeed) hariSeed.hidden = isExpert;
+        if (fundPanel) fundPanel.hidden = !isFund;
+        if (hariBudget) hariBudget.hidden = isExpert || isFund;
+        if (hariSeed) hariSeed.hidden = isExpert || isFund;
         if (genBtn) {
-          genBtn.hidden = isExpert;
-          genBtn.disabled = isExpert;
+          genBtn.hidden = isExpert || isFund;
+          genBtn.disabled = isExpert || isFund;
         }
         if (expertHint) expertHint.hidden = !isExpert;
         document.querySelectorAll(".leg-freeze-btn").forEach(function (btn) {
-          btn.hidden = isExpert;
+          btn.hidden = isExpert || isFund;
         });
         var statsBtn = document.getElementById("btn-expert-stats");
         if (statsBtn) statsBtn.hidden = !isExpert;
         if (title) {
-          title.textContent = isExpert
-            ? "Experttips och hästar"
-            : "Välj hästar för modellen";
+          title.textContent = isFund
+            ? "Fundamental startlista"
+            : isExpert
+              ? "Experttips och hästar"
+              : "Välj hästar för modellen";
         }
         if (hint) {
-          hint.textContent = isExpert
-            ? "Välj ett tips och/eller klicka hästar. Spelkvitto och kostnad uppdateras automatiskt vid varje markering. (Hari och Expert har skilda system.)"
-            : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar. (Hari och Expert har skilda system.)";
+          hint.textContent = isFund
+            ? "Sortera kolumner. Uppdatera hämtar odds, V85 % och strykningar. Last 5 d=diskad, o=osk! Km är uppskattning."
+            : isExpert
+              ? "Välj ett tips och/eller klicka hästar. Spelkvitto och kostnad uppdateras automatiskt vid varje markering. (Hari och Expert har skilda system.)"
+              : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar. (Hari och Expert har skilda system.)";
         }
         if (rationaleH) {
-          rationaleH.textContent = isExpert ? "Rationale — Expert" : "Rationale — Hari";
+          rationaleH.textContent = isFund
+            ? "Rationale — Fundamental"
+            : isExpert
+              ? "Rationale — Expert"
+              : "Rationale — Hari";
         }
-        if (isExpert) {
+        if (isFund) {
+          if (rationaleT) {
+            rationaleT.textContent =
+              "Inspect-läge: form, kusk och uppskattad hemma-km. Genererar inte system. Hari/Expert-systemet till höger är oförändrat.";
+          }
+          ensureFundamentalAvdTabs();
+          loadFundamentalStartInfo({ includeForm: true });
+        } else if (isExpert) {
           loadExpertsRoster();
           loadExpertTips();
           if (statsMode) loadExpertStats();
@@ -2790,7 +3105,7 @@
           refreshHorseButtonsMeta();
         }
         // Restore this mode's independent grid + slip (skip when caller applies payload itself).
-        if (switching && !opts.skipRestore) {
+        if (switching && !opts.skipRestore && !isFund) {
           restoreModeState(modeStates[activeMode] || emptyModeState());
         } else if (!switching) {
           updateSlipPrintMeta();
@@ -2798,7 +3113,7 @@
             rationaleT.textContent =
               "Välj ett experttips (t.ex. Björn Goop / Björnkollen) eller klicka hästar för att bygga system.";
           }
-          if (rationaleT && !isExpert && !randomBaseSelections) {
+          if (rationaleT && !isExpert && !isFund && !randomBaseSelections) {
             rationaleT.textContent = RATIONALE_DEFAULT;
           }
         } else {
@@ -4860,6 +5175,9 @@
             currentCard = card;
             document.getElementById("source-badge").textContent = (card.source || "yaml").toUpperCase();
             renderLegs(card);
+            if (activeMode === "fundamental") {
+              loadFundamentalStartInfo({ includeForm: true });
+            }
             // Different race day/track → horse numbers no longer apply in any mode.
             if (cardChanged) {
               if (opts.preserveModeStates) {
@@ -5034,6 +5352,24 @@
         btn.addEventListener("click", function () {
           if (btn.disabled) return;
           setActiveMode(btn.getAttribute("data-mode"));
+        });
+      });
+      var fundRefresh = document.getElementById("btn-fundamental-refresh");
+      if (fundRefresh) {
+        fundRefresh.addEventListener("click", function () {
+          loadFundamentalStartInfo({ includeForm: false });
+        });
+      }
+      document.querySelectorAll("#fundamental-table th[data-sort]").forEach(function (th) {
+        th.addEventListener("click", function () {
+          var key = th.getAttribute("data-sort");
+          if (fundamentalSort.key === key) {
+            fundamentalSort.dir = fundamentalSort.dir === "asc" ? "desc" : "asc";
+          } else {
+            fundamentalSort.key = key;
+            fundamentalSort.dir = "asc";
+          }
+          renderFundamentalTable();
         });
       });
       var freeOnlyCb = document.getElementById("expert-free-only");

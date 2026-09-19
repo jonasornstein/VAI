@@ -382,6 +382,26 @@ def test_api_race_cards_and_generate() -> None:
         server.shutdown()
         server.server_close()
 
+
+def test_api_start_info_yaml_includes_scratches() -> None:
+    server, base = _start_test_server()
+    try:
+        listing = _get(f"{base}/api/v1/race-cards")
+        card_id = listing["race_cards"][0]["id"]
+        data = _get(f"{base}/api/v1/start-info/{card_id}")
+        assert data["starts_by_leg"]
+        leg1 = data["starts_by_leg"]["1"]
+        numbers = [row["number"] for row in leg1]
+        assert 5 in numbers
+        scratched = [row for row in leg1 if row["number"] == 5][0]
+        assert scratched["scratched"] is True
+        assert scratched["kusk"] is None
+        assert len(data["starts_by_leg"]) == 8
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
 def test_api_experts_roster() -> None:
     server, base = _start_test_server()
     try:
