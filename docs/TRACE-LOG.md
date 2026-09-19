@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-09-19 | P | Assistant | **Commit + push v1.3.4** — `7857992` + tag `v1.3.4` on `origin/master`; FUNDAMENTAL mode; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.4` |
 | 2026-09-19 | P | ornstein | **fundamental-v1 APPROVED** — FUNDAMENTAL läge on live UI; sortable AVD tables; refresh odds/V85 %/strykningar | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), [REVIEW_fundamental-v1.md](../../outbox/reviews/REVIEW_fundamental-v1.md) |
 | 2026-09-19 | R | Assistant | **Fundamental mode** — inspect läge FUNDAMENTAL (AVD1–8 sortable tables: last-5, kusk, estimated km); refresh odds/V85 %/strykningar; `GET /api/v1/start-info/{id}` | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), mockup, [start_info.py](../../src/vai/start_info.py) |
 | 2026-09-12 | P | ornstein | **End of session (O&O)** — TRAVBANOR v1.3.3 (F-094); session closed | See [§ End of session — 2026-09-12 (TRAVBANOR)](#end-of-session--2026-09-12-travbanor) |
