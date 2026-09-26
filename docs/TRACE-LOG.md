@@ -14,6 +14,8 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-09-26 | P | ornstein | **End of session (O&O)** — prize ladder v1.3.5 pushed; session closed. Prod still v1.3.4 until sudo deploy | See [§ End of session — 2026-09-26 (prize ladder)](#end-of-session--2026-09-26-prize-ladder) |
+| 2026-09-26 | P | Assistant | **Commit + push v1.3.5** — `84cb95d` + tag `v1.3.5` on `origin/master`; prize ladder per avdelning; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.5` |
 | 2026-09-26 | U | Assistant | **Prize ladder per avdelning** — ATG `races[].prize` as a second row above the horses (leg cards and FUNDAMENTAL) | [race-card-schema.md](requirements/race-card-schema.md), [atg_race_card.py](../src/vai/atg_race_card.py), mockup |
 | 2026-09-19 | P | Assistant | **Commit + push v1.3.4** — `7857992` + tag `v1.3.4` on `origin/master`; FUNDAMENTAL mode; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.4` |
 | 2026-09-19 | P | ornstein | **fundamental-v1 APPROVED** — FUNDAMENTAL läge on live UI; sortable AVD tables; refresh odds/V85 %/strykningar | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), [REVIEW_fundamental-v1.md](../../outbox/reviews/REVIEW_fundamental-v1.md) |
@@ -281,6 +283,34 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-09-26 (prize ladder)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `84cb95d` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **v1.3.4** still live (no prize row). Run: `sudo bash /opt/vai/deploy/update-server.sh`
+
+### Delivered
+
+| Item | Detail |
+|------|--------|
+| Prize ladder | ATG place sums as a second row above the horses on each avdelning |
+| FUNDAMENTAL | Same row under the race header, above the horse table; follows AVD1–AVD8 |
+| Tooltip | Full ATG prize sentence (minimum and max total) |
+| Package | **v1.3.5** (`pyproject.toml`, `__version__`, UI pill, tag `v1.3.5`) |
+
+### Commits (origin/master)
+
+| SHA | Summary |
+|-----|---------|
+| `84cb95d` | release: v1.3.5 prize ladder per avdelning · tag `v1.3.5` |
+
+### Approval
+
+- **O&O (ornstein):** session closed 2026-09-26. Prod deploy still needs sudo.
 
 ---
 
