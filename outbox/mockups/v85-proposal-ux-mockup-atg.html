@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.3.4</title>
+  <title>VAI V85 — Local UI v1.3.5</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -869,6 +869,15 @@
       font-weight: 700;
       text-transform: uppercase;
     }
+    .race-info-prize {
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--v85-headline);
+      margin-top: 2px;
+      line-height: 1.35;
+      text-transform: none;
+    }
     .race-info-secondary,
     .race-info-class {
       font-size: 10px;
@@ -920,6 +929,18 @@
       margin-bottom: 8px;
       text-transform: uppercase;
     }
+    .fundamental-race:has(+ .fundamental-prize:not([hidden])) {
+      margin-bottom: 2px;
+    }
+    .fundamental-prize {
+      font-size: 13px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--v85-headline);
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .fundamental-prize[hidden] { display: none; }
     .fundamental-table-wrap { overflow-x: auto; border: 1px solid var(--atg-border); }
     .fundamental-table {
       width: 100%;
@@ -1527,7 +1548,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.3.4 Local UI · Hari + Expert + Fundamental · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.5 Local UI · Hari + Expert + Fundamental · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -1567,7 +1588,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.3.4</span>
+        <span class="game-header__pill">v1.3.5</span>
       </div>
     </header>
 
@@ -1772,6 +1793,7 @@
             </div>
           </div>
           <div class="fundamental-race" id="fundamental-race"></div>
+          <div class="fundamental-prize" id="fundamental-prize" hidden></div>
           <div class="fundamental-table-wrap">
             <table class="fundamental-table" id="fundamental-table">
               <thead>
@@ -1904,7 +1926,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.3.4 Local UI · Hari + Expert + Fundamental · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.5 Local UI · Hari + Expert + Fundamental · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -2726,6 +2748,13 @@
         return method;
       }
 
+      function prizeSumsLabel(prize) {
+        if (!prize) return "";
+        var match = String(prize).match(/Pris:\s*([0-9][0-9.\-]*)\s*kr/i);
+        if (!match) return String(prize);
+        return match[1].replace(/-/g, "\u2013") + " kr";
+      }
+
       function buildRaceInfoHtml(leg) {
         var info = leg.race_info || null;
         var primary = [leg.race_label];
@@ -2733,6 +2762,11 @@
         if (info && info.distance_m) primary.push(info.distance_m + " m");
         if (info && info.start_method) primary.push(startMethodLabel(info.start_method));
         var html = '<div class="race-info-primary">' + primary.join(" · ") + "</div>";
+        var prizeLabel = info ? prizeSumsLabel(info.prize) : "";
+        if (prizeLabel) {
+          html += '<div class="race-info-prize" title="' + fundamentalEscape(info.prize) + '">' +
+            fundamentalEscape(prizeLabel) + "</div>";
+        }
         if (info && info.race_name) {
           html += '<div class="race-info-secondary" title="' + info.race_name.replace(/"/g, "&quot;") + '">' +
             truncateText(info.race_name, 72) + "</div>";
@@ -2823,7 +2857,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.3.4";
+        document.title = title + " — Local UI v1.3.5";
         var logo = document.getElementById("app-logo");
         if (logo) {
           logo.setAttribute("title", title + " — Användarguide (öppnas i ny flik)");
@@ -2968,12 +3002,27 @@
           }
         });
         var raceEl = document.getElementById("fundamental-race");
+        var prizeEl = document.getElementById("fundamental-prize");
         var tbody = document.getElementById("fundamental-tbody");
         if (!tbody) return;
+        function showPrize(prize) {
+          if (!prizeEl) return;
+          var label = prizeSumsLabel(prize);
+          if (!label) {
+            prizeEl.hidden = true;
+            prizeEl.textContent = "";
+            prizeEl.removeAttribute("title");
+            return;
+          }
+          prizeEl.hidden = false;
+          prizeEl.textContent = label;
+          prizeEl.title = String(prize);
+        }
         var payload = fundamentalPayload;
         if (!payload) {
           tbody.innerHTML = "";
           if (raceEl) raceEl.textContent = "";
+          showPrize("");
           return;
         }
         var legMeta = null;
@@ -2991,6 +3040,7 @@
         }
         if (info.race_name) parts.push(info.race_name);
         if (raceEl) raceEl.textContent = parts.join(" · ");
+        showPrize(info.prize);
         var rows = (payload.starts_by_leg && payload.starts_by_leg[String(fundamentalAvd)]) || [];
         var sorted = sortFundamentalRows(rows);
         tbody.innerHTML = sorted.map(function (row) {

@@ -42,6 +42,7 @@ def test_load_race_info_from_yaml(tmp_path: Path) -> None:
                 "      distance_m: 2140\n"
                 "      start_method: volt\n"
                 "      class_summary: 3-åriga ston\n"
+                "      prize: 'Pris: 100.000-50.000 kr'\n"
             )
         legs_yaml += block
     path = tmp_path / "with-info.yaml"
@@ -55,7 +56,44 @@ def test_load_race_info_from_yaml(tmp_path: Path) -> None:
     assert info is not None
     assert info.race_name == "Testlopp"
     assert info.distance_m == 2140
+    assert info.prize == "Pris: 100.000-50.000 kr"
     assert card.leg_by_number(2).race_info is None
+
+
+def test_load_prize_only_race_info(tmp_path: Path) -> None:
+    legs_yaml = ""
+    for i in range(1, 9):
+        block = f"  - leg: {i}\n    race_label: V85-{i}\n    horses: [1]\n"
+        if i == 1:
+            block += "    race_info:\n      prize: 'Pris: 75.000 kr'\n"
+        legs_yaml += block
+    path = tmp_path / "prize-only.yaml"
+    path.write_text(
+        "game: v85\ndate: 2026-01-01\ntrack: X\nsource: manual\n"
+        f"fetched_at: 2026-01-01T00:00:00Z\nsettled: false\nlegs:\n{legs_yaml}",
+        encoding="utf-8",
+    )
+    info = load_race_card(path).leg_by_number(1).race_info
+    assert info is not None
+    assert info.prize == "Pris: 75.000 kr"
+    assert info.race_name is None
+
+
+def test_rejects_blank_prize(tmp_path: Path) -> None:
+    legs_yaml = ""
+    for i in range(1, 9):
+        block = f"  - leg: {i}\n    race_label: V85-{i}\n    horses: [1]\n"
+        if i == 1:
+            block += "    race_info:\n      prize: '   '\n"
+        legs_yaml += block
+    path = tmp_path / "blank-prize.yaml"
+    path.write_text(
+        "game: v85\ndate: 2026-01-01\ntrack: X\nsource: manual\n"
+        f"fetched_at: 2026-01-01T00:00:00Z\nsettled: false\nlegs:\n{legs_yaml}",
+        encoding="utf-8",
+    )
+    with pytest.raises(RaceCardValidationError, match="prize must be a non-empty string"):
+        load_race_card(path)
 
 
 def test_load_optional_horse_names_from_yaml(tmp_path: Path) -> None:

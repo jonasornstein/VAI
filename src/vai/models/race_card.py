@@ -10,6 +10,7 @@ class RaceInfo:
     start_method: str | None = None  # "volt" | "auto"
     class_summary: str | None = None
     status: str | None = None
+    prize: str | None = None  # ATG races[].prize, place ladder as published
 
 
 @dataclass(frozen=True)

@@ -59,6 +59,7 @@ def extract_race_info(race: dict[str, Any]) -> RaceInfo | None:
     distance = race.get("distance")
     terms = race.get("terms")
     status = race.get("status")
+    prize_raw = race.get("prize")
 
     class_summary: str | None = None
     if isinstance(terms, list) and terms and isinstance(terms[0], str):
@@ -70,8 +71,9 @@ def extract_race_info(race: dict[str, Any]) -> RaceInfo | None:
     distance_m = distance if isinstance(distance, int) and distance > 0 else None
     race_name_str = race_name.strip() if isinstance(race_name, str) and race_name.strip() else None
     status_str = status if isinstance(status, str) and status.strip() else None
+    prize = prize_raw.strip() if isinstance(prize_raw, str) and prize_raw.strip() else None
 
-    if not any([race_name_str, distance_m, start_method, class_summary, status_str]):
+    if not any([race_name_str, distance_m, start_method, class_summary, status_str, prize]):
         return None
 
     return RaceInfo(
@@ -80,6 +82,7 @@ def extract_race_info(race: dict[str, Any]) -> RaceInfo | None:
         start_method=start_method,
         class_summary=class_summary,
         status=status_str,
+        prize=prize,
     )
 
 

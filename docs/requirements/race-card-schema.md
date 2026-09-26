@@ -2,11 +2,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 1.0 |
+| **Version** | 1.2 |
 | **Status** | APPROVED |
 | **Reviewer** | Povl (format), Nisse (scratches/reserves) |
 | **Approved** | 2026-07-07 |
-| **Last updated** | 2026-07-07 |
+| **Last updated** | 2026-09-26 |
 | **Owner** | Povl (format), Nisse (scratches/reserves) |
 | **Glossary** | [VISION.md §8 — Race card](../VISION.md#8-glossary) |
 | **Spec** | [atg-data-source.md](../../outbox/specs/atg-data-source.md) (ATG mapping) |
@@ -51,6 +51,7 @@ Canonical file location: `inbox/race-cards/<YYYY-MM-DD>-<track>.yaml`
 | `start_method` | enum | `volt` \| `auto` |
 | `class_summary` | string | First eligibility/terms line |
 | `status` | string | e.g. `upcoming`, `results` |
+| `prize` | string | ATG place ladder as published, e.g. `Pris: 500.000-250.000-… kr …`. Shown above the horses. Omit when unknown |
 
 ATG ingestion populates via **F-029**; manual YAML may omit.
 
@@ -96,6 +97,7 @@ legs:
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.2 | 2026-09-26 | Optional `race_info.prize` — ATG place sums per avdelning |
 | 1.1 | 2026-07-08 | Optional `race_info` per leg (UC-15, F-029) |
 | 1.0 | 2026-07-07 | APPROVED — v1.1 ATG primary; `source: atg` aligned with implementation |
 | 0.3 | 2026-07-07 | v1 primary ingestion = manual YAML; ATG fetch v1.1+ |

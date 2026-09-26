@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.4)."""
+"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.5)."""
 
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ from vai.io.race_card_json import list_race_card_ids, load_race_card_by_id, race
 from vai.models.expert_tip import ExpertError, ExpertResult
 from vai.models.proposal import RandomError, RandomResult
 from vai.schedule import fetch_atg_schedule, schedule_to_dict
-from vai.start_info import fetch_start_info, starts_from_yaml_card
+from vai.start_info import fetch_start_info, leg_header, starts_from_yaml_card
 from vai.strategies.expert import generate_expert_v1
 from vai.strategies.random import generate_random_v1
 
@@ -380,15 +380,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 "starts_by_leg": {
                     str(leg): rows for leg, rows in starts_from_yaml_card(card).items()
                 },
-                "legs": [
-                    {
-                        "leg": leg.leg,
-                        "race_label": leg.race_label,
-                        "start_time": leg.start_time,
-                        "race_info": None,
-                    }
-                    for leg in card.legs
-                ],
+                "legs": [leg_header(leg) for leg in card.legs],
             },
         )
 

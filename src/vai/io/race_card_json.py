@@ -67,4 +67,6 @@ def _race_info_to_dict(info: RaceInfo) -> dict[str, Any]:
         payload["class_summary"] = info.class_summary
     if info.status is not None:
         payload["status"] = info.status
+    if info.prize is not None:
+        payload["prize"] = info.prize
     return payload

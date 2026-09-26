@@ -136,7 +136,11 @@ def _parse_race_info(value: Any, leg_num: int) -> RaceInfo | None:
     if status is not None and (not isinstance(status, str) or not status.strip()):
         raise RaceCardValidationError(f"Leg {leg_num}: race_info.status must be a non-empty string")
 
-    if not any([race_name, distance_m, start_method, class_summary, status]):
+    prize = value.get("prize")
+    if prize is not None and (not isinstance(prize, str) or not prize.strip()):
+        raise RaceCardValidationError(f"Leg {leg_num}: race_info.prize must be a non-empty string")
+
+    if not any([race_name, distance_m, start_method, class_summary, status, prize]):
         return None
 
     return RaceInfo(
@@ -145,6 +149,7 @@ def _parse_race_info(value: Any, leg_num: int) -> RaceInfo | None:
         start_method=start_method,
         class_summary=class_summary.strip() if isinstance(class_summary, str) else None,
         status=status.strip() if isinstance(status, str) else None,
+        prize=prize.strip() if isinstance(prize, str) else None,
     )
 
 

@@ -42,6 +42,25 @@ def test_extract_race_info_from_atg_race() -> None:
     assert info.start_method == "volt"
     assert info.class_summary == "3-åriga och äldre svenska ston 100.001 - 725.000 kr."
     assert info.status == "upcoming"
+    assert info.prize is None
+
+
+def test_extract_race_info_prize_ladder() -> None:
+    prize = (
+        "Pris: 500.000-250.000-125.000-65.000-40.000-25.000-15.000-10.000 kr "
+        "(8 prisplacerade). Lägst 2.500 kr till alla tävlande."
+    )
+    info = extract_race_info({**SAMPLE_RACE, "prize": prize})
+    assert info is not None
+    assert info.prize == prize
+
+
+def test_extract_race_info_prize_only() -> None:
+    info = extract_race_info({"prize": "  Pris: 75.000 kr  "})
+    assert info is not None
+    assert info.prize == "Pris: 75.000 kr"
+    assert info.race_name is None
+    assert info.distance_m is None
 
 
 def test_extract_horse_names_from_atg_starts() -> None:

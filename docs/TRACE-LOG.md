@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-09-19 |
+| **Last updated** | 2026-09-26 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-09-26 | U | Assistant | **Prize ladder per avdelning** — ATG `races[].prize` as a second row above the horses (leg cards and FUNDAMENTAL) | [race-card-schema.md](requirements/race-card-schema.md), [atg_race_card.py](../src/vai/atg_race_card.py), mockup |
 | 2026-09-19 | P | Assistant | **Commit + push v1.3.4** — `7857992` + tag `v1.3.4` on `origin/master`; FUNDAMENTAL mode; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.4` |
 | 2026-09-19 | P | ornstein | **fundamental-v1 APPROVED** — FUNDAMENTAL läge on live UI; sortable AVD tables; refresh odds/V85 %/strykningar | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), [REVIEW_fundamental-v1.md](../../outbox/reviews/REVIEW_fundamental-v1.md) |
 | 2026-09-19 | R | Assistant | **Fundamental mode** — inspect läge FUNDAMENTAL (AVD1–8 sortable tables: last-5, kusk, estimated km); refresh odds/V85 %/strykningar; `GET /api/v1/start-info/{id}` | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), mockup, [start_info.py](../../src/vai/start_info.py) |

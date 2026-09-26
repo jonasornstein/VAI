@@ -9,7 +9,7 @@ from typing import Any
 
 from vai.atg_fetch import AtgFetchError, fetch_horse_results, fetch_v85_game
 from vai.atg_race_card import extract_leg_distributions, extract_leg_odds, parse_atg_game
-from vai.models.race_card import RaceCard
+from vai.models.race_card import Leg, RaceCard
 from vai.track_distance import km_between
 
 _LAST5_CACHE: dict[int, str] = {}
@@ -198,6 +198,25 @@ def starts_from_yaml_card(card: RaceCard) -> dict[int, list[dict[str, Any]]]:
     return out
 
 
+def leg_header(leg: Leg) -> dict[str, Any]:
+    """Race header for one avdelning, including the ATG prize ladder when present."""
+    info = leg.race_info
+    race_info = None
+    if info is not None:
+        race_info = {
+            "race_name": info.race_name,
+            "distance_m": info.distance_m,
+            "start_method": info.start_method,
+            "prize": info.prize,
+        }
+    return {
+        "leg": leg.leg,
+        "race_label": leg.race_label,
+        "start_time": leg.start_time,
+        "race_info": race_info,
+    }
+
+
 def fetch_start_info(game_id: str, *, include_form: bool = True) -> dict[str, Any]:
     payload = fetch_v85_game(game_id)
     card = parse_atg_game(game_id, payload)
@@ -212,19 +231,5 @@ def fetch_start_info(game_id: str, *, include_form: bool = True) -> dict[str, An
         "km_note": "ESTIMATE driving km (haversine × 1.35, round 10). Not ST avståndstabell.",
         "include_form": include_form,
         "starts_by_leg": {str(leg): rows for leg, rows in starts.items()},
-        "legs": [
-            {
-                "leg": leg.leg,
-                "race_label": leg.race_label,
-                "start_time": leg.start_time,
-                "race_info": {
-                    "race_name": leg.race_info.race_name if leg.race_info else None,
-                    "distance_m": leg.race_info.distance_m if leg.race_info else None,
-                    "start_method": leg.race_info.start_method if leg.race_info else None,
-                }
-                if leg.race_info
-                else None,
-            }
-            for leg in card.legs
-        ],
+        "legs": [leg_header(leg) for leg in card.legs],
     }

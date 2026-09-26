@@ -2,8 +2,29 @@
 
 from __future__ import annotations
 
-from vai.start_info import compact_last5, extract_starts_from_game, form_token, starts_from_yaml_card
+from vai.models.race_card import Leg, RaceInfo
+from vai.start_info import compact_last5, extract_starts_from_game, form_token, leg_header, starts_from_yaml_card
 from vai.track_distance import km_between
+
+
+def test_leg_header_includes_prize() -> None:
+    header = leg_header(
+        Leg(
+            leg=1,
+            race_label="V85-1",
+            horses=(1,),
+            start_time="15:02",
+            race_info=RaceInfo(
+                race_name="Aby",
+                distance_m=2140,
+                start_method="auto",
+                prize="Pris: 500.000-250.000 kr",
+            ),
+        )
+    )
+    assert header["race_info"]["prize"] == "Pris: 500.000-250.000 kr"
+    assert header["race_info"]["distance_m"] == 2140
+    assert leg_header(Leg(leg=2, race_label="V85-2", horses=(1,)))["race_info"] is None
 
 
 def test_form_token_diskad() -> None:

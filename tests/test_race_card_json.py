@@ -20,6 +20,7 @@ def test_race_card_to_dict_includes_race_info() -> None:
                     distance_m=2140,
                     start_method="volt",
                     class_summary="3-åriga ston",
+                    prize="Pris: 100.000-50.000 kr",
                 )
                 if i == 1
                 else None,
@@ -39,7 +40,31 @@ def test_race_card_to_dict_includes_race_info() -> None:
     assert leg1["race_info"]["distance_m"] == 2140
     assert leg1["race_info"]["start_method"] == "volt"
     assert leg1["race_info"]["race_name"] == "STL Stodivisionen"
+    assert leg1["race_info"]["prize"] == "Pris: 100.000-50.000 kr"
     assert "race_info" not in payload["legs"][1]
+
+
+def test_race_card_to_dict_omits_empty_prize() -> None:
+    card = RaceCard(
+        game="v85",
+        date="2026-07-11",
+        track="Årjäng",
+        legs=(
+            Leg(
+                leg=1,
+                race_label="V85-1",
+                horses=(1,),
+                race_info=RaceInfo(distance_m=1640),
+            ),
+        )
+        + tuple(Leg(leg=i, race_label=f"V85-{i}", horses=(1,)) for i in range(2, 9)),
+        source="atg",
+        fetched_at="2026-07-11T10:00:00Z",
+        settled=False,
+    )
+    race_info = race_card_to_dict(card)["legs"][0]["race_info"]
+    assert race_info == {"distance_m": 1640}
+    assert "prize" not in race_info
 
 
 def test_race_card_to_dict_includes_horse_names() -> None:
