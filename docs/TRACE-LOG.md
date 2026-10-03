@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-10-03 | P | ornstein | **End of session (O&O)** — FUNDAMENTAL Tränare v1.3.7 pushed; session closed. Prod still v1.3.6 until sudo deploy | See [§ End of session — 2026-10-03 (fundamental tranare)](#end-of-session--2026-10-03-fundamental-tranare) |
+| 2026-10-03 | P | Assistant | **Commit + push v1.3.7** — `bd910b6` + tag `v1.3.7` on `origin/master`; FUNDAMENTAL Tränare and Tränare km; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.7` |
+| 2026-10-03 | U | Assistant | **FUNDAMENTAL Tränare** — trainer name and estimated home-track km beside Kusk, from `horse.trainer` | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), mockup, [start_info.py](../../src/vai/start_info.py) |
 | 2026-10-03 | P | ornstein | **End of session (O&O)** — header course, start, OMSÄTTNING v1.3.6 pushed; session closed. Prod still v1.3.5 until sudo deploy | See [§ End of session — 2026-10-03 (header turnover)](#end-of-session--2026-10-03-header-turnover) |
 | 2026-10-03 | P | Assistant | **Commit + push v1.3.6** — `b870f28` + tag `v1.3.6` on `origin/master`; bana, start time, OMSÄTTNING under VAI V85; Uppdatera in every mode; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.6` |
 | 2026-10-03 | U | Assistant | **Header race facts** — selected V85 shows course, start time, and ATG pool turnover (öre → kr) under the headline; Uppdatera reloads the card in Hari, Expert, and FUNDAMENTAL | [atg-data-source.md](../../outbox/specs/atg-data-source.md), mockup |
@@ -286,6 +289,35 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-10-03 (fundamental tranare)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `bd910b6` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **v1.3.6** still live (header course, start, and OMSÄTTNING; no Tränare columns). Run: `sudo bash /opt/vai/deploy/update-server.sh`
+
+### Delivered
+
+| Item | Detail |
+|------|--------|
+| Tränare | FUNDAMENTAL column after Kusk. Name from ATG `horse.trainer` |
+| Tränare km | Column after Kusk km. Same home-track estimate. Missing home track shows — |
+| Scratches | A scratched horse keeps the trainer. Odds and V85 % stay blank |
+| YAML | `tranare`, `tranare_home`, and `km_tranare` are null |
+| Package | **v1.3.7** (`pyproject.toml`, `__version__`, UI pill, tag `v1.3.7`) |
+
+### Commits (origin/master)
+
+| SHA | Summary |
+|-----|---------|
+| `bd910b6` | release: v1.3.7 FUNDAMENTAL Tränare and Tränare km · tag `v1.3.7` |
+
+### Approval
+
+- **O&O (ornstein):** session closed 2026-10-03. Prod deploy still needs sudo. Production is serving v1.3.6.
 
 ---
 
