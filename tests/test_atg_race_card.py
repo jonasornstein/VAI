@@ -7,6 +7,7 @@ from vai.atg_race_card import (
     extract_leg_distributions,
     extract_leg_odds,
     extract_race_info,
+    extract_turnover_ore,
     parse_atg_game,
 )
 
@@ -94,6 +95,22 @@ def _start_with_pools(number: int, bet_dist: int, vinnare_odds: int) -> dict:
             "vinnare": {"odds": vinnare_odds},
         },
     }
+
+
+def test_parse_atg_game_turnover_ore() -> None:
+    payload = _game_payload()
+    payload["pools"] = {"V85": {"turnover": 2079694900}}
+    card = parse_atg_game("V85_2026-07-11_31_5", payload)
+    assert card.turnover_ore == 2079694900
+
+
+def test_parse_atg_game_turnover_missing_or_invalid() -> None:
+    assert parse_atg_game("V85_2026-07-11_31_5", _game_payload()).turnover_ore is None
+    for bad in (-1, 1.5, "2079694900", None, True, False):
+        payload = _game_payload()
+        payload["pools"] = {"V85": {"turnover": bad}}
+        assert extract_turnover_ore(payload) is None
+        assert parse_atg_game("V85_2026-07-11_31_5", payload).turnover_ore is None
 
 
 def test_extract_leg_distributions_and_odds() -> None:

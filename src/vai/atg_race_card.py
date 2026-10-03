@@ -86,6 +86,20 @@ def extract_race_info(race: dict[str, Any]) -> RaceInfo | None:
     )
 
 
+def extract_turnover_ore(payload: dict[str, Any]) -> int | None:
+    """ATG pools.V85.turnover in öre. Bools are rejected (bool is a subclass of int)."""
+    pools = payload.get("pools")
+    if not isinstance(pools, dict):
+        return None
+    v85 = pools.get("V85")
+    if not isinstance(v85, dict):
+        return None
+    raw = v85.get("turnover")
+    if isinstance(raw, bool) or not isinstance(raw, int) or raw < 0:
+        return None
+    return raw
+
+
 def _track_name(game: dict[str, Any], game_id: str) -> str:
     races = game.get("races")
     if isinstance(races, list) and races:
@@ -173,6 +187,7 @@ def parse_atg_game(game_id: str, payload: dict[str, Any]) -> RaceCard:
         source="atg",
         fetched_at=datetime.now(timezone.utc).isoformat(),
         settled=_is_settled(payload),
+        turnover_ore=extract_turnover_ore(payload),
     )
 
 

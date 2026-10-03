@@ -2,13 +2,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 0.1 |
+| **Version** | 0.2 |
 | **Status** | APPROVED |
 | **AIRUP phase** | R |
 | **Reviewer** | Povl (API); Nisse (field semantics) |
 | **Approved** | 2026-07-07 · Povl |
 | **Author** | Assistant |
-| **Last updated** | 2026-07-07 |
+| **Last updated** | 2026-10-03 |
 | **Implements** | F-006, F-007, F-008, F-027, F-028, UC-09 (partial) |
 
 ---
@@ -65,6 +65,10 @@ From ATG game JSON:
 | `legs[].start_time` | `races[].startTime` (HH:MM) |
 | `source` | `"atg"` |
 | `settled` | all races `status == results` |
+| `turnover_ore` | `pools.V85.turnover` (öre; omit when missing or not a non-negative int) |
+| `track` | `races[0].track.name` |
+
+The local UI keeps the headline **VAI V85**. Under it, the selected round shows the track, leg-1 start `HH:MM` (else the schedule round `start_time`), and **OMSÄTTNING** as kronor (`turnover_ore` ÷ 100). **Uppdatera** in that header reloads the race card in Hari, Expert, and FUNDAMENTAL.
 
 **Mapped in v1.2 (race-info):** `legs[].race_info` via **F-029** — `name`, `distance`, `startMethod`, `terms[0]`, `status`.
 
@@ -130,3 +134,4 @@ Exposed in API as `leg_distributions` on ATG race-card responses.
 | Version | Date | Change |
 |---------|------|--------|
 | 0.1 | 2026-07-07 | Initial spec — documents shipped v1.1 ATG integration |
+| 0.2 | 2026-10-03 | `turnover_ore` from `pools.V85.turnover`; header shows course, start, OMSÄTTNING |

@@ -34,6 +34,7 @@ class RaceCard:
     source: str
     fetched_at: str
     settled: bool
+    turnover_ore: int | None = None  # ATG pools.V85.turnover, öre
 
     def leg_by_number(self, leg_num: int) -> Leg:
         for leg in self.legs:

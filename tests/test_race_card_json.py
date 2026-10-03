@@ -88,3 +88,20 @@ def test_race_card_to_dict_includes_horse_names() -> None:
     payload = race_card_to_dict(card)
     assert payload["legs"][0]["horse_names"] == {"1": "Easy Pick", "7": "Hankypanky Leonie"}
     assert "horse_names" not in payload["legs"][1]
+    assert "turnover_ore" not in payload
+
+
+def test_race_card_to_dict_includes_turnover_ore() -> None:
+    legs = tuple(Leg(leg=i, race_label=f"V85-{i}", horses=(1,)) for i in range(1, 9))
+    card = RaceCard(
+        game="v85",
+        date="2026-10-03",
+        track="Boden",
+        legs=legs,
+        source="atg",
+        fetched_at="2026-10-03T12:00:00Z",
+        settled=False,
+        turnover_ore=2079694900,
+    )
+    payload = race_card_to_dict(card)
+    assert payload["turnover_ore"] == 2079694900

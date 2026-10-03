@@ -7,7 +7,7 @@
 | **Reviewer** | Nisse, ornstein |
 | **Approved** | 2026-07-08 |
 | **AIRUP phase** | P |
-| **Last updated** | 2026-07-08 |
+| **Last updated** | 2026-10-03 |
 | **Implements** | F-029, UC-15 |
 | **Extends** | [atg-data-source.md](./atg-data-source.md), [local-ui-v1.1.md](./local-ui-v1.1.md) |
 
@@ -57,9 +57,11 @@ ATG `starts[].scratched` horses excluded from `legs[].horses` (schema rule 5).
 
 ## 6. Deferred (v1.2+)
 
-- `prize`, full `terms[]`, pool turnover
+- `prize`, full `terms[]`
 - Per-horse names/drivers/odds in grid
 - Race info on printed slip
+
+Game-level V85 turnover is not a leg-header field. ATG `pools.V85.turnover` (öre) is `turnover_ore` on the race card and shown beside the headline as OMSÄTTNING.
 
 ---
 
@@ -68,3 +70,4 @@ ATG `starts[].scratched` horses excluded from `legs[].horses` (schema rule 5).
 | Version | Date | Change |
 |---------|------|--------|
 | 1.0 | 2026-07-08 | APPROVED — F-029, leg header UI, scratches fix |
+| 1.0 | 2026-10-03 | Pool turnover moved off this deferred list — header OMSÄTTNING via `turnover_ore` |

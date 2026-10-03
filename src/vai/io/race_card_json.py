@@ -26,7 +26,7 @@ def load_race_card_by_id(race_cards_dir: Path, card_id: str) -> RaceCard:
 
 
 def race_card_to_dict(card: RaceCard) -> dict[str, Any]:
-    return {
+    data: dict[str, Any] = {
         "id": f"{card.date}-{card.track.lower()}",
         "game": card.game,
         "date": card.date,
@@ -36,6 +36,9 @@ def race_card_to_dict(card: RaceCard) -> dict[str, Any]:
         "settled": card.settled,
         "legs": [_leg_to_dict(leg) for leg in card.legs],
     }
+    if card.turnover_ore is not None:
+        data["turnover_ore"] = card.turnover_ore
+    return data
 
 
 def _leg_to_dict(leg: Leg) -> dict[str, Any]:
