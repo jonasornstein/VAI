@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.3.6</title>
+  <title>VAI V85 — Local UI v1.3.7</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1582,7 +1582,7 @@
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.3.6 Local UI · Hari + Expert + Fundamental · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.7 Local UI · Hari + Expert + Fundamental · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -1626,7 +1626,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.3.6</span>
+        <span class="game-header__pill">v1.3.7</span>
       </div>
     </header>
 
@@ -1840,11 +1840,13 @@
                   <th data-sort="postPosition">Spår</th>
                   <th data-sort="name">Häst</th>
                   <th data-sort="kusk">Kusk</th>
+                  <th data-sort="tranare">Tränare</th>
                   <th data-sort="last5">Last 5</th>
                   <th data-sort="odds">Odds</th>
                   <th data-sort="v85_pct">V85 %</th>
                   <th data-sort="km_horse">Häst km</th>
                   <th data-sort="km_kusk">Kusk km</th>
+                  <th data-sort="km_tranare">Tränare km</th>
                   <th data-sort="scratched">Anm</th>
                 </tr>
               </thead>
@@ -1964,7 +1966,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.3.6 Local UI · Hari + Expert + Fundamental · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.7 Local UI · Hari + Expert + Fundamental · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -2895,7 +2897,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.3.6";
+        document.title = title + " — Local UI v1.3.7";
         var logo = document.getElementById("app-logo");
         if (logo) {
           logo.setAttribute("title", title + " — Användarguide (öppnas i ny flik)");
@@ -3085,7 +3087,7 @@
         var key = fundamentalSort.key;
         var dir = fundamentalSort.dir === "desc" ? -1 : 1;
         var numeric = {
-          number: 1, postPosition: 1, odds: 1, v85_pct: 1, km_horse: 1, km_kusk: 1, scratched: 1
+          number: 1, postPosition: 1, odds: 1, v85_pct: 1, km_horse: 1, km_kusk: 1, km_tranare: 1, scratched: 1
         };
         return rows.slice().sort(function (a, b) {
           var av = a[key];
@@ -3174,11 +3176,13 @@
             "<td>" + fundamentalEscape(row.postPosition) + "</td>" +
             "<td class=\"col-name\">" + fundamentalEscape(fundamentalDash(row.name)) + "</td>" +
             "<td>" + fundamentalEscape(fundamentalDash(row.kusk)) + "</td>" +
+            "<td>" + fundamentalEscape(fundamentalDash(row.tranare)) + "</td>" +
             "<td class=\"col-last5\">" + fundamentalEscape(fundamentalDash(row.last5)) + "</td>" +
             "<td>" + fundamentalEscape(row.odds == null ? "—" : formatOdds(row.odds)) + "</td>" +
             "<td>" + fundamentalEscape(formatFundamentalPct(row.v85_pct)) + "</td>" +
             "<td>" + fundamentalEscape(formatFundamentalKm(row.km_horse)) + "</td>" +
             "<td>" + fundamentalEscape(formatFundamentalKm(row.km_kusk)) + "</td>" +
+            "<td>" + fundamentalEscape(formatFundamentalKm(row.km_tranare)) + "</td>" +
             "<td>" + fundamentalEscape(anm) + "</td>" +
             "</tr>"
           );
@@ -3248,7 +3252,7 @@
         }
         if (hint) {
           hint.textContent = isFund
-            ? "Sortera kolumner. Uppdatera hämtar odds, V85 % och strykningar. Last 5 d=diskad, o=osk! Km är uppskattning."
+            ? "Sortera kolumner. Uppdatera hämtar odds, V85 % och strykningar. Last 5 d=diskad, o=osk! Km för häst, kusk och tränare är uppskattning."
             : isExpert
               ? "Välj ett tips och/eller klicka hästar. Spelkvitto och kostnad uppdateras automatiskt vid varje markering. (Hari och Expert har skilda system.)"
               : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar. (Hari och Expert har skilda system.)";
@@ -3263,7 +3267,7 @@
         if (isFund) {
           if (rationaleT) {
             rationaleT.textContent =
-              "Inspect-läge: form, kusk och uppskattad hemma-km. Genererar inte system. Hari/Expert-systemet till höger är oförändrat.";
+              "Inspect-läge: form, kusk, tränare och uppskattad hemma-km. Genererar inte system. Hari/Expert-systemet till höger är oförändrat.";
           }
           ensureFundamentalAvdTabs();
           loadFundamentalStartInfo({ includeForm: true });

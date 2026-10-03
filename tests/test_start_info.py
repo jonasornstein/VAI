@@ -81,6 +81,11 @@ def test_extract_starts_includes_scratches_and_pools() -> None:
                             "id": 1,
                             "name": "Licorice Sisu",
                             "homeTrack": {"name": "Solvalla"},
+                            "trainer": {
+                                "firstName": "Daniel",
+                                "lastName": "Redén",
+                                "homeTrack": {"name": "Solvalla"},
+                            },
                         },
                         "driver": {
                             "firstName": "Örjan",
@@ -114,11 +119,15 @@ def test_extract_starts_includes_scratches_and_pools() -> None:
     first = rows[1][0]
     assert first["name"] == "Licorice Sisu"
     assert first["kusk"] == "Örjan Kihlström"
+    assert first["tranare"] == "Daniel Redén"
+    assert first["km_tranare"] == km_between("Solvalla", "Färjestad")
     assert first["odds"] == 9.67
     assert first["v85_pct"] == 0.147
     assert first["km_horse"] == km_between("Solvalla", "Färjestad")
     scratched = rows[1][1]
     assert scratched["scratched"] is True
+    assert scratched["tranare"] is None
+    assert scratched["km_tranare"] is None
     assert scratched["odds"] is None
     assert scratched["v85_pct"] is None
     assert scratched["km_horse"] == 0
@@ -130,4 +139,6 @@ def test_starts_from_yaml_card(sample_race_card) -> None:
     row = by_leg[1][0]
     assert "number" in row
     assert row["kusk"] is None
+    assert row["tranare"] is None
+    assert row["km_tranare"] is None
     assert row["last5"] is None

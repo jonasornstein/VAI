@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.6)."""
+"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.7)."""
 
 from __future__ import annotations
 
@@ -375,7 +375,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 "track": card.track,
                 "source": card.source,
                 "fetched_at": datetime.now(timezone.utc).isoformat(),
-                "km_note": "ESTIMATE — YAML cards have no kusk/form/km",
+                "km_note": "ESTIMATE — YAML cards have no kusk/tränare/form/km",
                 "include_form": False,
                 "starts_by_leg": {
                     str(leg): rows for leg, rows in starts_from_yaml_card(card).items()

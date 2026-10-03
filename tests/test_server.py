@@ -396,6 +396,8 @@ def test_api_start_info_yaml_includes_scratches() -> None:
         scratched = [row for row in leg1 if row["number"] == 5][0]
         assert scratched["scratched"] is True
         assert scratched["kusk"] is None
+        assert scratched["tranare"] is None
+        assert scratched["km_tranare"] is None
         assert len(data["starts_by_leg"]) == 8
     finally:
         server.shutdown()

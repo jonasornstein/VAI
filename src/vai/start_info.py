@@ -1,4 +1,4 @@
-"""Fundamental-mode start-info: per-horse form, kusk, km (FUNDAMENTAL läge)."""
+"""Fundamental-mode start-info: per-horse form, kusk, tränare, km (FUNDAMENTAL läge)."""
 
 from __future__ import annotations
 
@@ -134,10 +134,12 @@ def extract_starts_from_game(
                 continue
             horse = start.get("horse") if isinstance(start.get("horse"), dict) else {}
             driver = start.get("driver") if isinstance(start.get("driver"), dict) else {}
+            trainer = horse.get("trainer") if isinstance(horse.get("trainer"), dict) else {}
             hid = horse.get("id") if isinstance(horse, dict) else None
             last5 = last5_from_cache(hid) if isinstance(hid, int) else None
             horse_home = _home_track(horse)
             kusk_home = _home_track(driver)
+            tranare_home = _home_track(trainer)
             scratched = bool(start.get("scratched"))
             odds_val = odds.get(index, {}).get(number)
             pct_val = dists.get(index, {}).get(number)
@@ -153,13 +155,16 @@ def extract_starts_from_game(
                     "name": horse.get("name") if isinstance(horse, dict) else None,
                     "scratched": scratched,
                     "kusk": _person_name(driver),
+                    "tranare": _person_name(trainer),
                     "last5": last5 or None,
                     "odds": odds_val,
                     "v85_pct": pct_val,
                     "horse_home": horse_home,
                     "kusk_home": kusk_home,
+                    "tranare_home": tranare_home,
                     "km_horse": km_between(horse_home, race_track),
                     "km_kusk": km_between(kusk_home, race_track),
+                    "km_tranare": km_between(tranare_home, race_track),
                 }
             )
         out[index] = rows
@@ -184,13 +189,16 @@ def starts_from_yaml_card(card: RaceCard) -> dict[int, list[dict[str, Any]]]:
                     "name": names.get(number),
                     "scratched": number in leg.scratches,
                     "kusk": None,
+                    "tranare": None,
                     "last5": None,
                     "odds": None,
                     "v85_pct": None,
                     "horse_home": None,
                     "kusk_home": None,
+                    "tranare_home": None,
                     "km_horse": None,
                     "km_kusk": None,
+                    "km_tranare": None,
                 }
             )
         rows.sort(key=lambda r: r["number"])
