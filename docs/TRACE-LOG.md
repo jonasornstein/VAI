@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-09-26 |
+| **Last updated** | 2026-10-03 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,9 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-10-03 | P | ornstein | **End of session (O&O)** — header course, start, OMSÄTTNING v1.3.6 pushed; session closed. Prod still v1.3.5 until sudo deploy | See [§ End of session — 2026-10-03 (header turnover)](#end-of-session--2026-10-03-header-turnover) |
+| 2026-10-03 | P | Assistant | **Commit + push v1.3.6** — `b870f28` + tag `v1.3.6` on `origin/master`; bana, start time, OMSÄTTNING under VAI V85; Uppdatera in every mode; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.6` |
+| 2026-10-03 | U | Assistant | **Header race facts** — selected V85 shows course, start time, and ATG pool turnover (öre → kr) under the headline; Uppdatera reloads the card in Hari, Expert, and FUNDAMENTAL | [atg-data-source.md](../../outbox/specs/atg-data-source.md), mockup |
 | 2026-09-26 | P | ornstein | **End of session (O&O)** — prize ladder v1.3.5 pushed; session closed. Prod still v1.3.4 until sudo deploy | See [§ End of session — 2026-09-26 (prize ladder)](#end-of-session--2026-09-26-prize-ladder) |
 | 2026-09-26 | P | Assistant | **Commit + push v1.3.5** — `84cb95d` + tag `v1.3.5` on `origin/master`; prize ladder per avdelning; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.5` |
 | 2026-09-26 | U | Assistant | **Prize ladder per avdelning** — ATG `races[].prize` as a second row above the horses (leg cards and FUNDAMENTAL) | [race-card-schema.md](requirements/race-card-schema.md), [atg_race_card.py](../src/vai/atg_race_card.py), mockup |
@@ -283,6 +286,33 @@ Blast radius, ownership fights under `/opt/vai`, Grok CLI running as unrestricte
 1. Develop in `~/grok/vai` as `ornstein` with `grok`.  
 2. Ship: `git push origin master` then `sudo bash /opt/vai/deploy/update-server.sh` when prod should match.  
 3. Production URL: https://vai.ornstein.work/ (unchanged; `/opt/vai` as user `vai`).
+
+---
+
+## End of session — 2026-10-03 (header turnover)
+
+**Session owner:** ornstein  
+**Status:** **Closed (O&O)**  
+**Dev:** `/home/ornstein/grok/vai` @ `b870f28` (+ this TRACE-LOG close-out)  
+**Production:** https://vai.ornstein.work/ — **v1.3.5** still live (no course, start time, or OMSÄTTNING under the headline). Run: `sudo bash /opt/vai/deploy/update-server.sh`
+
+### Delivered
+
+| Item | Detail |
+|------|--------|
+| Header | Under **VAI V85**: race course, start time, and OMSÄTTNING (ATG `pools.V85.turnover` in öre, shown as kronor) |
+| Uppdatera | Header button in Hari, Expert, and FUNDAMENTAL. Reloads the race card and keeps marks. The FUNDAMENTAL toolbar button is unchanged |
+| Package | **v1.3.6** (`pyproject.toml`, `__version__`, UI pill, tag `v1.3.6`) |
+
+### Commits (origin/master)
+
+| SHA | Summary |
+|-----|---------|
+| `b870f28` | release: v1.3.6 header course, start time, and OMSÄTTNING · tag `v1.3.6` |
+
+### Approval
+
+- **O&O (ornstein):** session closed 2026-10-03. Prod deploy still needs sudo. Production is serving v1.3.5.
 
 ---
 
