@@ -44,6 +44,8 @@ When rules conflict: Nisse wins on trotting/ATG rules; Povl wins on math/odds; K
 | [docs/requirements/](docs/requirements/) | RUP use cases + supplementary spec (FURPS+) |
 | [docs/ROSTER.md](docs/ROSTER.md) | Team and ownership |
 | [docs/TRACE-LOG.md](docs/TRACE-LOG.md) | Decision audit trail |
+| [docs/fundamental-race-card.md](docs/fundamental-race-card.md) | v1.3.8 FUNDAMENTAL = race card: /api/v1/card, caches, ATG fetch rule, parallel ~/v85-card test card |
+| [docs/experts-collector.md](docs/experts-collector.md) | Expert-tips collector in experts/ (experts_sched.sh loop) |
 | [docs/betting/v85.md](docs/betting/v85.md) | V85 rules (Nisse) |
 | [docs/strategies/](docs/strategies/) | Random, expert, quantitative |
 

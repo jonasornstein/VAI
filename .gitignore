@@ -38,3 +38,7 @@ logs/
 # Runtime operator betslips (SPARA archive on host; not versioned)
 betslips/*.yaml
 betslips/*.yml
+
+# Runtime race-card caches (v1.3.8)
+inbox/card-odds/
+inbox/card-form/

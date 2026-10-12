@@ -1366,3 +1366,10 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 
 - Mockup working copies remain in `pending/mockups/`; canonical published versions in `outbox/mockups/`.
 - No automated bet placement — proposals are operator-transcribed artifacts only.
+## 2026-10-12 — v1.3.8 FUNDAMENTAL race card
+
+- FUNDAMENTAL panel replaced by full race card; new GET /api/v1/card/{gameId} (?include_form=cached).
+- Caches inbox/card-odds/ (opening odds, placeholders skipped) and inbox/card-form/ (keyed on career start count).
+- ATG fetched only on panel open, Datum/Bana change, Uppdatera; no timers.
+- Separate test card ~/v85-card (port 8090) kept running in parallel until 2026-10-17 13:05 UTC by ornstein decision.
+- Details: docs/fundamental-race-card.md, docs/experts-collector.md. Approved: ornstein.

@@ -2,7 +2,7 @@
 <html lang="sv" class="active-game-type-v85" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <title>VAI V85 — Local UI v1.3.7</title>
+  <title>VAI V85 — Local UI v1.3.8</title>
   <link rel="stylesheet" href="https://static-content.prod.c1.atg.cloud/atg-web/assets/frame/frame-main.8850c63d7923222b93dc.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1579,10 +1579,87 @@
         display: block;
       }
     }
+    /* ---- FUNDAMENTAL race card (ported from v85-deploy ui, scoped to #fundamental-panel) ---- */
+    #fundamental-panel.rc {
+      --rc-bg: var(--atg-bg); --rc-elev: var(--atg-surface); --rc-row: var(--atg-surface); --rc-row-alt: var(--atg-muted-bg);
+      --rc-hover: var(--atg-horse-pool); --rc-line: var(--atg-border); --rc-text: inherit; --rc-muted: var(--atg-text);
+      --rc-accent: var(--v85-mid); --rc-accent-2: var(--v85-headline); --rc-amber: #8a5a00; --rc-red: #c43c3c;
+      --rc-blue: #1f6fc0; --rc-chip: var(--atg-muted-bg); --rc-thead: var(--atg-muted-bg); --rc-on-accent: #fff;
+      --rc-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      background: var(--rc-bg); color: var(--rc-text); padding: 8px; border: 1px solid var(--rc-line); border-radius: 8px;
+    }
+    [data-theme="dark"] #fundamental-panel.rc[data-rcpal="vai"] { --rc-amber: #f0b429; --rc-red: #e85d5d; --rc-blue: #5eb0ff; --rc-on-accent: #fff; }
+    #fundamental-panel.rc[data-rcpal="green"], #fundamental-panel.rc[data-rcpal="blue"],
+    #fundamental-panel.rc[data-rcpal="black"], #fundamental-panel.rc[data-rcpal="grey"] {
+      --rc-text: #f2f7f4; --rc-accent: #00a651; --rc-accent-2: #19c463; --rc-amber: #f0b429; --rc-red: #e85d5d; --rc-blue: #5eb0ff; --rc-on-accent: #04140c;
+    }
+    #fundamental-panel.rc[data-rcpal="green"] { --rc-bg: #0d1f17; --rc-elev: #132a1f; --rc-row: #163225; --rc-row-alt: #1a3a2b; --rc-hover: #1f4633; --rc-line: #2a5a42; --rc-muted: #9bb5a8; --rc-chip: #0a3d28; --rc-thead: #0a2418; }
+    #fundamental-panel.rc[data-rcpal="blue"] { --rc-bg: #0c1726; --rc-elev: #12223a; --rc-row: #142640; --rc-row-alt: #182d4b; --rc-hover: #1e3a60; --rc-line: #2a4a75; --rc-muted: #9db0c9; --rc-chip: #0e2a4a; --rc-thead: #0b1b30; }
+    #fundamental-panel.rc[data-rcpal="black"] { --rc-bg: #0b0c0d; --rc-elev: #141618; --rc-row: #141618; --rc-row-alt: #1a1d20; --rc-hover: #23272b; --rc-line: #2c3136; --rc-muted: #a0a6ab; --rc-chip: #1a1d20; --rc-thead: #111315; }
+    #fundamental-panel.rc[data-rcpal="grey"] { --rc-bg: #1f2226; --rc-elev: #272b30; --rc-row: #2a2e33; --rc-row-alt: #30353b; --rc-hover: #3a4047; --rc-line: #474e56; --rc-muted: #b0b6bc; --rc-chip: #30353b; --rc-thead: #24282d; }
+    #fundamental-panel.rc[data-rcpal="lgreen"], #fundamental-panel.rc[data-rcpal="lblue"],
+    #fundamental-panel.rc[data-rcpal="white"], #fundamental-panel.rc[data-rcpal="lgrey"] {
+      --rc-text: #13261c; --rc-muted: #3e5247; --rc-accent: #00843f; --rc-accent-2: #00733a; --rc-amber: #7a4e00; --rc-red: #c43c3c; --rc-blue: #1f6fc0; --rc-on-accent: #fff;
+    }
+    #fundamental-panel.rc[data-rcpal="lgreen"] { --rc-bg: #f4f7f5; --rc-elev: #fff; --rc-row: #fff; --rc-row-alt: #eef4f0; --rc-hover: #dcefe3; --rc-line: #c9dbd0; --rc-chip: #dff2e7; --rc-thead: #e6efe9; }
+    #fundamental-panel.rc[data-rcpal="lblue"] { --rc-bg: #f3f6fb; --rc-elev: #fff; --rc-row: #fff; --rc-row-alt: #eaf1fa; --rc-hover: #d8e6f7; --rc-line: #c6d5e8; --rc-chip: #dde9f8; --rc-thead: #e3ecf7; }
+    #fundamental-panel.rc[data-rcpal="white"] { --rc-bg: #fff; --rc-elev: #fff; --rc-row: #fff; --rc-row-alt: #f6f7f8; --rc-hover: #eceff1; --rc-line: #dde1e4; --rc-chip: #eef1f3; --rc-thead: #f1f3f5; }
+    #fundamental-panel.rc[data-rcpal="lgrey"] { --rc-bg: #e9ebed; --rc-elev: #f4f5f6; --rc-row: #f4f5f6; --rc-row-alt: #e6e9ec; --rc-hover: #d9dde1; --rc-line: #c4c9ce; --rc-chip: #dfe3e6; --rc-thead: #dde1e5; }
+    #fundamental-panel.rc .rc-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    #fundamental-panel.rc .rc-meeting { font-size: 13px; color: var(--rc-muted); }
+    #fundamental-panel.rc .rc-meeting b { color: var(--rc-text); }
+    #fundamental-panel.rc .rc-meeting .rc-turnover { color: var(--rc-amber); font-family: var(--rc-mono); font-weight: 600; margin-left: 6px; }
+    #fundamental-panel.rc .fundamental-status { color: var(--rc-muted); }
+    #fundamental-panel.rc .rc-palette { height: 28px; border-radius: 6px; border: 1px solid var(--rc-line); background: var(--rc-elev); color: var(--rc-text); font: inherit; font-size: 12px; padding: 0 6px; }
+    #fundamental-panel.rc .rc-leg-strip { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; }
+    #fundamental-panel.rc .rc-leg-btn { appearance: none; border: 1px solid var(--rc-line); background: var(--rc-chip); color: var(--rc-text); border-radius: 999px; padding: 5px 12px; font-weight: 600; font-size: 12px; cursor: pointer; white-space: nowrap; }
+    #fundamental-panel.rc .rc-leg-btn:hover { border-color: var(--rc-accent); }
+    #fundamental-panel.rc .rc-leg-btn[aria-selected="true"] { background: var(--rc-accent); border-color: var(--rc-accent); color: var(--rc-on-accent); }
+    #fundamental-panel.rc .rc-leg-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+    #fundamental-panel.rc .rc-leg-header h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--rc-text); }
+    #fundamental-panel.rc .rc-leg-meta { color: var(--rc-muted); font-size: 12px; }
+    #fundamental-panel.rc .rc-ladder { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: baseline; font-size: 12px; color: var(--rc-accent-2); font-family: var(--rc-mono); }
+    #fundamental-panel.rc .rc-ladder b, #fundamental-panel.rc .rc-ladder .rc-total { color: var(--rc-amber); font-weight: 700; }
+    #fundamental-panel.rc .rc-ladder .rc-sep { color: var(--rc-muted); }
+    #fundamental-panel.rc .rc-table-wrap { overflow: auto; border: 1px solid var(--rc-line); border-radius: 8px; background: var(--rc-elev); max-height: calc(100vh - 260px); }
+    #fundamental-panel.rc .rc-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+    #fundamental-panel.rc .rc-table thead th { position: sticky; top: 0; z-index: 2; background: var(--rc-thead); color: var(--rc-muted); font-weight: 600; text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--rc-line); white-space: nowrap; user-select: none; }
+    #fundamental-panel.rc .rc-table thead th.sortable { cursor: pointer; }
+    #fundamental-panel.rc .rc-table thead th.sortable:hover { color: var(--rc-text); }
+    #fundamental-panel.rc .rc-table thead th .sort-ind { opacity: 0.45; margin-left: 3px; font-size: 10px; }
+    #fundamental-panel.rc .rc-table thead th.sorted .sort-ind { opacity: 1; color: var(--rc-accent-2); }
+    #fundamental-panel.rc .rc-table tbody td { padding: 6px 8px; border-bottom: 1px solid var(--rc-line); white-space: nowrap; vertical-align: middle; color: var(--rc-text); }
+    #fundamental-panel.rc .rc-table tbody tr:nth-child(odd) { background: var(--rc-row); }
+    #fundamental-panel.rc .rc-table tbody tr:nth-child(even) { background: var(--rc-row-alt); }
+    #fundamental-panel.rc .rc-table tbody tr:hover { background: var(--rc-hover); }
+    #fundamental-panel.rc .rc-table .num-col { text-align: right; font-variant-numeric: tabular-nums; }
+    #fundamental-panel.rc .rc-num { display: inline-flex; width: 1.6rem; height: 1.6rem; align-items: center; justify-content: center; border-radius: 50%; background: var(--rc-chip); border: 1px solid var(--rc-accent); font-weight: 700; font-family: var(--rc-mono); }
+    #fundamental-panel.rc .rc-horse { font-weight: 700; }
+    #fundamental-panel.rc .rc-people { display: flex; flex-direction: column; font-size: 11px; color: var(--rc-muted); line-height: 1.25; margin-top: 2px; }
+    #fundamental-panel.rc .rc-home { display: flex; flex-direction: column; }
+    #fundamental-panel.rc .rc-home .hc-line { display: flex; align-items: baseline; gap: 8px; }
+    #fundamental-panel.rc .rc-home .hc-line:nth-child(n+2) { font-size: 11px; line-height: 1.25; color: var(--rc-muted); }
+    #fundamental-panel.rc .rc-home .hc-line:nth-child(2) { margin-top: 2px; }
+    #fundamental-panel.rc .rc-home .km-inline { display: inline-block; width: 2.6rem; text-align: right; font-family: var(--rc-mono); font-variant-numeric: tabular-nums; color: var(--rc-text); }
+    #fundamental-panel.rc .rc-home .km-home { color: var(--rc-accent-2); }
+    #fundamental-panel.rc .rc-odds { font-family: var(--rc-mono); font-weight: 700; color: var(--rc-amber); }
+    #fundamental-panel.rc .mono { font-family: var(--rc-mono); }
+    #fundamental-panel.rc .muted { color: var(--rc-muted); }
+    #fundamental-panel.rc .delta-neg { color: var(--rc-accent-2); font-family: var(--rc-mono); }
+    #fundamental-panel.rc .delta-pos { color: var(--rc-red); font-family: var(--rc-mono); }
+    #fundamental-panel.rc .delta-zero { color: var(--rc-muted); font-family: var(--rc-mono); }
+    #fundamental-panel.rc .flag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; letter-spacing: 0.03em; }
+    #fundamental-panel.rc .flag-hot { background: #5a1a1a; color: #ff8a8a; }
+    #fundamental-panel.rc .flag-cold { background: #12344a; color: #5eb0ff; }
+    #fundamental-panel.rc .flag-chg { background: #4a3a12; color: #f0b429; }
+    #fundamental-panel.rc .flag-scr { background: #3a3a3a; color: #ddd; }
+    #fundamental-panel.rc .rc-table tbody tr.scratched td { opacity: 0.5; text-decoration: line-through; }
+    #fundamental-panel.rc .rc-table tbody tr.scratched td .flag-scr { text-decoration: none; }
+    #fundamental-panel.rc .rc-error { padding: 10px; border: 1px solid var(--rc-red); border-radius: 6px; color: var(--rc-red); }
   </style>
 </head>
 <body>
-  <div class="mockup-banner">v1.3.7 Local UI · Hari + Expert + Fundamental · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
+  <div class="mockup-banner">v1.3.8 Local UI · Hari + Expert + Fundamental · API <span id="api-status">…</span> · Klicka hästar för att växla pool</div>
 
   <div class="app active-game-type-v85">
     <header class="game-header">
@@ -1626,7 +1703,7 @@
           <button class="theme-toggle__btn active" type="button" data-theme-set="light" aria-pressed="true"><span aria-hidden="true">☀</span> Ljus</button>
           <button class="theme-toggle__btn" type="button" data-theme-set="dark" aria-pressed="false"><span aria-hidden="true">☽</span> Mörk</button>
         </div>
-        <span class="game-header__pill">v1.3.7</span>
+        <span class="game-header__pill">v1.3.8</span>
       </div>
     </header>
 
@@ -1822,40 +1899,36 @@
           <div class="expert-stats-strip__head" id="expert-stats-strip-head"></div>
           <div id="expert-stats-strip-body"></div>
         </div>
-        <div class="fundamental-panel" id="fundamental-panel" hidden>
-          <div class="fundamental-toolbar">
-            <div class="avd-tabs" id="fundamental-avd-tabs" role="tablist" aria-label="Avdelning"></div>
+        <div class="fundamental-panel rc" id="fundamental-panel" hidden>
+          <div class="rc-toolbar">
+            <div class="rc-meeting" id="rc-meeting"></div>
             <div class="fundamental-actions">
               <span class="fundamental-status" id="fundamental-status" aria-live="polite"></span>
-              <button type="button" class="button button--small" id="btn-fundamental-refresh" title="Uppdatera odds, V85 % och strykningar">Uppdatera</button>
+              <select class="rc-palette" id="rc-palette" aria-label="Färgtema för racekortet" title="Färgtema för racekortet">
+                <option value="vai">VAI-tema</option>
+                <option value="green">Mörkgrön</option>
+                <option value="blue">Mörkblå</option>
+                <option value="black">Nästan svart</option>
+                <option value="grey">Mörkgrå</option>
+                <option value="lgreen">Ljusgrön</option>
+                <option value="lblue">Ljusblå</option>
+                <option value="white">Vit</option>
+                <option value="lgrey">Ljusgrå</option>
+              </select>
+              <button type="button" class="button button--small" id="btn-fundamental-refresh" title="Uppdatera odds, streck % och strykningar från ATG">Uppdatera</button>
             </div>
           </div>
-          <div class="fundamental-race" id="fundamental-race"></div>
-          <div class="fundamental-prize" id="fundamental-prize" hidden></div>
-          <div class="fundamental-table-wrap">
-            <table class="fundamental-table" id="fundamental-table">
-              <thead>
-                <tr>
-                  <th data-sort="number">Nr</th>
-                  <th data-sort="postPosition">Spår</th>
-                  <th data-sort="name">Häst</th>
-                  <th data-sort="kusk">Kusk</th>
-                  <th data-sort="tranare">Tränare</th>
-                  <th data-sort="last5">Last 5</th>
-                  <th data-sort="odds">Odds</th>
-                  <th data-sort="v85_pct">V85 %</th>
-                  <th data-sort="km_horse">Häst km</th>
-                  <th data-sort="km_kusk">Kusk km</th>
-                  <th data-sort="km_tranare">Tränare km</th>
-                  <th data-sort="scratched">Anm</th>
-                </tr>
-              </thead>
+          <nav class="rc-leg-strip" id="fundamental-avd-tabs" role="tablist" aria-label="Avdelning"></nav>
+          <div class="rc-leg-header" id="fundamental-race"></div>
+          <div class="rc-table-wrap">
+            <table class="rc-table" id="fundamental-table">
+              <thead id="fundamental-thead"></thead>
               <tbody id="fundamental-tbody"></tbody>
             </table>
           </div>
           <p class="stake-hint" id="fundamental-legend">
-            Last 5: nyast först. <strong>d</strong> = diskad, <strong>o</strong> = osk!
-            Km är uppskattad körsträcka hemma→bana (ej ST avståndstabell).
+            Form: äldst→nyast, <strong>x</strong> = galopp, <strong>d</strong> = disk. Öppning = första odds VAI hämtade för spelet; Δ = nu − öppning.
+            Km är uppskattad körsträcka hemmabana→dagens bana (ej ST avståndstabell). Hämtas från ATG endast vid öppning, byte av omgång eller Uppdatera.
           </p>
         </div>
         <div class="legs-grid" id="legs-grid"></div>
@@ -1966,7 +2039,7 @@
     </div>
   </div>
 
-  <p class="footer-note">VAI Trotting Betting Systems · v1.3.7 Local UI · Hari + Expert + Fundamental · Logo: travhäst + VAI</p>
+  <p class="footer-note">VAI Trotting Betting Systems · v1.3.8 Local UI · Hari + Expert + Fundamental · Logo: travhäst + VAI</p>
 
   <script>
     (function () {
@@ -1984,7 +2057,11 @@
       var slipReady = false;
       var activeMode = "random";
       var fundamentalAvd = 1;
-      var fundamentalSort = { key: "number", dir: "asc" };
+      var fundamentalSort = { key: "startNumber", dir: "asc" };
+      try {
+        var _rcSort = JSON.parse(localStorage.getItem("vai-card-sort") || "null");
+        if (_rcSort && _rcSort.key && (_rcSort.dir === "asc" || _rcSort.dir === "desc")) fundamentalSort = _rcSort;
+      } catch (e) {}
       var fundamentalPayload = null;
       var selectedTipId = null;
       var expertTipsCache = [];
@@ -2897,7 +2974,7 @@
         var title = "VAI " + game;
         var headline = document.getElementById("app-headline");
         if (headline) headline.textContent = title;
-        document.title = title + " — Local UI v1.3.7";
+        document.title = title + " — Local UI v1.3.8";
         var logo = document.getElementById("app-logo");
         if (logo) {
           logo.setAttribute("title", title + " — Användarguide (öppnas i ny flik)");
@@ -2975,13 +3052,15 @@
         var modeAtClick = activeMode;
         if (modeAtClick !== "fundamental") captureModeState();
         var opts = {};
-        if (modeAtClick === "fundamental") opts.skipFundamental = true;
+        if (modeAtClick === "fundamental") {
+          opts.skipFundamental = true;
+          // Parallel with race-cards; server shares the one ATG game fetch between both.
+          loadFundamentalStartInfo({ includeForm: false });
+        }
         loadSelectedCard(opts).then(function (card) {
           try {
             if (!card || activeMode !== modeAtClick) return;
-            if (modeAtClick === "fundamental") {
-              loadFundamentalStartInfo({ includeForm: false });
-            } else {
+            if (modeAtClick !== "fundamental") {
               restoreModeState(modeStates[modeAtClick] || emptyModeState());
             }
           } finally {
@@ -3023,27 +3102,57 @@
         return "~" + String(km);
       }
 
+      // ---- FUNDAMENTAL race card (ported from v85-deploy/ui/app.js) ----
+      // Fetches ATG only via loadFundamentalStartInfo: on entering FUNDAMENTAL, on card
+      // selection (Datum/Bana), on header refresh, or on Uppdatera. No timers.
+      var RC_ATG_ID = /^V\d{2}_\d{4}-\d{2}-\d{2}_\d+_\d+$/;
+      var RC_HIDDEN = { driver: 1, trainer: 1, horseHemmabana: 1, driverHemmabana: 1, trainerHemmabana: 1, horseKm: 1, driverKm: 1, trainerKm: 1, trainerForm: 1 };
+      var RC_NOSORT = { homeCombo: 1 };
+      var rcNumCols = {};
+      var rcLoadSeq = 0;
+
+      function rcEsc(v) {
+        return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+      function rcSek(v) { return Number(v).toLocaleString("sv-SE"); }
+      function rcNum(v, d) {
+        if (v == null || isNaN(Number(v))) return "—";
+        return Number(v).toFixed(d == null ? 1 : d).replace(/\.0$/, "");
+      }
       function setFundamentalStatus(text) {
         var el = document.getElementById("fundamental-status");
         if (el) el.textContent = text || "";
       }
+      function rcColumns() {
+        var raw = (fundamentalPayload && fundamentalPayload.sortableColumns) || [];
+        return raw.filter(function (c) { return c && c.key && !RC_HIDDEN[c.key]; });
+      }
+      function rcComputeNumCols(card) {
+        var seen = {};
+        (card.legs || []).forEach(function (leg) {
+          (leg.starters || []).forEach(function (st) {
+            Object.keys(st).forEach(function (k) {
+              var v = st[k];
+              if (v === null || v === undefined || v === "") return;
+              if (!(k in seen)) seen[k] = true;
+              if (typeof v !== "number") seen[k] = false;
+            });
+          });
+        });
+        rcNumCols = {};
+        Object.keys(seen).forEach(function (k) { if (seen[k] && k !== "startNumber") rcNumCols[k] = 1; });
+      }
 
       function ensureFundamentalAvdTabs() {
         var wrap = document.getElementById("fundamental-avd-tabs");
-        if (!wrap || wrap.children.length) return;
-        for (var i = 1; i <= 8; i++) {
-          var btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "avd-tab";
-          btn.setAttribute("role", "tab");
-          btn.setAttribute("data-avd", String(i));
-          btn.textContent = "AVD" + i;
-          btn.addEventListener("click", function () {
-            fundamentalAvd = Number(this.getAttribute("data-avd"));
-            renderFundamentalTable();
-          });
-          wrap.appendChild(btn);
-        }
+        if (!wrap) return;
+        var legs = (fundamentalPayload && fundamentalPayload.legs) || [];
+        if (legs.length && fundamentalAvd > legs.length) fundamentalAvd = 1;
+        wrap.innerHTML = legs.map(function (leg) {
+          var on = leg.leg === fundamentalAvd;
+          return "<button type=\"button\" class=\"rc-leg-btn avd-tab\" role=\"tab\" data-avd=\"" + leg.leg + "\" aria-selected=\"" + on + "\">" +
+            "Avd " + leg.leg + " · L" + rcEsc(leg.raceNumber) + (leg.postTime ? " · " + rcEsc(leg.postTime) : "") + "</button>";
+        }).join("");
       }
 
       function loadFundamentalStartInfo(opts) {
@@ -3051,153 +3160,214 @@
         if (activeMode !== "fundamental") return;
         var id = document.getElementById("bana") && document.getElementById("bana").value;
         if (!id) return;
-        var includeForm = opts.includeForm !== false;
         var refreshBtn = document.getElementById("btn-fundamental-refresh");
+        if (!RC_ATG_ID.test(id)) {
+          fundamentalPayload = null;
+          renderFundamentalTable();
+          document.getElementById("fundamental-race").innerHTML =
+            "<div class=\"rc-error\">Racekortet kräver en ATG-omgång (vald: " + rcEsc(id) + ").</div>";
+          if (refreshBtn) refreshBtn.disabled = true;
+          return;
+        }
+        var seq = ++rcLoadSeq;
         if (refreshBtn) refreshBtn.disabled = true;
-        setFundamentalStatus(includeForm ? "Hämtar form…" : "Uppdaterar odds…");
-        var url = API + "/api/v1/start-info/" + encodeURIComponent(id) +
-          "?include_form=" + (includeForm ? "1" : "0");
-        fetch(url)
-          .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        setFundamentalStatus(fundamentalPayload && fundamentalPayload.id === id ? "Uppdaterar från ATG…" : "Hämtar racekort från ATG…");
+        // Step 1: include_form=cached → table with odds + cached form at once.
+        // Step 2 (only if some horses lack cached form): include_form=1 fills the rest.
+        // Both belong to this one user action; the server reuses the same ATG game payload.
+        function rcFetch(form) {
+          return fetch(API + "/api/v1/card/" + encodeURIComponent(id) + "?include_form=" + form)
+            .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); });
+        }
+        function rcApply(res) {
+          if (!fundamentalPayload || fundamentalPayload.id !== res.j.id) fundamentalAvd = 1;
+          fundamentalPayload = res.j;
+          rcComputeNumCols(res.j);
+          renderFundamentalTable();
+        }
+        rcFetch("cached")
           .then(function (res) {
-            if (refreshBtn) refreshBtn.disabled = false;
+            if (seq !== rcLoadSeq) return;
             if (!res.ok) {
-              var msg = (res.j && res.j.error && res.j.error.message) || "Kunde inte hämta startinfo";
-              setFundamentalStatus(msg);
+              if (refreshBtn) refreshBtn.disabled = false;
+              setFundamentalStatus((res.j && res.j.error && res.j.error.message) || "Kunde inte hämta racekort");
               return;
             }
-            fundamentalPayload = res.j;
-            var src = (res.j.source || "").toLowerCase();
-            if (refreshBtn) {
-              refreshBtn.disabled = src !== "atg";
-              refreshBtn.title = src === "atg"
-                ? "Uppdatera odds, V85 % och strykningar"
-                : "YAML-kort har inga live-odds";
+            rcApply(res);
+            if (!res.j.formMissing) {
+              if (refreshBtn) refreshBtn.disabled = false;
+              return;
             }
-            renderFundamentalTable();
+            setFundamentalStatus("Hämtar form för " + res.j.formMissing + " hästar…");
+            return rcFetch("1").then(function (res2) {
+              if (seq !== rcLoadSeq) return;
+              if (refreshBtn) refreshBtn.disabled = false;
+              if (!res2.ok) {
+                setFundamentalStatus("Form kunde inte hämtas (odds visas)");
+                return;
+              }
+              rcApply(res2);
+            });
           })
           .catch(function (err) {
+            if (seq !== rcLoadSeq) return;
             if (refreshBtn) refreshBtn.disabled = false;
             setFundamentalStatus("ATG otillgänglig");
             console.error(err);
           });
       }
 
+      function rcCompare(a, b, key) {
+        var va = a[key], vb = b[key];
+        var an = va == null || va === "", bn = vb == null || vb === "";
+        if (an && bn) return 0;
+        if (an) return 1;
+        if (bn) return -1;
+        if (typeof va === "boolean") return va === vb ? 0 : va ? 1 : -1;
+        if (typeof va === "number" && typeof vb === "number") return va - vb;
+        return String(va).localeCompare(String(vb), "sv", { numeric: true });
+      }
       function sortFundamentalRows(rows) {
-        var key = fundamentalSort.key;
-        var dir = fundamentalSort.dir === "desc" ? -1 : 1;
-        var numeric = {
-          number: 1, postPosition: 1, odds: 1, v85_pct: 1, km_horse: 1, km_kusk: 1, km_tranare: 1, scratched: 1
-        };
+        var key = fundamentalSort.key, dir = fundamentalSort.dir === "desc" ? -1 : 1;
         return rows.slice().sort(function (a, b) {
-          var av = a[key];
-          var bv = b[key];
-          var aNull = av == null || av === "";
-          var bNull = bv == null || bv === "";
-          if (aNull && bNull) return (a.number || 0) - (b.number || 0);
-          if (aNull) return 1;
-          if (bNull) return -1;
-          var cmp;
-          if (key === "scratched") {
-            cmp = (av ? 1 : 0) - (bv ? 1 : 0);
-          } else if (numeric[key]) {
-            cmp = Number(av) - Number(bv);
-          } else {
-            cmp = String(av).localeCompare(String(bv), "sv");
-          }
-          if (cmp === 0) cmp = (a.number || 0) - (b.number || 0);
-          return cmp * dir;
+          if (!!a.scratched !== !!b.scratched) return a.scratched ? 1 : -1;
+          var c = rcCompare(a, b, key);
+          // nulls stay last regardless of direction
+          var an = a[key] == null || a[key] === "", bn = b[key] == null || b[key] === "";
+          if (an !== bn) return c;
+          return (c * dir) || (a.startNumber - b.startNumber);
         });
+      }
+      function rcDelta(v) {
+        if (v == null) return "<span class=\"muted\">—</span>";
+        var n = Number(v);
+        var cls = n < 0 ? "delta-neg" : n > 0 ? "delta-pos" : "delta-zero";
+        return "<span class=\"" + cls + "\">" + (n > 0 ? "+" : "") + n.toFixed(2) + "</span>";
+      }
+      function rcCell(key, s) {
+        switch (key) {
+          case "startNumber": return "<span class=\"rc-num\">" + rcEsc(s.startNumber) + "</span>";
+          case "horseName":
+            return "<span class=\"rc-horse\">" + rcEsc(s.horseName || "—") + "</span>" +
+              (s.scratched ? " <span class=\"flag flag-scr\">STRUKEN</span>" : "") +
+              "<div class=\"rc-people\"><span title=\"Kusk\">K: " + rcEsc(s.driver || "—") + "</span>" +
+              "<span title=\"Tränare\">T: " + rcEsc(s.trainer || "—") + "</span></div>";
+          case "homeCombo": {
+            var line = function (h, km) {
+              var kmTxt = km == null ? "—" : String(km);
+              return "<span class=\"hc-line\"><span class=\"km-inline" + (km === 0 ? " km-home" : "") + "\">" + kmTxt +
+                "</span><span>" + rcEsc(h || "—") + "</span></span>";
+            };
+            return "<div class=\"rc-home\">" + line(s.horseHemmabana, s.horseKm) + line(s.driverHemmabana, s.driverKm) +
+              line(s.trainerHemmabana, s.trainerKm) + "</div>";
+          }
+          case "odds": return "<span class=\"rc-odds\">" + (s.odds == null ? "—" : Number(s.odds).toFixed(2)) + "</span>";
+          case "oddsOpen": return "<span class=\"mono muted\">" + (s.oddsOpen == null ? "—" : Number(s.oddsOpen).toFixed(2)) + "</span>";
+          case "oddsDelta": return rcDelta(s.oddsDelta);
+          case "bookingPct": return "<span class=\"mono\">" + (s.bookingPct == null ? "—" : Math.round(Number(s.bookingPct)) + "%") + "</span>";
+          case "impliedWinPct": return "<span class=\"mono\">" + rcNum(s.impliedWinPct) + "</span>";
+          case "hotMoney": return s.hotMoney && !s.scratched ? "<span class=\"flag flag-hot\">HOT</span>" : "<span class=\"muted\">—</span>";
+          case "coldMoney": return s.coldMoney && !s.scratched ? "<span class=\"flag flag-cold\">COLD</span>" : "<span class=\"muted\">—</span>";
+          case "formLast5": return "<span class=\"mono\">" + rcEsc(s.formLast5 || "—") + "</span>";
+          case "driverChange": return s.driverChange ? "<span class=\"flag flag-chg\">JA</span>" : "<span class=\"muted\">—</span>";
+          case "shoes": return rcEsc(String(s.shoes || "—").replace(/_/g, " "));
+          default: return rcEsc(s[key] == null ? "—" : s[key]);
+        }
       }
 
       function renderFundamentalTable() {
-        ensureFundamentalAvdTabs();
-        var tabs = document.querySelectorAll("#fundamental-avd-tabs .avd-tab");
-        tabs.forEach(function (btn) {
-          var on = Number(btn.getAttribute("data-avd")) === fundamentalAvd;
-          btn.setAttribute("aria-selected", on ? "true" : "false");
-        });
-        document.querySelectorAll("#fundamental-table th[data-sort]").forEach(function (th) {
-          var key = th.getAttribute("data-sort");
-          if (key === fundamentalSort.key) {
-            th.setAttribute("aria-sort", fundamentalSort.dir === "desc" ? "descending" : "ascending");
-          } else {
-            th.removeAttribute("aria-sort");
-          }
-        });
-        var raceEl = document.getElementById("fundamental-race");
-        var prizeEl = document.getElementById("fundamental-prize");
+        var thead = document.getElementById("fundamental-thead");
         var tbody = document.getElementById("fundamental-tbody");
-        if (!tbody) return;
-        function showPrize(prize) {
-          if (!prizeEl) return;
-          var label = prizeSumsLabel(prize);
-          if (!label) {
-            prizeEl.hidden = true;
-            prizeEl.textContent = "";
-            prizeEl.removeAttribute("title");
-            return;
-          }
-          prizeEl.hidden = false;
-          prizeEl.textContent = label;
-          prizeEl.title = String(prize);
-        }
-        var payload = fundamentalPayload;
-        if (!payload) {
-          tbody.innerHTML = "";
-          if (raceEl) raceEl.textContent = "";
-          showPrize("");
+        var raceEl = document.getElementById("fundamental-race");
+        var meetEl = document.getElementById("rc-meeting");
+        if (!tbody || !thead) return;
+        var card = fundamentalPayload;
+        ensureFundamentalAvdTabs();
+        if (!card) {
+          thead.innerHTML = ""; tbody.innerHTML = "";
+          if (raceEl) raceEl.innerHTML = "";
+          if (meetEl) meetEl.innerHTML = "";
           return;
         }
-        var legMeta = null;
-        (payload.legs || []).forEach(function (leg) {
-          if (leg && leg.leg === fundamentalAvd) legMeta = leg;
-        });
-        var info = legMeta && legMeta.race_info ? legMeta.race_info : {};
-        var parts = [];
-        if (legMeta && legMeta.race_label) parts.push(legMeta.race_label);
-        else parts.push("V85-" + fundamentalAvd);
-        if (legMeta && legMeta.start_time) parts.push(legMeta.start_time);
-        if (info.distance_m) parts.push(info.distance_m + " m");
-        if (info.start_method) {
-          parts.push(info.start_method === "volt" ? "Volt" : info.start_method === "auto" ? "Autostart" : info.start_method);
+        if (meetEl) {
+          meetEl.innerHTML = "<b>" + rcEsc(card.product) + "</b> · " + rcEsc(card.trackName) + " · " + rcEsc(card.meetingDate) +
+            " · " + card.legCount + " avd" +
+            (card.turnover != null ? "<span class=\"rc-turnover\">Omsättning: " + rcSek(card.turnover) + " SEK</span>" : "");
         }
-        if (info.race_name) parts.push(info.race_name);
-        if (raceEl) raceEl.textContent = parts.join(" · ");
-        showPrize(info.prize);
-        var rows = (payload.starts_by_leg && payload.starts_by_leg[String(fundamentalAvd)]) || [];
-        var sorted = sortFundamentalRows(rows);
-        tbody.innerHTML = sorted.map(function (row) {
-          var cls = row.scratched ? "scratched" : "";
-          var anm = row.scratched ? "STRUKEN" : "";
-          return (
-            "<tr class=\"" + cls + "\">" +
-            "<td>" + fundamentalEscape(row.number) + "</td>" +
-            "<td>" + fundamentalEscape(row.postPosition) + "</td>" +
-            "<td class=\"col-name\">" + fundamentalEscape(fundamentalDash(row.name)) + "</td>" +
-            "<td>" + fundamentalEscape(fundamentalDash(row.kusk)) + "</td>" +
-            "<td>" + fundamentalEscape(fundamentalDash(row.tranare)) + "</td>" +
-            "<td class=\"col-last5\">" + fundamentalEscape(fundamentalDash(row.last5)) + "</td>" +
-            "<td>" + fundamentalEscape(row.odds == null ? "—" : formatOdds(row.odds)) + "</td>" +
-            "<td>" + fundamentalEscape(formatFundamentalPct(row.v85_pct)) + "</td>" +
-            "<td>" + fundamentalEscape(formatFundamentalKm(row.km_horse)) + "</td>" +
-            "<td>" + fundamentalEscape(formatFundamentalKm(row.km_kusk)) + "</td>" +
-            "<td>" + fundamentalEscape(formatFundamentalKm(row.km_tranare)) + "</td>" +
-            "<td>" + fundamentalEscape(anm) + "</td>" +
-            "</tr>"
-          );
+        var leg = null;
+        (card.legs || []).forEach(function (l) { if (l.leg === fundamentalAvd) leg = l; });
+        leg = leg || (card.legs || [])[0];
+        if (!leg) { tbody.innerHTML = ""; return; }
+        var ladder = leg.prizeMoneyLadder || [];
+        var ladderHtml = ladder.length
+          ? "<div class=\"rc-ladder\">" + ladder.map(function (p) { return "<span><b>" + p.place + ".</b> " + rcSek(p.amount) + "</span>"; })
+              .join("<span class=\"rc-sep\">·</span>") + "<span class=\"rc-total\">Total " + rcSek(leg.prizeMoney) + " SEK</span></div>"
+          : "";
+        var sm = (leg.startMethod === "volt" || leg.startMethod === "volte") ? "Voltstart" : leg.startMethod === "auto" ? "Autostart" : leg.startMethod;
+        var info = [leg.trackName, leg.distance != null ? leg.distance + " m" : null, sm, leg.postTime ? "start " + leg.postTime : null,
+          leg.trackCondition, leg.starterCount != null ? leg.starterCount + " startande" : null, card.product + "-" + leg.leg]
+          .filter(Boolean).map(rcEsc).join(" · ");
+        if (raceEl) {
+          raceEl.innerHTML = "<h3>Avd " + leg.leg + " · L" + rcEsc(leg.raceNumber) + " · " + rcEsc(leg.raceName || "") + "</h3>" +
+            ladderHtml + "<div class=\"rc-leg-meta\">" + info + "</div>";
+        }
+        var cols = rcColumns();
+        thead.innerHTML = "<tr>" + cols.map(function (c) {
+          var can = !RC_NOSORT[c.key];
+          var on = fundamentalSort.key === c.key;
+          var cls = [can ? "sortable" : "", on ? "sorted" : "", rcNumCols[c.key] ? "num-col" : ""].filter(Boolean).join(" ");
+          return "<th class=\"" + cls + "\" data-key=\"" + c.key + "\"" + (c.tip ? " title=\"" + rcEsc(c.tip) + "\"" : "") +
+            (on ? " aria-sort=\"" + (fundamentalSort.dir === "desc" ? "descending" : "ascending") + "\"" : "") + ">" +
+            rcEsc(c.label || c.key) + (can ? "<span class=\"sort-ind\">" + (on ? (fundamentalSort.dir === "asc" ? "▲" : "▼") : "↕") + "</span>" : "") + "</th>";
+        }).join("") + "</tr>";
+        tbody.innerHTML = sortFundamentalRows(leg.starters || []).map(function (s) {
+          return "<tr class=\"" + (s.scratched ? "scratched" : "") + "\">" + cols.map(function (c) {
+            return "<td" + (rcNumCols[c.key] ? " class=\"num-col\"" : "") + ">" + rcCell(c.key, s) + "</td>";
+          }).join("") + "</tr>";
         }).join("");
-        var scratchCount = rows.filter(function (r) { return r.scratched; }).length;
-        var fetched = payload.fetched_at ? String(payload.fetched_at) : "";
+        var scr = (leg.starters || []).filter(function (s) { return s.scratched; }).length;
         var clock = "";
-        if (fetched.length >= 19) {
-          clock = fetched.slice(11, 19);
-        }
+        try { clock = new Date(card.fetchedAt).toLocaleTimeString("sv-SE"); } catch (e) { clock = ""; }
         var bits = [];
-        if (clock) bits.push("Uppdaterad " + clock + " UTC");
-        if (scratchCount) bits.push(scratchCount + " strukna");
-        if (payload.km_note) bits.push("km ESTIMATE");
+        if (clock) bits.push("Hämtad " + clock);
+        if (scr) bits.push(scr + " strukna");
         setFundamentalStatus(bits.join(" · "));
+      }
+
+      function initFundamentalCard() {
+        var panel = document.getElementById("fundamental-panel");
+        var sel = document.getElementById("rc-palette");
+        var pal = "vai";
+        try { pal = localStorage.getItem("vai-card-palette") || "vai"; } catch (e) {}
+        if (panel) panel.setAttribute("data-rcpal", pal);
+        if (sel) {
+          sel.value = pal;
+          sel.addEventListener("change", function () {
+            panel.setAttribute("data-rcpal", sel.value);
+            try { localStorage.setItem("vai-card-palette", sel.value); } catch (e) {}
+          });
+        }
+        var tabs = document.getElementById("fundamental-avd-tabs");
+        if (tabs) {
+          tabs.addEventListener("click", function (ev) {
+            var btn = ev.target.closest("[data-avd]");
+            if (!btn) return;
+            fundamentalAvd = Number(btn.getAttribute("data-avd"));
+            renderFundamentalTable(); // local re-render, no ATG fetch
+          });
+        }
+        var thead = document.getElementById("fundamental-thead");
+        if (thead) {
+          thead.addEventListener("click", function (ev) {
+            var th = ev.target.closest("th.sortable");
+            if (!th) return;
+            var key = th.getAttribute("data-key");
+            if (fundamentalSort.key === key) fundamentalSort.dir = fundamentalSort.dir === "asc" ? "desc" : "asc";
+            else { fundamentalSort.key = key; fundamentalSort.dir = "asc"; }
+            try { localStorage.setItem("vai-card-sort", JSON.stringify(fundamentalSort)); } catch (e) {}
+            renderFundamentalTable();
+          });
+        }
       }
 
       function setActiveMode(mode, opts) {
@@ -3252,7 +3422,7 @@
         }
         if (hint) {
           hint.textContent = isFund
-            ? "Sortera kolumner. Uppdatera hämtar odds, V85 % och strykningar. Last 5 d=diskad, o=osk! Km för häst, kusk och tränare är uppskattning."
+            ? "Racekort: sortera kolumner (sparas). Uppdatera hämtar odds, streck % och strykningar från ATG. Form äldst→nyast, x=galopp, d=disk. Km är uppskattning."
             : isExpert
               ? "Välj ett tips och/eller klicka hästar. Spelkvitto och kostnad uppdateras automatiskt vid varje markering. (Hari och Expert har skilda system.)"
               : "Klicka för att markera hästar du vill låsa (eller justera efter generering). Spelkvitto och kostnad uppdateras automatiskt. Tomt val = slumpen väljer på öppna avdelningar. Frys avd. blockerar slumpen — markera minst en häst på frysta avdelningar. (Hari och Expert har skilda system.)";
@@ -3267,7 +3437,7 @@
         if (isFund) {
           if (rationaleT) {
             rationaleT.textContent =
-              "Inspect-läge: form, kusk, tränare och uppskattad hemma-km. Genererar inte system. Hari/Expert-systemet till höger är oförändrat.";
+              "Racekort: odds, öppningsodds/trend, streck %, form, kusk, tränare och uppskattad hemma-km. Genererar inte system. Hari/Expert-systemet till höger är oförändrat.";
           }
           ensureFundamentalAvdTabs();
           loadFundamentalStartInfo({ includeForm: true });
@@ -5347,6 +5517,10 @@
           return Promise.resolve(null);
         }
         updateRoundHeadline();
+        // FUNDAMENTAL card fetch runs in parallel with race-cards (was: after it).
+        if (activeMode === "fundamental" && !opts.skipFundamental) {
+          loadFundamentalStartInfo({ includeForm: true });
+        }
         return fetch(API + "/api/v1/race-cards/" + encodeURIComponent(id))
           .then(function (r) { return r.json(); })
           .then(function (card) {
@@ -5359,9 +5533,6 @@
             updateRoundHeadline();
             document.getElementById("source-badge").textContent = (card.source || "yaml").toUpperCase();
             renderLegs(card);
-            if (activeMode === "fundamental" && !opts.skipFundamental) {
-              loadFundamentalStartInfo({ includeForm: true });
-            }
             // Different race day/track → horse numbers no longer apply in any mode.
             if (cardChanged) {
               if (opts.preserveModeStates) {
@@ -5548,18 +5719,7 @@
       if (roundRefresh) {
         roundRefresh.addEventListener("click", refreshSelectedRound);
       }
-      document.querySelectorAll("#fundamental-table th[data-sort]").forEach(function (th) {
-        th.addEventListener("click", function () {
-          var key = th.getAttribute("data-sort");
-          if (fundamentalSort.key === key) {
-            fundamentalSort.dir = fundamentalSort.dir === "asc" ? "desc" : "asc";
-          } else {
-            fundamentalSort.key = key;
-            fundamentalSort.dir = "asc";
-          }
-          renderFundamentalTable();
-        });
-      });
+      initFundamentalCard();
       var freeOnlyCb = document.getElementById("expert-free-only");
       if (freeOnlyCb) {
         freeOnlyCb.addEventListener("change", function () {

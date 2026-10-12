@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.7)."""
+"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.8)."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ from urllib.parse import parse_qs, urlparse
 from vai.activity_log import ActivityLogger
 from vai.atg_fetch import AtgFetchError
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
+from vai.card import build_card, default_odds_dir, is_card_game_id
 from vai.expert_stats import expert_horse_stats_for_round
 from vai.hit_summary import compute_hit_summary
 from vai.io.betslip import (
@@ -81,6 +82,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
     race_cards_dir: Path = repo_root / "inbox" / "race-cards"
     expert_tips_dir: Path = repo_root / "inbox" / "expert-tips"
     betslips_dir: Path = repo_root / "betslips"
+    card_odds_dir: Path | None = None  # None → inbox/card-odds
     activity_logger: ActivityLogger | None = None
     trusted_proxy_hops: int = 1
     trusted_proxies: frozenset[str] = frozenset()
@@ -162,6 +164,10 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if path.startswith("/api/v1/race-cards/"):
             card_id = path.removeprefix("/api/v1/race-cards/").strip("/")
             self._handle_get_race_card(card_id)
+            return
+        if path.startswith("/api/v1/card/"):
+            game_id = path.removeprefix("/api/v1/card/").strip("/")
+            self._handle_get_card(game_id, parsed.query)
             return
         if path.startswith("/api/v1/start-info/"):
             card_id = path.removeprefix("/api/v1/start-info/").strip("/")
@@ -332,6 +338,28 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             return
         payload = race_card_to_dict(card)
         payload["id"] = card_id
+        self._send_json(HTTPStatus.OK, payload)
+
+    def _handle_get_card(self, game_id: str, query: str) -> None:
+        """FUNDAMENTAL race card — fetched from ATG only when this endpoint is called."""
+        if not is_card_game_id(game_id):
+            self._send_json(
+                HTTPStatus.BAD_REQUEST,
+                {"error": {"code": "INVALID_ID", "message": f"Not an ATG game id: {game_id}"}},
+            )
+            return
+        params = parse_qs(query)
+        raw_form = (params.get("include_form") or ["1"])[0]
+        include_form: bool | str = "cached" if raw_form == "cached" else raw_form not in ("0", "false", "no")
+        odds_dir = type(self).card_odds_dir or default_odds_dir(self.repo_root)
+        try:
+            payload = build_card(game_id, odds_dir=odds_dir, include_form=include_form)
+        except AtgFetchError as exc:
+            self._send_json(HTTPStatus.BAD_GATEWAY, {"error": {"code": "ATG_UNAVAILABLE", "message": str(exc)}})
+            return
+        except (ValueError, KeyError, TypeError) as exc:
+            self._send_json(HTTPStatus.BAD_GATEWAY, {"error": {"code": "ATG_PARSE_ERROR", "message": str(exc)}})
+            return
         self._send_json(HTTPStatus.OK, payload)
 
     def _handle_get_start_info(self, card_id: str, query: str) -> None:
