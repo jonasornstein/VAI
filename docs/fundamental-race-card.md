@@ -86,3 +86,8 @@ UI (`outbox/mockups/v85-proposal-ux-mockup-atg.html`): orange ▲ for over, gree
 - `formLast5` is now **newest first** (for example `1-3-x-2-5`, where the first token is the latest start). The Form tooltip and the UI help text say "senaste först".
 - `sortableColumns` puts **Öppning** (`oddsOpen`) and **Δ** (`oddsDelta`) right after **km / Hemmabana**. The panel (`rcColumns()` in the mockup html) renders the server order as is, so `card.py` controls it. Only Kvot (`streckRatio`) is added on the client, after Streck %.
 - The version text in the UI comes from `vai.__version__`. The html holds `{{VAI_VERSION}}` (5 places), and `server.render_index_html` fills it in when serving `/`. Don't hardcode a version in the html; `tests/test_version_text.py` enforces this.
+
+## v1.3.11: sort indicator and streck alignment
+
+- Sort indicator: a thin ↑/↓ in the header text colour (`color: inherit`) instead of a green ▲/▼. Unsorted sortable columns show a faint ↕.
+- Streck % cell (`.streck-cell`): right-aligned. The ▲/▼ arrow has a fixed width of 1em. Rows without an arrow get an invisible ▲ placeholder (`visibility:hidden`, `aria-hidden`), so the % values line up.

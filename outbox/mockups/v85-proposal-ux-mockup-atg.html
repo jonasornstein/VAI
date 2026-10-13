@@ -996,8 +996,8 @@
       text-transform: uppercase;
       letter-spacing: 0.02em;
     }
-    .fundamental-table th[aria-sort="ascending"]::after { content: " ▲"; }
-    .fundamental-table th[aria-sort="descending"]::after { content: " ▼"; }
+    .fundamental-table .sort-ind { color: inherit; opacity: .55; font-weight: 400; margin-left: 3px; }
+    .fundamental-table th[aria-sort] .sort-ind { opacity: 1; }
     .fundamental-table tbody tr.scratched td {
       color: #c41e3a;
       opacity: 0.75;
@@ -1627,7 +1627,7 @@
     #fundamental-panel.rc .rc-table thead th.sortable { cursor: pointer; }
     #fundamental-panel.rc .rc-table thead th.sortable:hover { color: var(--rc-text); }
     #fundamental-panel.rc .rc-table thead th .sort-ind { opacity: 0.45; margin-left: 3px; font-size: 10px; }
-    #fundamental-panel.rc .rc-table thead th.sorted .sort-ind { opacity: 1; color: var(--rc-accent-2); }
+    #fundamental-panel.rc .rc-table thead th.sorted .sort-ind { opacity: 1; color: inherit; font-weight: 400; }
     #fundamental-panel.rc .rc-table tbody td { padding: 6px 8px; border-bottom: 1px solid var(--rc-line); white-space: nowrap; vertical-align: middle; color: var(--rc-text); }
     #fundamental-panel.rc .rc-table tbody tr:nth-child(odd) { background: var(--rc-row); }
     #fundamental-panel.rc .rc-table tbody tr:nth-child(even) { background: var(--rc-row-alt); }
@@ -1656,7 +1656,8 @@
     #fundamental-panel.rc .rc-table tbody tr.scratched td { opacity: 0.5; text-decoration: line-through; }
     #fundamental-panel.rc .rc-table tbody tr.scratched td .flag-scr { text-decoration: none; }
     #fundamental-panel.rc .rc-error { padding: 10px; border: 1px solid var(--rc-red); border-radius: 6px; color: var(--rc-red); }
-  .streck-arrow{font-size:11px;margin-left:3px;cursor:help}
+  .streck-arrow{display:inline-block;width:1em;text-align:center;font-size:11px;margin-left:3px;cursor:help}
+.streck-cell{display:block;text-align:right;white-space:nowrap}
 .arrow-over{color:#ff9f1a}.arrow-under{color:#3ddc84}
 </style>
 </head>
@@ -3140,7 +3141,7 @@
         return "Streck " + rcSv(s.bookingPct, 1) + " % mot vinstchans " + rcSv(s.winChancePct, 1) + " %, kvot " + rcSv(s.streckRatio, 2);
       }
       function rcStreckArrow(s) {
-        if (s.scratched || !s.streckFlag) return "";
+        if (s.scratched || !s.streckFlag) return " <span class=\"streck-arrow\" aria-hidden=\"true\" style=\"visibility:hidden\">▲</span>";
         var over = s.streckFlag === "over";
         return " <span class=\"streck-arrow " + (over ? "arrow-over" : "arrow-under") + "\" title=\"" +
           rcEsc((over ? "Överstreckad. " : "Understreckad. ") + rcStreckTip(s)) + "\">" + (over ? "▲" : "▼") + "</span>";
@@ -3282,7 +3283,7 @@
           case "odds": return "<span class=\"rc-odds\">" + (s.odds == null ? "—" : Number(s.odds).toFixed(2)) + "</span>";
           case "oddsOpen": return "<span class=\"mono muted\">" + (s.oddsOpen == null ? "—" : Number(s.oddsOpen).toFixed(2)) + "</span>";
           case "oddsDelta": return rcDelta(s.oddsDelta);
-          case "bookingPct": return "<span class=\"mono\">" + (s.bookingPct == null ? "—" : Math.round(Number(s.bookingPct)) + "%") + "</span>" + rcStreckArrow(s);
+          case "bookingPct": return "<span class=\"streck-cell\"><span class=\"mono\">" + (s.bookingPct == null ? "—" : Math.round(Number(s.bookingPct)) + "%") + "</span>" + rcStreckArrow(s) + "</span>";
           case "streckRatio":
             if (s.streckRatio == null || s.scratched) return "<span class=\"muted\">—</span>";
             return "<span class=\"mono " + (s.streckFlag === "over" ? "arrow-over" : s.streckFlag === "under" ? "arrow-under" : "") +
@@ -3340,7 +3341,7 @@
           var cls = [can ? "sortable" : "", on ? "sorted" : "", rcNumCols[c.key] ? "num-col" : ""].filter(Boolean).join(" ");
           return "<th class=\"" + cls + "\" data-key=\"" + c.key + "\"" + (c.tip ? " title=\"" + rcEsc(c.tip) + "\"" : "") +
             (on ? " aria-sort=\"" + (fundamentalSort.dir === "desc" ? "descending" : "ascending") + "\"" : "") + ">" +
-            rcEsc(c.label || c.key) + (can ? "<span class=\"sort-ind\">" + (on ? (fundamentalSort.dir === "asc" ? "▲" : "▼") : "↕") + "</span>" : "") + "</th>";
+            rcEsc(c.label || c.key) + (can ? "<span class=\"sort-ind\">" + (on ? (fundamentalSort.dir === "asc" ? "↑" : "↓") : "↕") + "</span>" : "") + "</th>";
         }).join("") + "</tr>";
         tbody.innerHTML = sortFundamentalRows(leg.starters || []).map(function (s) {
           return "<tr class=\"" + (s.scratched ? "scratched" : "") + "\">" + cols.map(function (c) {

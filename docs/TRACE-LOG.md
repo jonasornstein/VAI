@@ -1383,3 +1383,8 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 - Mockup (andre): "Form: senaste först".
 - Bug fix: live UI showed 1.3.8 in 5 places (title, banner, header pill, footer, JS document.title). These are now `{{VAI_VERSION}}`, rendered from vai.__version__ in server._serve_index. Also removed stale 1.3.8 from the server.py docstring and the pyproject description. New test: tests/test_version_text.py. 165 tests pass.
 - Not yet deployed (sudo deploy needed).
+
+## 2026-10-13: v1.3.11 sort indicator and streck alignment
+- Mockup (andre): sort indicator ↑/↓ in header text colour (was green ▲/▼). Streck % right-aligned with an invisible placeholder when there is no arrow.
+- The box copy still had hardcoded v1.3.8. I changed it back to {{VAI_VERSION}} before committing.
+- Not yet deployed (sudo deploy needed).
