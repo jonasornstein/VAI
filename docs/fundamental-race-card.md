@@ -91,3 +91,8 @@ UI (`outbox/mockups/v85-proposal-ux-mockup-atg.html`): orange ▲ for over, gree
 
 - Sort indicator: a thin ↑/↓ in the header text colour (`color: inherit`) instead of a green ▲/▼. Unsorted sortable columns show a faint ↕.
 - Streck % cell (`.streck-cell`): right-aligned. The ▲/▼ arrow has a fixed width of 1em. Rows without an arrow get an invisible ▲ placeholder (`visibility:hidden`, `aria-hidden`), so the % values line up.
+
+## v1.3.12: streck info box
+
+- An ⓘ button (`.streck-info`) in the Streck % header opens `<dialog id="streck-help">`. It explains streck %, win chance, the ratio, the Blixten/Stjärnan examples, ▲/▼, the apple rule and the caveat (the arrow means cheap, not likely to win).
+- It closes with ✕ (form method=dialog) or Esc (native dialog). A capture-phase click handler calls stopPropagation, so clicking ⓘ does not sort the column.

@@ -1658,6 +1658,14 @@
     #fundamental-panel.rc .rc-error { padding: 10px; border: 1px solid var(--rc-red); border-radius: 6px; color: var(--rc-red); }
   .streck-arrow{display:inline-block;width:1em;text-align:center;font-size:11px;margin-left:3px;cursor:help}
 .streck-cell{display:block;text-align:right;white-space:nowrap}
+.streck-info{background:none;border:0;color:inherit;opacity:.7;cursor:pointer;font-size:12px;padding:0 2px;margin-left:3px}
+.streck-info:hover{opacity:1}
+.streck-help{max-width:520px;background:#10251b;color:#e8f2ec;border:1px solid #2c5a42;border-radius:10px;padding:18px 22px;line-height:1.5;font-size:14px}
+.streck-help::backdrop{background:rgba(0,0,0,.55)}
+.streck-help h3{margin:0 0 10px;font-size:16px}
+.streck-help ul{padding-left:18px;margin:6px 0}
+.streck-help-close{position:absolute;top:8px;right:10px;background:none;border:0;color:inherit;font-size:16px;cursor:pointer}
+.streck-help-note{font-style:italic;opacity:.85;border-top:1px solid #2c5a42;padding-top:8px}
 .arrow-over{color:#ff9f1a}.arrow-under{color:#3ddc84}
 </style>
 </head>
@@ -3341,7 +3349,7 @@
           var cls = [can ? "sortable" : "", on ? "sorted" : "", rcNumCols[c.key] ? "num-col" : ""].filter(Boolean).join(" ");
           return "<th class=\"" + cls + "\" data-key=\"" + c.key + "\"" + (c.tip ? " title=\"" + rcEsc(c.tip) + "\"" : "") +
             (on ? " aria-sort=\"" + (fundamentalSort.dir === "desc" ? "descending" : "ascending") + "\"" : "") + ">" +
-            rcEsc(c.label || c.key) + (can ? "<span class=\"sort-ind\">" + (on ? (fundamentalSort.dir === "asc" ? "↑" : "↓") : "↕") + "</span>" : "") + "</th>";
+            rcEsc(c.label || c.key) + (c.key === "bookingPct" ? "<button type=\"button\" class=\"streck-info\" aria-label=\"Vad betyder streck, pilar och kvot?\" title=\"Vad betyder streck, pilar och kvot?\">ⓘ</button>" : "") + (can ? "<span class=\"sort-ind\">" + (on ? (fundamentalSort.dir === "asc" ? "↑" : "↓") : "↕") + "</span>" : "") + "</th>";
         }).join("") + "</tr>";
         tbody.innerHTML = sortFundamentalRows(leg.starters || []).map(function (s) {
           return "<tr class=\"" + (s.scratched ? "scratched" : "") + "\">" + cols.map(function (c) {
@@ -3357,6 +3365,14 @@
         setFundamentalStatus(bits.join(" · "));
       }
 
+
+      document.addEventListener("click", function (e) {
+        var b = e.target && e.target.closest && e.target.closest(".streck-info");
+        if (!b) return;
+        e.stopPropagation(); e.preventDefault();
+        var d = document.getElementById("streck-help");
+        if (d && d.showModal) d.showModal(); else if (d) d.setAttribute("open", "");
+      }, true);
       function initFundamentalCard() {
         var panel = document.getElementById("fundamental-panel");
         var sel = document.getElementById("rc-palette");
@@ -5899,5 +5915,21 @@
       };
     })();
   </script>
+<dialog id="streck-help" class="streck-help">
+  <form method="dialog"><button class="streck-help-close" aria-label="Stäng">✕</button></form>
+  <h3>Streck, pilar och kvot, enkelt förklarat</h3>
+  <p><b>Streck %</b> visar hur många som tror på hästen. Tänk dig att alla kuponger tillsammans har 100 rader. Om 40 av raderna har med Blixten har Blixten 40 % streck.</p>
+  <p><b>Vinstchans</b> är hur troligt det är att hästen vinner. Den räknas fram från oddsen.</p>
+  <p><b>Kvot</b> är strecket delat med vinstchansen.</p>
+  <ul>
+    <li>Runt 1 betyder att folk tror lagom mycket på hästen.</li>
+    <li><span class="arrow-over">▲</span> <b>Överstreckad</b> (kvot 1,30 eller mer): folk tror mer på hästen än den förtjänar.</li>
+    <li><span class="arrow-under">▼</span> <b>Understreckad</b> (kvot 0,70 eller mindre): folk har glömt bort hästen.</li>
+  </ul>
+  <p><b>Exempel:</b> Blixten har 40 % streck men 20 % vinstchans. Kvoten blir 40 / 20 = 2,0, så Blixten är överstreckad. Stjärnan har 5 % streck och 10 % vinstchans. Kvoten blir 0,5, så Stjärnan är understreckad.</p>
+  <p><b>Varför spelar det roll?</b> I V85 delar alla som har rätt på potten. Vinner Stjärnan är det få som har henne med, och din del blir stor. Vinner Blixten har nästan alla honom med, och din del blir liten.</p>
+  <p>Det handlar alltså inte om vilken häst som är bäst, utan om vilken som är billigast i förhållande till sin chans. Ett bra äpple till överpris är ett sämre köp än ett nästan lika bra äpple på rea.</p>
+  <p class="streck-help-note">Kom ihåg att pilen säger att hästen är billig, inte att den kommer att vinna. Vinstchansen kommer från folkets egna odds och kan också vara fel.</p>
+</dialog>
 </body>
 </html>

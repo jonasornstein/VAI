@@ -1388,3 +1388,7 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 - Mockup (andre): sort indicator ↑/↓ in header text colour (was green ▲/▼). Streck % right-aligned with an invisible placeholder when there is no arrow.
 - The box copy still had hardcoded v1.3.8. I changed it back to {{VAI_VERSION}} before committing.
 - Not yet deployed (sudo deploy needed).
+
+## 2026-10-13: v1.3.12 streck info box
+- Mockup (andre): ⓘ at Streck % opens an explanation dialog that closes with ✕ or Esc. The click does not trigger sort. {{VAI_VERSION}} placeholders and the 1.3.11 styling are kept, and the form order is unchanged.
+- Not yet deployed (sudo deploy needed).
