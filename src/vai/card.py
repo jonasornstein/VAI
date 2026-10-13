@@ -211,6 +211,54 @@ def _odds(raw: Any) -> float | None:
     return round(raw / 100, 2)
 
 
+STRECK_OVER = 1.3
+STRECK_UNDER = 0.7
+STRECK_MIN_PCT = 3.0
+_STRECK_EPS = 1e-9
+
+
+def add_streck_flags(card: dict[str, Any]) -> dict[str, Any]:
+    """Port of v85-card-api addStreckFlags: streck % vs odds-implied (normalized) win chance.
+
+    Per leg, win% = (1/odds) / sum(1/odds of live starters) * 100. Sets winChancePct,
+    streckRatio (bookingPct / win, 2 dp) and streckFlag ('over' >= 1.3, 'under' <= 0.7).
+    Thresholds compare the ROUNDED streckRatio (2 dp) so the arrow always matches the
+    shown number (1.296 -> 1.30 -> over), with a 1e-9 tolerance against float error. No flag when both streck % and win% are below 3.
+    """
+    for leg in card.get("legs") or []:
+        starters = leg.get("starters") or []
+
+        def _live_odds(s: dict[str, Any]) -> float | None:
+            o = s.get("odds")
+            if s.get("scratched") or not isinstance(o, (int, float)) or o <= 0:
+                return None
+            return float(o)
+
+        total = sum(1 / o for o in (_live_odds(s) for s in starters) if o is not None)
+        for s in starters:
+            s["streckRatio"] = None
+            s["streckFlag"] = None
+            s["winChancePct"] = None
+            o = _live_odds(s)
+            book = s.get("bookingPct")
+            if o is None or not isinstance(book, (int, float)) or not total:
+                continue
+            win = (1 / o) / total * 100
+            s["winChancePct"] = round(win, 1)
+            if win <= 0:
+                continue
+            r = book / win
+            rr = round(r, 2)
+            s["streckRatio"] = rr
+            if book < STRECK_MIN_PCT and win < STRECK_MIN_PCT:
+                continue
+            if rr >= STRECK_OVER - _STRECK_EPS:
+                s["streckFlag"] = "over"
+            elif rr <= STRECK_UNDER + _STRECK_EPS:
+                s["streckFlag"] = "under"
+    return card
+
+
 def build_card(
     game_id: str,
     *,
@@ -345,7 +393,7 @@ def build_card(
 
     pool = (g.get("pools") or {}).get(product) or {}
     turnover = pool.get("turnover")
-    return {
+    return add_streck_flags({
         "id": game_id,
         "gameId": game_id,
         "product": product,
@@ -365,4 +413,4 @@ def build_card(
         "kmNote": "ESTIMATE driving km (haversine × 1.35, round 10). Not ST avståndstabell.",
         "sortableColumns": SORTABLE_COLUMNS,
         "legs": legs,
-    }
+    })

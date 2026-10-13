@@ -69,3 +69,14 @@ Do not kill it or merge it into VAI without his say-so.
 Standard: `sudo bash deploy/update-server.sh` (see `docs/deploy-hetzner.md`),
 then ensure `/opt/vai/inbox/card-odds` and `/opt/vai/inbox/card-form` exist,
 owned by `vai`.
+
+## Streck arrows (v1.3.9)
+
+`add_streck_flags` in `src/vai/card.py` runs inside `build_card()` and adds these fields to each starter:
+
+- `winChancePct`: 1/odds normalized to 100% over the live (non-scratched) starters in the leg, 1 dp.
+- `streckRatio`: `bookingPct / winChancePct`, rounded to 2 dp.
+- `streckFlag`: decided on the **rounded** `streckRatio`. `"over"` if >= 1.30, `"under"` if <= 0.70, otherwise `null`. So 1.296 → 1.30 → over, and 1.294 → 1.29 → no flag.
+- All three are `null` when the horse is scratched or odds or streck are missing. `streckFlag` is `null` when both streck % and win chance are below 3%.
+
+UI (`outbox/mockups/v85-proposal-ux-mockup-atg.html`): orange ▲ for over, green ▼ for under, with a tooltip. A sortable **Kvot** column sits after **Streck %**.

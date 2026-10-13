@@ -1373,3 +1373,7 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 - ATG fetched only on panel open, Datum/Bana change, Uppdatera; no timers.
 - Separate test card ~/v85-card (port 8090) kept running in parallel until 2026-10-17 13:05 UTC by ornstein decision.
 - Details: docs/fundamental-race-card.md, docs/experts-collector.md. Approved: ornstein.
+
+## 2026-10-13: v1.3.9 streck arrows
+- `add_streck_flags` (card.py): the flag now follows the rounded streckRatio (1.296 → over, 0.704 → under). Version bumped to 1.3.9. 163 tests pass.
+- Not yet deployed. Production needs a sudo deploy after the push.

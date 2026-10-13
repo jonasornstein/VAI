@@ -93,3 +93,4 @@ VAI/
 - Automated bet placement on ATG
 - Unapproved artifacts in `outbox/`
 - Financial advice or guaranteed-return claims
+- v1.3.9 streck arrows: per-starter `winChancePct`, `streckRatio` (2 dp) and `streckFlag` (over >= 1.30 / under <= 0.70, decided on the ROUNDED ratio). See docs/fundamental-race-card.md "Streck arrows". Tests: tests/test_streck_flags.py.
