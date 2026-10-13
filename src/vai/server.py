@@ -1,4 +1,4 @@
-"""Local HTTP server — mockup + random/expert/fundamental API (v1.3.8)."""
+"""Local HTTP server — mockup + random/expert/fundamental API."""
 
 from __future__ import annotations
 
@@ -76,6 +76,15 @@ def find_repo_root() -> Path:
     raise RuntimeError("Could not locate VAI repo root")
 
 
+
+VERSION_PLACEHOLDER = "{{VAI_VERSION}}"
+
+
+def render_index_html(html: str) -> str:
+    from vai import __version__
+
+    return html.replace(VERSION_PLACEHOLDER, __version__)
+
 class VaiRequestHandler(BaseHTTPRequestHandler):
     repo_root: Path = find_repo_root()
     mockup_dir: Path = repo_root / "outbox" / "mockups"
@@ -126,7 +135,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path
         if path == "/" or path == "/index.html":
-            self._serve_file(self.mockup_dir / "v85-proposal-ux-mockup-atg.html")
+            self._serve_index()
             return
         # Activity stats viewer — always from repo tree (same file git deploy updates).
         if path == "/vai-stats.html":
@@ -1292,6 +1301,22 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             content_type="application/x-ndjson; charset=utf-8",
             cache_control="no-cache",
         )
+
+    def _serve_index(self) -> None:
+        """Serve the UI with {{VAI_VERSION}} replaced by vai.__version__ (no drift)."""
+        path = self.mockup_dir / "v85-proposal-ux-mockup-atg.html"
+        if not path.is_file():
+            self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": str(path)}})
+            return
+        content = render_index_html(path.read_text(encoding="utf-8")).encode("utf-8")
+        self.send_response(HTTPStatus.OK)
+        self._set_cors_headers()
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Content-Length", str(len(content)))
+        self.end_headers()
+        if not getattr(self, "_head_only", False):
+            self.wfile.write(content)
 
     def _serve_file(
         self,

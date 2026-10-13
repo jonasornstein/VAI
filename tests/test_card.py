@@ -49,7 +49,7 @@ def test_build_card_v85_and_open_odds_kept(tmp_path: Path) -> None:
         assert c["legCount"] == 8 and c["product"] == "V85" and c["turnover"] == 12345
         s = c["legs"][0]["starters"][0]
         assert s["odds"] == 4.5 and s["oddsOpen"] == 4.5 and s["oddsDelta"] == 0
-        assert s["bookingPct"] == 25.0 and s["formLast5"] == "x-1" and s["gallops"] == 1
+        assert s["bookingPct"] == 25.0 and s["formLast5"] == "1-x" and s["gallops"] == 1
         assert s["horseKm"] == 0 and s["trainerKm"] and s["driverChange"] is True
         assert c["legs"][0]["starters"][1]["scratched"] and c["legs"][0]["starters"][1]["oddsOpen"] is None
         saved = json.loads((tmp_path / "V85_2026-10-17_16_5.json").read_text())
@@ -98,12 +98,12 @@ def test_form_disk_cache_keyed_by_life_starts(tmp_path: Path) -> None:
     clear_records_cache()
     with patch("vai.card.fetch_horse_results", return_value=RESULTS) as fh:
         c = build_card("V85_2026-10-17_16_5", odds_dir=odds, fetch_game=lambda g: _with_stats(_game("V85", 8), 40))
-        assert fh.call_count == 16 and c["legs"][0]["starters"][0]["formLast5"] == "x-1"
+        assert fh.call_count == 16 and c["legs"][0]["starters"][0]["formLast5"] == "1-x"
     assert (form / "100.json").is_file()
     clear_records_cache()  # simulate server restart: disk serves form, no ATG calls
     with patch("vai.card.fetch_horse_results", return_value=RESULTS) as fh:
         c = build_card("V85_2026-10-17_16_5", odds_dir=odds, fetch_game=lambda g: _with_stats(_game("V85", 8), 40))
-        assert fh.call_count == 0 and c["legs"][0]["starters"][0]["formLast5"] == "x-1"
+        assert fh.call_count == 0 and c["legs"][0]["starters"][0]["formLast5"] == "1-x"
         # horse raced again (start count changed) → refetch
         build_card("V85_2026-10-17_16_5", odds_dir=odds, fetch_game=lambda g: _with_stats(_game("V85", 8), 41))
         assert fh.call_count == 16
@@ -120,7 +120,7 @@ def test_include_form_cached_reports_missing(tmp_path: Path) -> None:
         build_card("V85_2026-10-17_16_5", odds_dir=tmp_path / "o", fetch_game=lambda g: _with_stats(_game("V85", 8), 3))
         c = build_card("V85_2026-10-17_16_5", odds_dir=tmp_path / "o", include_form="cached",
                        fetch_game=lambda g: _with_stats(_game("V85", 8), 3))
-        assert c["formMissing"] == 0 and c["legs"][0]["starters"][0]["formLast5"] == "x-1"
+        assert c["formMissing"] == 0 and c["legs"][0]["starters"][0]["formLast5"] == "1-x"
 
 
 def test_game_fetch_shared_between_concurrent_callers() -> None:

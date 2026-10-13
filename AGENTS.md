@@ -94,3 +94,4 @@ VAI/
 - Unapproved artifacts in `outbox/`
 - Financial advice or guaranteed-return claims
 - v1.3.9 streck arrows: per-starter `winChancePct`, `streckRatio` (2 dp) and `streckFlag` (over >= 1.30 / under <= 0.70, decided on the ROUNDED ratio). See docs/fundamental-race-card.md "Streck arrows". Tests: tests/test_streck_flags.py.
+- v1.3.10: formLast5 newest-first; Öppning/Δ after km / Hemmabana (order comes from card.SORTABLE_COLUMNS). The UI version is `{{VAI_VERSION}}`, filled from vai.__version__ at serve time, so only bump pyproject.toml and src/vai/__init__.py.

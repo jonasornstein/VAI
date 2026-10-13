@@ -1377,3 +1377,9 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 ## 2026-10-13: v1.3.9 streck arrows
 - `add_streck_flags` (card.py): the flag now follows the rounded streckRatio (1.296 → over, 0.704 → under). Version bumped to 1.3.9. 163 tests pass.
 - Not yet deployed. Production needs a sudo deploy after the push.
+
+## 2026-10-13: v1.3.10 form newest-first, column order, version text
+- card.py (stikkan): formLast5 newest-first, tooltip "senaste först", Öppning and Δ after km / Hemmabana. Tests updated.
+- Mockup (andre): "Form: senaste först".
+- Bug fix: live UI showed 1.3.8 in 5 places (title, banner, header pill, footer, JS document.title). These are now `{{VAI_VERSION}}`, rendered from vai.__version__ in server._serve_index. Also removed stale 1.3.8 from the server.py docstring and the pyproject description. New test: tests/test_version_text.py. 165 tests pass.
+- Not yet deployed (sudo deploy needed).
