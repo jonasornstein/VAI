@@ -17,6 +17,7 @@ from urllib.parse import parse_qs, urlparse
 from vai.activity_log import ActivityLogger
 from vai.api_auth import API_KEY_HEADER, check_api_key, is_protected, log_write_attempt
 from vai.atg_fetch import AtgFetchError
+from vai.bets import BetStore, BetValidationError, default_db_path, record_snapshots, snapshot_card
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
 from vai.card import build_card, default_odds_dir, is_card_game_id
 from vai.expert_stats import expert_horse_stats_for_round
@@ -96,6 +97,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
     activity_logger: ActivityLogger | None = None
     trusted_proxy_hops: int = 1
     trusted_proxies: frozenset[str] = frozenset()
+    bet_store: BetStore | None = None  # None → lazily from VAI_DB_PATH / <repo>/data/vai.sqlite
 
     def log_message(self, format: str, *args: Any) -> None:
         # Structured activity log replaces default access lines.
@@ -137,6 +139,12 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         path = parsed.path
         if path == "/" or path == "/index.html":
             self._serve_index()
+            return
+        if path == "/api/bets":
+            # T-35: bets are read-protected too (no read access until password protection exists).
+            if not self._require_api_key():
+                return
+            self._handle_list_bets(parsed.query)
             return
         # Activity stats viewer — always from repo tree (same file git deploy updates).
         if path == "/vai-stats.html":
@@ -242,6 +250,15 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         if not self._require_api_key():
             return
         path = urlparse(self.path).path
+        if path == "/api/bets":
+            self._handle_create_bet()
+            return
+        if path == "/api/bets/settle":
+            self._handle_settle_bets()
+            return
+        if path == "/api/snapshots":
+            self._handle_record_snapshots()
+            return
         if path == "/api/v1/generate/random":
             self._handle_generate_random()
             return
@@ -1298,6 +1315,84 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
             response["hit_summary"] = hit_summary
         self._send_json(HTTPStatus.OK, response)
 
+    # --- T-35 "Mina spel" (bets) -------------------------------------------
+    def _get_bet_store(self) -> BetStore:
+        cls = type(self)
+        if cls.bet_store is None:
+            cls.bet_store = BetStore(default_db_path(cls.repo_root))
+        return cls.bet_store
+
+    def _bet_card_lookup(self, date: str, game: str) -> dict[int, dict[str, set[int]]] | None:
+        """Starters/scratches per leg for validation, or None if no card is available.
+
+        Sources, in order: local YAML race cards (inbox/race-cards, matched on date+game),
+        then recorded start snapshots. No live ATG fetch (keeps POST fast and offline-safe).
+        """
+        try:
+            for path in sorted(self.race_cards_dir.glob("*.yaml")):
+                try:
+                    card = load_race_card_by_id(self.race_cards_dir, path.stem)
+                except Exception:  # noqa: BLE001 - a broken card must not block bet saving
+                    continue
+                if str(card.date) == date and card.game.lower() == game.lower():
+                    return {
+                        leg.leg: {"starters": set(leg.horses), "scratched": set(leg.scratches)}
+                        for leg in card.legs
+                    }
+        except OSError:
+            pass
+        return snapshot_card(self._get_bet_store(), date, game)
+
+    def _read_json_or_400(self) -> dict[str, Any] | None:
+        try:
+            return self._read_json_body()
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError):
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": {"code": "INVALID_JSON", "message": "Expected JSON object"}})
+            return None
+
+    def _handle_list_bets(self, query: str) -> None:
+        date = (parse_qs(query).get("date") or [None])[0]
+        if date is not None and not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
+            self._send_json(HTTPStatus.UNPROCESSABLE_ENTITY, {"errors": [{"leg": None, "startNo": None, "reason": "invalid_value", "field": "date"}]})
+            return
+        self._send_json(HTTPStatus.OK, {"bets": self._get_bet_store().list_bets(date)})
+
+    def _handle_create_bet(self) -> None:
+        body = self._read_json_or_400()
+        if body is None:
+            return
+        card = None
+        if isinstance(body.get("date"), str) and isinstance(body.get("game"), str):
+            card = self._bet_card_lookup(body["date"], body["game"])
+        try:
+            bet = self._get_bet_store().create_bet(body, card)
+        except BetValidationError as exc:
+            self._send_json(HTTPStatus.UNPROCESSABLE_ENTITY, {"errors": exc.errors})
+            return
+        self._send_json(HTTPStatus.CREATED, bet)
+
+    def _handle_settle_bets(self) -> None:
+        body = self._read_json_or_400()
+        if body is None:
+            return
+        try:
+            result = self._get_bet_store().settle(body)
+        except BetValidationError as exc:
+            self._send_json(HTTPStatus.UNPROCESSABLE_ENTITY, {"errors": exc.errors})
+            return
+        self._send_json(HTTPStatus.OK, result)
+
+    def _handle_record_snapshots(self) -> None:
+        body = self._read_json_or_400()
+        if body is None:
+            return
+        try:
+            n = record_snapshots(self._get_bet_store(), body)
+        except BetValidationError as exc:
+            self._send_json(HTTPStatus.UNPROCESSABLE_ENTITY, {"errors": exc.errors})
+            return
+        self._send_json(HTTPStatus.OK, {"upserted": n})
+
     def _read_json_body(self) -> dict[str, Any]:
         length = int(self.headers.get("Content-Length", "0"))
         raw = self.rfile.read(length) if length else b"{}"
@@ -1408,6 +1503,7 @@ def serve(
     VaiRequestHandler.race_cards_dir = root / "inbox" / "race-cards"
     VaiRequestHandler.expert_tips_dir = root / "inbox" / "expert-tips"
     VaiRequestHandler.betslips_dir = root / "betslips"
+    VaiRequestHandler.bet_store = BetStore(default_db_path(root))
     VaiRequestHandler.trusted_proxy_hops = max(0, int(trusted_proxy_hops))
     VaiRequestHandler.trusted_proxies = trusted_proxies or frozenset()
 
@@ -1442,6 +1538,7 @@ def serve(
     print(f"  Expert stats: http://{host}:{port}/api/v1/expert-stats")
     print(f"  Activity stats: http://{host}:{port}/vai-stats.html")
     print(f"  Travbanor: http://{host}:{port}/travbanor.html")
+    print(f"  Bets DB: {VaiRequestHandler.bet_store.path}")
     if log_path is None:
         print("  Activity log: disabled")
     else:
