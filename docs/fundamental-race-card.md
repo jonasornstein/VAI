@@ -96,3 +96,7 @@ UI (`outbox/mockups/v85-proposal-ux-mockup-atg.html`): orange ▲ for over, gree
 
 - An ⓘ button (`.streck-info`) in the Streck % header opens `<dialog id="streck-help">`. It explains streck %, win chance, the ratio, the Blixten/Stjärnan examples, ▲/▼, the apple rule and the caveat (the arrow means cheap, not likely to win).
 - It closes with ✕ (form method=dialog) or Esc (native dialog). A capture-phase click handler calls stopPropagation, so clicking ⓘ does not sort the column.
+
+## v1.3.13: API key for writes
+
+- Saving/deleting betslips, expert tips and experts needs header `X-API-Key`. On the first 401 the UI prompts for the key and keeps it in `localStorage` (`vai_api_key`). 401 = wrong/missing key, 503 = no key configured on the server. Details: [deploy-hetzner.md](deploy-hetzner.md#api-key-for-write-endpoints-v1313).

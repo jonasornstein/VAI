@@ -97,6 +97,7 @@ VAI/
 - v1.3.10: formLast5 newest-first; Öppning/Δ after km / Hemmabana (order comes from card.SORTABLE_COLUMNS). The UI version is `{{VAI_VERSION}}`, filled from vai.__version__ at serve time, so only bump pyproject.toml and src/vai/__init__.py.
 - v1.3.11: FUNDAMENTAL sort indicator is a thin ↑/↓ in the header colour. Streck % is right-aligned with an invisible arrow placeholder. Mockup html only. Keep the `{{VAI_VERSION}}` placeholders.
 - v1.3.12: ⓘ at the Streck % header opens the #streck-help dialog (explanation in plain Swedish). Clicking ⓘ must not sort. Mockup html only.
+- v1.3.13: write endpoints (betslips, expert-tips, experts) require header `X-API-Key` = `VAI_API_KEY` from `/etc/vai/vai.env` (systemd drop-in for vai.service). Wrong/missing key → 401, key unset on server → 503. UI asks for the key at the first 401 and stores it in localStorage (`vai_api_key`). Expert collector reads `~/.config/vai/api_key` (chmod 600).
 
 ## Write API security
 

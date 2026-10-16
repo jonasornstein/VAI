@@ -243,16 +243,20 @@ Protected: `POST /api/v1/betslips`, `POST /api/v1/betslips/delete`, `DELETE /api
 `POST /api/v1/experts/reset`, `PUT /api/v1/experts/visibility|reorder|{id}`, `DELETE /api/v1/experts/{id}`.
 Unprotected (compute only, no writes): `POST /api/v1/generate/random|expert`, `POST /api/v1/betslips/parse`; all GET/HEAD.
 
-Setup:
+Setup (as root; the installed `/etc/systemd/system/vai.service` is not replaced by
+`update-server.sh`, so add a drop-in):
 
 ```bash
 sudo install -d -m 755 /etc/vai
-KEY=$(openssl rand -hex 32)
-echo "VAI_API_KEY=$KEY" | sudo tee /etc/vai/vai.env >/dev/null
-sudo chown root:root /etc/vai/vai.env && sudo chmod 600 /etc/vai/vai.env
-sudo systemctl edit vai   # add: [Service]  EnvironmentFile=/etc/vai/vai.env
+read -rs KEY   # paste key from `openssl rand -hex 32`
+printf 'VAI_API_KEY=%s\n' "$KEY" | sudo install -m 600 -o root -g root /dev/stdin /etc/vai/vai.env
+sudo install -d -m 755 /etc/systemd/system/vai.service.d
+printf '[Service]\nEnvironmentFile=/etc/vai/vai.env\n' | sudo tee /etc/systemd/system/vai.service.d/api-key.conf >/dev/null
 sudo systemctl daemon-reload && sudo systemctl restart vai
 ```
+
+Expert collector (`experts/`, user ornstein): reads `VAI_API_KEY`, else `~/.config/vai/api_key`
+(dir 700, file 600).
 
 Clients: `curl -H "X-API-Key: $VAI_API_KEY" -X POST ...`. The web UI prompts for the key on
 the first 401 and keeps it in browser `localStorage` (`vai_api_key`).

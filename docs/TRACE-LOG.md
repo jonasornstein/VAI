@@ -1392,3 +1392,8 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 ## 2026-10-13: v1.3.12 streck info box
 - Mockup (andre): ⓘ at Streck % opens an explanation dialog that closes with ✕ or Esc. The click does not trigger sort. {{VAI_VERSION}} placeholders and the 1.3.11 styling are kept, and the form order is unchanged.
 - Not yet deployed (sudo deploy needed).
+
+## 2026-10-16: v1.3.13 API key for write endpoints
+- Merged feature/api-key. All write endpoints (betslips, expert-tips, experts) require header `X-API-Key`. The key is `VAI_API_KEY` in `/etc/vai/vai.env` (root, 600), loaded by a systemd drop-in for vai.service (`/etc/systemd/system/vai.service.d/api-key.conf`). Wrong/missing key → 401; key unset on server → 503 (fail closed).
+- UI asks for the key at the first 401 and stores it in localStorage. Expert collector reads `~/.config/vai/api_key` (chmod 600).
+- Not yet deployed (sudo deploy needed).
