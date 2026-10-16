@@ -15,6 +15,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from vai.activity_log import ActivityLogger
+from vai.api_auth import API_KEY_HEADER, check_api_key, is_protected, log_write_attempt
 from vai.atg_fetch import AtgFetchError
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
 from vai.card import build_card, default_odds_dir, is_card_game_id
@@ -219,7 +220,27 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                 return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
+    def _require_api_key(self) -> bool:
+        """Gate write endpoints (fail closed). Returns True if the request may proceed."""
+        path = urlparse(self.path).path
+        method = self.command or ""
+        if not is_protected(method, path):
+            return True
+        status, outcome = check_api_key(self.headers.get(API_KEY_HEADER))
+        client_ip = self.headers.get("X-Real-IP") or (self.client_address[0] if self.client_address else None)
+        log_write_attempt(method=method, path=path, client_ip=client_ip, outcome=outcome)
+        if status is None:
+            return True
+        if status == HTTPStatus.SERVICE_UNAVAILABLE:
+            err = {"code": "API_KEY_NOT_CONFIGURED", "message": "Write endpoints disabled: VAI_API_KEY not set on server"}
+        else:
+            err = {"code": "UNAUTHORIZED", "message": "Missing or invalid X-API-Key header"}
+        self._send_json(status, {"error": err})
+        return False
+
     def do_POST(self) -> None:
+        if not self._require_api_key():
+            return
         path = urlparse(self.path).path
         if path == "/api/v1/generate/random":
             self._handle_generate_random()
@@ -248,6 +269,8 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
     def do_PUT(self) -> None:
+        if not self._require_api_key():
+            return
         path = urlparse(self.path).path
         if path == "/api/v1/expert-tips":
             self._handle_save_expert_tip()
@@ -266,6 +289,8 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         self._send_json(HTTPStatus.NOT_FOUND, {"error": {"code": "NOT_FOUND", "message": path}})
 
     def do_DELETE(self) -> None:
+        if not self._require_api_key():
+            return
         parsed = urlparse(self.path)
         path = parsed.path
         if path.startswith("/api/v1/expert-tips/"):
@@ -1357,7 +1382,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
     def _set_cors_headers(self) -> None:
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-API-Key")
 
 
 def serve(
@@ -1393,6 +1418,13 @@ def serve(
     else:
         log_path = Path(activity_log)  # type: ignore[arg-type]
     VaiRequestHandler.activity_logger = ActivityLogger(log_path)
+
+    import logging
+    import os
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+    if not os.environ.get("VAI_API_KEY", "").strip():
+        print("WARNING: VAI_API_KEY not set - write endpoints will refuse (503).", file=sys.stderr)
 
     try:
         server = ThreadingHTTPServer((host, port), VaiRequestHandler)

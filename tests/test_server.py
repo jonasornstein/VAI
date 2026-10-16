@@ -11,6 +11,8 @@ from vai.activity_log import ActivityLogger
 from vai.schedule import V85Round, V85Schedule
 from vai.server import VaiRequestHandler, find_repo_root
 
+TEST_API_KEY = "test-key-0123456789abcdef"
+
 MOCK_SCHEDULE = V85Schedule(
     source="atg",
     fetched_at="2026-07-07T12:00:00+00:00",
@@ -66,7 +68,7 @@ def _get_status(url: str) -> tuple[int, dict]:
 
 def _post(url: str, payload: dict) -> tuple[int, dict]:
     body = json.dumps(payload).encode("utf-8")
-    request = Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    request = Request(url, data=body, headers={"Content-Type": "application/json", "X-API-Key": TEST_API_KEY}, method="POST")
     try:
         with urlopen(request) as response:
             return response.status, json.loads(response.read().decode("utf-8"))
@@ -76,7 +78,7 @@ def _post(url: str, payload: dict) -> tuple[int, dict]:
 
 def _put(url: str, payload: dict) -> tuple[int, dict]:
     body = json.dumps(payload).encode("utf-8")
-    request = Request(url, data=body, headers={"Content-Type": "application/json"}, method="PUT")
+    request = Request(url, data=body, headers={"Content-Type": "application/json", "X-API-Key": TEST_API_KEY}, method="PUT")
     try:
         with urlopen(request) as response:
             return response.status, json.loads(response.read().decode("utf-8"))
@@ -85,7 +87,7 @@ def _put(url: str, payload: dict) -> tuple[int, dict]:
 
 
 def _delete(url: str) -> tuple[int, dict]:
-    request = Request(url, method="DELETE")
+    request = Request(url, headers={"X-API-Key": TEST_API_KEY}, method="DELETE")
     try:
         with urlopen(request) as response:
             return response.status, json.loads(response.read().decode("utf-8"))

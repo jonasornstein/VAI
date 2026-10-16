@@ -2055,6 +2055,31 @@
   <script>
     (function () {
       var API = "";
+      // VAI_API_KEY: write calls (POST/PUT/DELETE) send X-API-Key from localStorage.
+      // On 401 the user is prompted once for the key (stored only in this browser).
+      (function () {
+        var origFetch = window.fetch.bind(window);
+        window.fetch = function (url, opts) {
+          opts = opts || {};
+          var method = (opts.method || "GET").toUpperCase();
+          if (method === "GET" || method === "HEAD") return origFetch(url, opts);
+          function withKey() {
+            var o = Object.assign({}, opts);
+            var h = new Headers(o.headers || {});
+            var k = localStorage.getItem("vai_api_key");
+            if (k) h.set("X-API-Key", k);
+            o.headers = h;
+            return o;
+          }
+          return origFetch(url, withKey()).then(function (resp) {
+            if (resp.status !== 401) return resp;
+            var k = window.prompt("VAI API-nyckel krävs för att spara/ändra:");
+            if (!k) return resp;
+            localStorage.setItem("vai_api_key", k.trim());
+            return origFetch(url, withKey());
+          });
+        };
+      })();
       function atgGameUrl(game) {
         return "https://www.atg.se/" + String(game || "V85").toLowerCase();
       }

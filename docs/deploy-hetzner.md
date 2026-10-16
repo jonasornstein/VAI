@@ -229,3 +229,30 @@ Optional other local port: `ssh -L 8767:127.0.0.1:8766 …` → http://127.0.0.1
 | 1.2 | 2026-07-15 | SSH tunnel from PC to browse dev UI (`-L 8766:127.0.0.1:8766`) |
 | 1.1 | 2026-07-15 | Workstation local-vs-prod — dev `~/grok/vai` as ornstein, prod `/opt/vai` as vai, ship bridge |
 | 1.0 | 2026-07-14 | Initial operator doc — Hetzner + vai.ornstein.work production path |
+
+## API key for write endpoints (v1.3.13)
+
+All data-modifying endpoints require header `X-API-Key: <key>`. The key is read
+from env `VAI_API_KEY`, installed by root in `/etc/vai/vai.env` (mode 600, never in git)
+and loaded by `vai.service` via `EnvironmentFile=`. If unset, writes fail closed (503).
+Wrong/missing key → 401 JSON. Every write attempt is logged (journald, logger
+`vai.api_auth`: ok/denied, method, path, client IP — never the key).
+
+Protected: `POST /api/v1/betslips`, `POST /api/v1/betslips/delete`, `DELETE /api/v1/betslips/{name}`,
+`POST|PUT /api/v1/expert-tips`, `DELETE /api/v1/expert-tips[/{id}]`, `POST /api/v1/experts`,
+`POST /api/v1/experts/reset`, `PUT /api/v1/experts/visibility|reorder|{id}`, `DELETE /api/v1/experts/{id}`.
+Unprotected (compute only, no writes): `POST /api/v1/generate/random|expert`, `POST /api/v1/betslips/parse`; all GET/HEAD.
+
+Setup:
+
+```bash
+sudo install -d -m 755 /etc/vai
+KEY=$(openssl rand -hex 32)
+echo "VAI_API_KEY=$KEY" | sudo tee /etc/vai/vai.env >/dev/null
+sudo chown root:root /etc/vai/vai.env && sudo chmod 600 /etc/vai/vai.env
+sudo systemctl edit vai   # add: [Service]  EnvironmentFile=/etc/vai/vai.env
+sudo systemctl daemon-reload && sudo systemctl restart vai
+```
+
+Clients: `curl -H "X-API-Key: $VAI_API_KEY" -X POST ...`. The web UI prompts for the key on
+the first 401 and keeps it in browser `localStorage` (`vai_api_key`).
