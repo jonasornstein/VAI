@@ -127,7 +127,7 @@ def test_unknown_layout(tmp_path):
 def test_cli_import_idempotent(files, tmp_path, monkeypatch, capsys):
     db = tmp_path / "vai.sqlite"
     monkeypatch.setenv("VAI_DB_PATH", str(db))
-    args = ["--raceday-id", "ts616707", "--date", "2026-10-10", "--track", "Testbana", *map(str, files)]
+    args = ["--raceday-id", "ts616707", "--date", "2026-10-10", "--track", "Solvalla", *map(str, files)]
     assert sa.main(args) == 0
     assert sa.main(args) == 0  # re-import must not duplicate
     assert "startlist, 5 rows" in capsys.readouterr().out
@@ -136,7 +136,33 @@ def test_cli_import_idempotent(files, tmp_path, monkeypatch, capsys):
     assert c.execute("select count(*) from sportapp_starts").fetchone()[0] == 5
     assert c.execute("select count(*) from sportapp_results").fetchone()[0] == 5
     assert c.execute("select raceday_id, race_date, track, base_distance from sportapp_races where race_no=2"
-                     ).fetchone() == ("616707", "2026-10-10", "Testbana", 3140)
+                     ).fetchone() == ("616707", "2026-10-10", "SOL", 3140)
+
+
+def test_track_normalized_via_distances_norm(files, tmp_path):
+    from vai.distances import norm
+    db = tmp_path / "t.sqlite"
+    sa.import_files([files[0]], raceday_id="1", track="solvalla", db=str(db))
+    c = sqlite3.connect(db)
+    assert {r[0] for r in c.execute("select track from sportapp_races")} == {norm("Solvalla")} == {"SOL"}
+    assert sa.normalize_track("Åby") == "ABY"
+    assert sa.normalize_track("SOL") == "SOL"
+    assert sa.normalize_track(None) is None
+
+
+def test_unknown_track_aborts_and_stores_nothing(files, tmp_path, capsys):
+    db = tmp_path / "u.sqlite"
+    args = ["--raceday-id", "1", "--db", str(db), "--track", "Testbana", *map(str, files)]
+    assert sa.main(args) != 0
+    assert "unknown track" in capsys.readouterr().err
+    assert not db.exists()  # aborted before the DB was even opened
+    with pytest.raises(ValueError, match="unknown track"):
+        sa.import_files(files, raceday_id="1", track="Testbana", db=str(db))
+    assert not db.exists()
+    conn = sqlite3.connect(":memory:")
+    with pytest.raises(ValueError):
+        sa.store(conn, sa.parse_file(files[0]), raceday_id="1", track="Nowhere")
+    assert conn.execute("select count(*) from sqlite_master where name like 'sportapp_%'").fetchone()[0] == 0
 
 
 def test_reimport_updates_row(files, tmp_path):

@@ -31,6 +31,12 @@ python -m vai.sportapp_import --raceday-id ts616707 --date 2026-10-10 --track So
   (`Häst` → start list, `Plac.` → results).
 - The exports contain **no date, track or raceday id**, so they are given on the
   command line (`--raceday-id` required; a `ts` prefix is stripped).
+- `--track` (and the `track=` parameter of `store()` / `import_files()`) is
+  normalized with erik's `vai.distances.norm()` so the stored code matches the
+  km calculations in `vai.distances` (e.g. `Solvalla`/`solvalla`/`SOL` -> `SOL`,
+  `Åby` -> `ABY`). An unknown track name aborts the import with
+  `error: unknown track ...` on stderr and exit code 2; nothing is stored
+  (the DB is not even opened).
 - DB path: `--db`, else `$VAI_DB_PATH`, else `/opt/vai/data/vai.sqlite`.
 - Re-import is idempotent: upsert keyed by `(raceday_id, race_no, start_no)`.
 - Python API: `parse_file(path)`, `store(conn, parsed, raceday_id=...)`,

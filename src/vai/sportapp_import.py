@@ -28,6 +28,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+from vai.distances import norm as _norm_track
+
 DB_PATH_ENV = "VAI_DB_PATH"
 DEFAULT_DB_PATH = "/opt/vai/data/vai.sqlite"
 
@@ -325,9 +327,23 @@ def _upsert(conn, table: str, keys: tuple[str, ...], rec: dict) -> None:
     )
 
 
+def normalize_track(track: str | None) -> str | None:
+    """Normalize a track name/code via erik's vai.distances.norm() (e.g. Solvalla -> SOL).
+
+    None/empty stays None. An unknown track raises ValueError so nothing is stored.
+    """
+    if track is None or not str(track).strip():
+        return None
+    code = _norm_track(track)
+    if code is None:
+        raise ValueError(f"unknown track {track!r}: not recognised by vai.distances.norm()")
+    return code
+
+
 def store(conn: sqlite3.Connection, parsed: Parsed, *, raceday_id: str,
           race_date: str | None = None, track: str | None = None) -> int:
     """Idempotent upsert keyed by (raceday_id, race_no, start_no). Returns rows written."""
+    track = normalize_track(track)
     ensure_schema(conn)
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     base = getattr(parsed, "base_distance", {})
@@ -352,6 +368,7 @@ def store(conn: sqlite3.Connection, parsed: Parsed, *, raceday_id: str,
 
 
 def import_files(paths, *, raceday_id: str, race_date=None, track=None, db=None) -> dict:
+    track = normalize_track(track)  # fail before opening the DB / parsing anything
     conn = sqlite3.connect(db or db_path())
     try:
         counts = {}
@@ -372,14 +389,20 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("files", nargs="+", help="Sportappen .xlsx export(s)")
     ap.add_argument("--raceday-id", required=True, help="e.g. 616707 (ts616707)")
     ap.add_argument("--date", help="Race date YYYY-MM-DD (not present in the export)")
-    ap.add_argument("--track", help="Track name, e.g. Solvalla (not present in the export)")
+    ap.add_argument("--track", help="Track name or code, e.g. Solvalla; normalized via "
+                    "vai.distances.norm() (stored as SOL); unknown name aborts")
     ap.add_argument("--db", help=f"SQLite path (default ${DB_PATH_ENV} or {DEFAULT_DB_PATH})")
     a = ap.parse_args(argv)
     rid = a.raceday_id.removeprefix("ts")
     if a.date:
         datetime.strptime(a.date, "%Y-%m-%d")
+    try:
+        track = normalize_track(a.track)
+    except ValueError as e:
+        print(f"error: {e}; nothing imported", file=sys.stderr)
+        return 2
     for path, (kind, n) in import_files(a.files, raceday_id=rid, race_date=a.date,
-                                        track=a.track, db=a.db).items():
+                                        track=track, db=a.db).items():
         print(f"{path}: {kind}, {n} rows")
     return 0
 
