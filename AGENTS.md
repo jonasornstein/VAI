@@ -97,3 +97,8 @@ VAI/
 - v1.3.10: formLast5 newest-first; Öppning/Δ after km / Hemmabana (order comes from card.SORTABLE_COLUMNS). The UI version is `{{VAI_VERSION}}`, filled from vai.__version__ at serve time, so only bump pyproject.toml and src/vai/__init__.py.
 - v1.3.11: FUNDAMENTAL sort indicator is a thin ↑/↓ in the header colour. Streck % is right-aligned with an invisible arrow placeholder. Mockup html only. Keep the `{{VAI_VERSION}}` placeholders.
 - v1.3.12: ⓘ at the Streck % header opens the #streck-help dialog (explanation in plain Swedish). Clicking ⓘ must not sort. Mockup html only.
+
+## Write API security
+
+Write endpoints (POST/PUT/DELETE that modify data) require `X-API-Key` matching env `VAI_API_KEY`
+(`src/vai/api_auth.py`, fail closed). Never commit keys. Details: [docs/deploy-hetzner.md](docs/deploy-hetzner.md#api-key-for-write-endpoints-v1313).

@@ -12,3 +12,8 @@ SAMPLE_RACE_CARD = REPO_ROOT / "inbox" / "race-cards" / "2026-07-05-halmstad.yam
 @pytest.fixture
 def sample_race_card() -> RaceCard:
     return load_race_card(SAMPLE_RACE_CARD)
+
+@pytest.fixture(autouse=True)
+def _vai_api_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Write endpoints fail closed without VAI_API_KEY; give tests a known key."""
+    monkeypatch.setenv("VAI_API_KEY", "test-key-0123456789abcdef")

@@ -8,6 +8,8 @@ User=vai
 Group=vai
 WorkingDirectory=/opt/vai
 Environment=PYTHONUNBUFFERED=1
+# VAI_API_KEY=... (root-owned, chmod 600, not in git). '-' = start even if missing (writes then fail closed).
+EnvironmentFile=-/etc/vai/vai.env
 ExecStart=/opt/vai/.venv/bin/python -m vai serve --host 127.0.0.1 --port 8765
 Restart=on-failure
 RestartSec=5
