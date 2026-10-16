@@ -1,0 +1,10 @@
+[Unit]
+Description=VAI weekly backup to Google Drive
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=ornstein
+ExecStart=/home/ornstein/grok/vai/deploy/backup/vai-backup.sh
+Nice=10
