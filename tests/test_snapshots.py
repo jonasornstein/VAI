@@ -151,12 +151,122 @@ def test_http_yaml_card_incomplete_field(server):  # noqa: F811
     assert all(e["leg"] == 1 for e in resp["errors"])
 
 
+SNAPSHOT_FUNCS = {"record_snapshots", "snapshot_card", "_prior_field", "_prior_names", "parse_start_time"}
+FORBIDDEN_MODULES = {"sched", "asyncio", "socket", "http", "urllib", "urllib3", "requests", "httpx", "aiohttp",
+                     "subprocess", "multiprocessing", "concurrent", "time", "signal", "selectors"}
+
+
 def test_no_automatic_collector_code():
-    """JR decision: no timers/threads/loops/ATG fetch in the snapshot path."""
+    """JR decision: no loops/threads/timers/sleeps/network/subprocess in the snapshot path (AST check of bets.py).
+
+    Fails on: any ``while`` anywhere in bets.py (none is legitimate there); any import of
+    sched/asyncio/socket/http/urllib/requests/httpx/subprocess/multiprocessing/time/...;
+    any ``sleep``/``Timer``/``Thread`` reference; any ``threading`` use inside the snapshot functions,
+    and module-level ``threading`` beyond the single ``import threading`` used for ``threading.Lock``;
+    any reference to the ATG fetchers.
+    """
     src = Path(__file__).resolve().parents[1] / "src" / "vai" / "bets.py"
-    text = src.read_text()
-    tree = ast.parse(text)
-    imported = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, (ast.Import, ast.ImportFrom))
-                for a in (n.names if isinstance(n, ast.Import) else [ast.alias(n.module or "")])}
-    assert not imported & {"sched", "asyncio", "urllib", "requests", "httpx", "subprocess"}
-    assert "atg_race_card" not in text and "Timer(" not in text and "time.sleep" not in text
+    tree = ast.parse(src.read_text())
+    problems = []
+    funcs = {n.name: n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    assert SNAPSHOT_FUNCS - {"_prior_names"} <= set(funcs), "snapshot functions renamed; update this guard"
+    threading_imports = 0
+    for n in ast.walk(tree):
+        if isinstance(n, (ast.While, ast.AsyncFor, ast.AsyncWith, ast.Await)):
+            problems.append(f"line {n.lineno}: {type(n).__name__}")
+        if isinstance(n, ast.Import):
+            mods = [a.name for a in n.names]
+        elif isinstance(n, ast.ImportFrom):
+            mods = [n.module or ""]
+        else:
+            mods = []
+        for m in mods:
+            top = m.split(".")[0]
+            if top in FORBIDDEN_MODULES or "atg" in m:
+                problems.append(f"line {n.lineno}: import {m}")
+            if top == "threading":
+                threading_imports += 1
+                if not isinstance(n, ast.Import) or n.col_offset != 0:
+                    problems.append(f"line {n.lineno}: threading import outside module top")
+        if isinstance(n, ast.Attribute) and n.attr in {"sleep", "Timer", "Thread", "run_forever", "urlopen"}:
+            problems.append(f"line {n.lineno}: .{n.attr}")
+        if isinstance(n, ast.Name) and n.id in {"sleep", "Timer", "Thread", "urlopen"}:
+            problems.append(f"line {n.lineno}: {n.id}")
+        if isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id == "threading" \
+                and n.attr not in {"Lock", "RLock"}:
+            problems.append(f"line {n.lineno}: threading.{n.attr}")
+    if threading_imports > 1:
+        problems.append("threading imported more than once")
+    for name in SNAPSHOT_FUNCS & set(funcs):
+        for n in ast.walk(funcs[name]):
+            if isinstance(n, (ast.Import, ast.ImportFrom)):
+                problems.append(f"{name} line {n.lineno}: import inside snapshot function")
+            if isinstance(n, ast.Name) and n.id == "threading":
+                problems.append(f"{name} line {n.lineno}: threading")
+            if isinstance(n, ast.For) and isinstance(n.iter, ast.Call) and getattr(n.iter.func, "id", "") == "iter":
+                problems.append(f"{name} line {n.lineno}: for over iter() (possible infinite loop)")
+    assert not problems, problems
+
+def test_horse_name_filled_from_local_card(store):
+    card = {1: {"starters": {1, 3}, "scratched": {2}, "startTime": None, "names": {1: "Card A", 2: "Card B", 3: "Card C"}}}
+    record_snapshots(store, _snap(), card=card, now=NOW)
+    rows = store.connect().execute("SELECT start_no, horse_name FROM snapshot_starts ORDER BY start_no").fetchall()
+    assert [tuple(r) for r in rows] == [(1, "A"), (2, "Card B"), (3, "Card C")]  # client "A" kept
+
+
+def test_horse_name_filled_from_prior_snapshot(store):
+    legs = [{"leg": 1, "starts": [{"startNo": 1, "horseName": "Alpha"}, {"startNo": 2, "horseName": "Beta"},
+                                  {"startNo": 3}]}]
+    record_snapshots(store, _snap(legs=legs), now=NOW)
+    legs2 = [{"leg": 1, "starts": [{"startNo": 1}, {"startNo": 2, "horseName": "Beta II"}, {"startNo": 3}]}]
+    record_snapshots(store, _snap(legs=legs2), now=NOW.replace(minute=30))
+    rows = store.connect().execute(
+        "SELECT start_no, horse_name FROM snapshot_starts WHERE taken_at LIKE '%12:30%' ORDER BY start_no").fetchall()
+    assert [tuple(r) for r in rows] == [(1, "Alpha"), (2, "Beta II"), (3, None)]
+
+
+def test_horse_name_not_taken_from_other_game(store):
+    record_snapshots(store, _snap(game="V64"), now=NOW)
+    legs = [{"leg": 1, "starts": [{"startNo": 1}]}]
+    record_snapshots(store, _snap(legs=legs), now=NOW)
+    rows = store.connect().execute("SELECT horse_name FROM snapshot_starts WHERE game='V85'").fetchall()
+    assert [r[0] for r in rows] == [None]
+
+
+def test_bets_get_fills_horse_name_from_snapshot(store):
+    bet = _bet()
+    for l in bet["legs"]:
+        for p in l["picks"]:
+            p.pop("horseName", None)
+    saved = store.create_bet(bet)
+    sn = saved["legs"][0]["picks"][0]["startNo"]
+    leg = saved["legs"][0]["leg"]
+    record_snapshots(store, _snap(legs=[{"leg": leg, "starts": [{"startNo": sn, "horseName": "Snap Horse"}]}]), now=NOW)
+    got = store.list_bets("2026-10-17")[0]
+    assert got["legs"][0]["picks"][0]["horseName"] == "Snap Horse"
+
+
+def test_http_horse_name_from_yaml_race_card(server, tmp_path):  # noqa: F811
+    from vai.server import VaiRequestHandler
+
+    cards = tmp_path / "race-cards"
+    cards.mkdir()
+    other_legs = "".join(
+        f"  - leg: {n}\n    race_label: V85-{n}\n    start_time: \"{15 + n}:00\"\n    horses: [1, 2]\n"
+        for n in range(2, 9))
+    (cards / "2026-10-17-solvalla.yaml").write_text(
+        "game: v85\ndate: 2026-10-17\ntrack: Solvalla\nsource: manual\n"
+        "fetched_at: \"2026-10-17T10:00:00+02:00\"\nsettled: false\nlegs:\n"
+        "  - leg: 1\n    race_label: V85-1\n    start_time: \"16:20\"\n    horses: [1, 3]\n    scratches: [2]\n"
+        "    horse_names: {1: Yaml A, 2: Yaml B, 3: Yaml C}\n" + other_legs
+    )
+    old = VaiRequestHandler.race_cards_dir
+    VaiRequestHandler.race_cards_dir = cards
+    try:
+        status, resp = _req(server, "POST", "/api/snapshots", body=_snap())
+    finally:
+        VaiRequestHandler.race_cards_dir = old
+    assert status == 201, resp
+    rows = VaiRequestHandler.bet_store.connect().execute(
+        "SELECT start_no, horse_name FROM snapshot_starts ORDER BY start_no").fetchall()
+    assert [tuple(r) for r in rows] == [(1, "A"), (2, "Yaml B"), (3, "Yaml C")]

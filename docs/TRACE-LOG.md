@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-10-16 | U | Assistant | **K-35 snapshot fixes** — AST guard test now fails on any `while`, threading use beyond `threading.Lock`, sched/asyncio/time/socket/http/urllib/requests/subprocess imports, sleep/Timer/Thread in `bets.py` (verified by injection); `horseName` filled server-side from YAML `horse_names` or latest prior snapshot (snapshots + bets GET). Local commit on `feature/snapshots`, not pushed | [api-bets.md](api-bets.md), [bets.py](../src/vai/bets.py), [test_snapshots.py](../tests/test_snapshots.py) |
 | 2026-10-03 | P | ornstein | **End of session (O&O)** — FUNDAMENTAL Tränare v1.3.7 pushed; session closed. Prod still v1.3.6 until sudo deploy | See [§ End of session — 2026-10-03 (fundamental tranare)](#end-of-session--2026-10-03-fundamental-tranare) |
 | 2026-10-03 | P | Assistant | **Commit + push v1.3.7** — `bd910b6` + tag `v1.3.7` on `origin/master`; FUNDAMENTAL Tränare and Tränare km; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.7` |
 | 2026-10-03 | U | Assistant | **FUNDAMENTAL Tränare** — trainer name and estimated home-track km beside Kusk, from `horse.trainer` | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), mockup, [start_info.py](../../src/vai/start_info.py) |

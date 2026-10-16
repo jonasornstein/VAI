@@ -1334,7 +1334,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         return snapshot_card(self._get_bet_store(), date, game)
 
     def _local_card_lookup(self, date: str, game: str) -> dict[int, dict[str, Any]] | None:
-        """Local YAML race card (inbox/race-cards) as {leg: starters, scratched, startTime} or None."""
+        """Local YAML race card (inbox/race-cards) as {leg: starters, scratched, startTime, names} or None."""
         try:
             for path in sorted(self.race_cards_dir.glob("*.yaml")):
                 try:
@@ -1347,6 +1347,7 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                             "starters": set(leg.horses),
                             "scratched": set(leg.scratches),
                             "startTime": parse_start_time(leg.start_time, date),
+                            "names": dict(leg.horse_names),
                         }
                         for leg in card.legs
                     }

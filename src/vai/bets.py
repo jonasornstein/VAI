@@ -281,12 +281,13 @@ class BetStore:
                 r["leg"]: r
                 for r in conn.execute("SELECT * FROM bet_legs WHERE date=? AND game=?", (b["date"], b["game"]))
             }
+            snap_names = _prior_names(conn, b["date"], b["game"])
             picks_by_leg: dict[int, list[dict[str, Any]]] = {}
             for p in conn.execute("SELECT * FROM bet_picks WHERE bet_id=? ORDER BY leg, start_no", (bet_id,)):
                 picks_by_leg.setdefault(p["leg"], []).append(
                     {
                         "startNo": p["start_no"],
-                        "horseName": p["horse_name"],
+                        "horseName": p["horse_name"] or snap_names.get((p["leg"], p["start_no"])),
                         "streckPct": p["streck_pct"],
                         "odds": p["odds"],
                         "finalOdds": p["final_odds"],
@@ -477,6 +478,18 @@ def _prior_field(conn: sqlite3.Connection, date: str, game: str) -> dict[int, se
     return out
 
 
+def _prior_names(conn: sqlite3.Connection, date: str, game: str) -> dict[tuple[int, int], str]:
+    """Latest non-null horse name per (leg, startNo) from earlier snapshots of date/game."""
+    out: dict[tuple[int, int], str] = {}
+    for r in conn.execute(
+        "SELECT leg, start_no, horse_name FROM snapshot_starts WHERE date=? AND game=? AND horse_name IS NOT NULL"
+        " ORDER BY snapshot_id",
+        (date, game),
+    ):
+        out[(r["leg"], r["start_no"])] = r["horse_name"]
+    return out
+
+
 def record_snapshots(
     store: BetStore,
     body: dict[str, Any],
@@ -485,8 +498,10 @@ def record_snapshots(
 ) -> dict[str, Any]:
     """Store one manual snapshot (one Update press). Inserts history rows; never overwrites.
 
-    ``card``: optional local race card {leg: {"starters": set, "scratched": set, "startTime": datetime|None}}
-    (from inbox/race-cards YAML). Without it, prior snapshots define the known field.
+    ``card``: optional local race card {leg: {"starters": set, "scratched": set, "startTime": datetime|None,
+    "names": {startNo: horseName}}} (from inbox/race-cards YAML). Without it, prior snapshots define the known field.
+    ``horseName`` omitted by the client is filled from the card's names, else the latest prior snapshot
+    for the same date/game/leg/startNo; a client-supplied name is kept.
     """
     taken = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).replace(microsecond=0)
     errors: list[dict[str, Any]] = []
@@ -513,6 +528,7 @@ def record_snapshots(
     conn = store.connect()
     try:
         prior = _prior_field(conn, date, game) if isinstance(game, str) and _valid_date(date) else {}
+        prior_names = _prior_names(conn, date, game) if isinstance(game, str) and _valid_date(date) else {}
         known_winners = {}
         if isinstance(game, str):
             known_winners = {
@@ -586,8 +602,14 @@ def record_snapshots(
                 decided = winner is not None or leg in known_winners or (mts is not None and mts < 0)
                 if not decided:
                     errors.append(_err("not_decided", leg=leg, field="phase"))
+            card_names = (leg_card or {}).get("names") or {}
+            names = {
+                sn: s.get("horseName") if isinstance(s.get("horseName"), str) and s.get("horseName").strip()
+                else card_names.get(sn) or prior_names.get((leg, sn))
+                for sn, s in by_no.items()
+            }
             parsed_legs.append({"leg": leg, "starts": by_no, "startTime": st, "minutesToStart": mts,
-                                "winner": winner})
+                                "winner": winner, "names": names})
         if errors:
             raise BetValidationError(errors)
         taken_iso = taken.isoformat()
@@ -606,7 +628,7 @@ def record_snapshots(
                         "INSERT INTO snapshot_starts(snapshot_id, date, game, track, leg, start_no, horse_name,"
                         " scratched, odds, streck_pct, source, phase, taken_at, start_time, minutes_to_start,"
                         " winner_start_no) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                        (snap_id, date, game, body.get("track"), pl["leg"], sn, s.get("horseName"),
+                        (snap_id, date, game, body.get("track"), pl["leg"], sn, pl["names"].get(sn),
                          1 if s.get("scratched") else 0, s.get("odds"), s.get("streckPct"), body["source"],
                          phase, taken_iso, st_iso, pl["minutesToStart"], pl["winner"]),
                     )

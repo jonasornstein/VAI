@@ -111,6 +111,7 @@ Request (the full payload the Update button sends):
 | `legs[].starts` | The **full field**: every start number of the race, scratched ones with `scratched:true`. `odds` ≥ 1 or null, `streckPct` 0–100 or null |
 | `legs[].startTime` | Optional ISO datetime (no offset = Swedish local time). Used only if no local race card has a `start_time` for that leg |
 | `legs[].winnerStartNo` | Optional; must be a non-scratched start in `starts` |
+| `legs[].starts[].horseName` | Optional string. If omitted/null/blank the server fills it from the local YAML race card's `horse_names` (matched on date + game), else from the latest prior snapshot for the same date/game/leg/startNo; otherwise stays `null`. A client-supplied name is always kept |
 
 Full-field check: the known start list comes from the local YAML race card in
 `inbox/race-cards/` (matched on date + game; horses + scratches), else from all prior snapshots
@@ -134,6 +135,9 @@ Errors `422`, same format as bets: `{"errors":[{"leg":1,"startNo":4,"reason":"in
 (field-level errors also carry `"field"`). Reasons: `invalid_source`, `incomplete_field`,
 `unknown_start`, `not_decided`, `duplicate`, `empty_leg`, `invalid_value`. Nothing is stored
 when any error is returned.
+
+`GET /api/bets`: a pick stored without `horseName` is returned with the latest non-null snapshot
+name for the same date/game/leg/startNo (read-time fallback; the stored pick is unchanged).
 
 Settle: `/api/bets/settle` fills `finalOdds`/`finalStreckPct` from the latest `phase='final'`
 row per leg/start (by `taken_at`, then id). `pre` rows never feed settle. The legacy T-35
