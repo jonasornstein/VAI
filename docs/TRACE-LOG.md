@@ -1397,3 +1397,7 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 - Merged feature/api-key. All write endpoints (betslips, expert-tips, experts) require header `X-API-Key`. The key is `VAI_API_KEY` in `/etc/vai/vai.env` (root, 600), loaded by a systemd drop-in for vai.service (`/etc/systemd/system/vai.service.d/api-key.conf`). Wrong/missing key → 401; key unset on server → 503 (fail closed).
 - UI asks for the key at the first 401 and stores it in localStorage. Expert collector reads `~/.config/vai/api_key` (chmod 600).
 - Not yet deployed (sudo deploy needed).
+
+## 2026-10-16: K-35 manual odds/streck snapshots
+- JR legal decision: snapshots only on manual Update press (one call, no retries/timers/collector, no ATG scraping). source must be manual (422 invalid_source); full field per leg (422 incomplete_field); takenAt UTC + minutesToStart server-side; phase pre/final, final only when the leg is decided; history kept (insert-only), settle uses latest final row. See docs/api-bets.md.
+- Branch feature/snapshots (local only, not deployed).

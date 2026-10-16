@@ -91,8 +91,9 @@ def test_rows_by_correct():
 def test_settle_with_snapshots_and_payout(store):
     store.create_bet(_bet())
     store.create_bet(_bet(game="V64"))
-    record_snapshots(store, {"date": "2026-10-17", "game": "V85", "track": "Solvalla", "starts": [
-        {"leg": 1, "startNo": 1, "horseName": "A", "scratched": False, "finalOdds": 2.9, "streckPct": 33.0}]})
+    record_snapshots(store, {"date": "2026-10-17", "game": "V85", "track": "Solvalla", "source": "manual",
+                             "phase": "final", "legs": [{"leg": 1, "winnerStartNo": 1, "starts": [
+        {"startNo": 1, "horseName": "A", "scratched": False, "odds": 2.9, "streckPct": 33.0}]}]})
     res = store.settle({"date": "2026-10-17", "game": "V85",
                         "legs": [{"leg": 1, "winner": 1, "winnerName": "A"}, {"leg": 2, "winner": 7},
                                  {"leg": 3, "winner": 9}],
@@ -117,17 +118,6 @@ def test_settle_partial_and_no_payouts(store):
     bet = store.settle({"date": "2026-10-17", "game": "V85",
                         "legs": [{"leg": 2, "winner": 7}, {"leg": 3, "winner": 5}]})["bets"][0]
     assert bet["result"] == {"correct": 3, "of": 3, "payout": None, "settled": True}
-
-
-def test_snapshot_upsert(store):
-    base = {"date": "2026-10-17", "game": "V85", "track": "Solvalla"}
-    record_snapshots(store, {**base, "starts": [{"leg": 1, "startNo": 1, "finalOdds": 5.0, "streckPct": 10}]})
-    record_snapshots(store, {**base, "starts": [{"leg": 1, "startNo": 1, "scratched": True, "finalOdds": None, "streckPct": 0}]})
-    conn = store.connect()
-    rows = conn.execute("SELECT scratched, final_odds, streck_pct FROM start_snapshots").fetchall()
-    assert [tuple(r) for r in rows] == [(1, None, 0)]
-    with pytest.raises(BetValidationError):
-        record_snapshots(store, {**base, "starts": [{"leg": 0, "startNo": 1}]})
 
 
 # --- HTTP -------------------------------------------------------------------
@@ -182,8 +172,10 @@ def test_http_flow(server):
     assert status == 201 and bet["rows"] == 6 and bet["price"] == 3.0
     status, resp = _req(server, "POST", "/api/bets", body=_bet(legs=[{"leg": 2, "picks": []}]))
     assert status == 422 and resp["errors"][0]["reason"] == "empty_leg"
-    assert _req(server, "POST", "/api/snapshots", body={"date": "2026-10-17", "game": "V85", "starts": [
-        {"leg": 2, "startNo": 7, "finalOdds": 1.7, "streckPct": 60}]}) == (200, {"upserted": 1})
+    status, resp = _req(server, "POST", "/api/snapshots", body={
+        "date": "2026-10-17", "game": "V85", "source": "manual", "phase": "final",
+        "legs": [{"leg": 2, "winnerStartNo": 7, "starts": [{"startNo": 7, "odds": 1.7, "streckPct": 60}]}]})
+    assert status == 201 and resp["inserted"] == 1
     status, resp = _req(server, "POST", "/api/bets/settle", body={
         "date": "2026-10-17", "game": "V85", "legs": [{"leg": 1, "winner": 4}, {"leg": 2, "winner": 7},
                                                      {"leg": 3, "winner": 3}], "payouts": {"3": 250}})
@@ -204,8 +196,11 @@ def test_http_rejects_scratched_from_yaml_card(server):
 
 
 def test_http_rejects_scratched_from_snapshots(server):
-    _req(server, "POST", "/api/snapshots", body={"date": "2026-10-17", "game": "V85", "starts": [
-        {"leg": 1, "startNo": 1, "scratched": False}, {"leg": 1, "startNo": 4, "scratched": True},
-        {"leg": 2, "startNo": 7}, {"leg": 3, "startNo": 2}, {"leg": 3, "startNo": 3}, {"leg": 3, "startNo": 5}]})
+    status, _ = _req(server, "POST", "/api/snapshots", body={
+        "date": "2026-10-17", "game": "V85", "source": "manual", "phase": "pre", "legs": [
+            {"leg": 1, "starts": [{"startNo": 1, "scratched": False}, {"startNo": 4, "scratched": True}]},
+            {"leg": 2, "starts": [{"startNo": 7}]},
+            {"leg": 3, "starts": [{"startNo": 2}, {"startNo": 3}, {"startNo": 5}]}]})
+    assert status == 201
     status, resp = _req(server, "POST", "/api/bets", body=_bet())
     assert status == 422 and resp["errors"] == [{"leg": 1, "startNo": 4, "reason": "scratched"}]

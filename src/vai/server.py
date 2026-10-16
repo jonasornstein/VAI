@@ -17,7 +17,7 @@ from urllib.parse import parse_qs, urlparse
 from vai.activity_log import ActivityLogger
 from vai.api_auth import API_KEY_HEADER, check_api_key, is_protected, log_write_attempt
 from vai.atg_fetch import AtgFetchError
-from vai.bets import BetStore, BetValidationError, default_db_path, record_snapshots, snapshot_card
+from vai.bets import BetStore, BetValidationError, default_db_path, parse_start_time, record_snapshots, snapshot_card
 from vai.atg_race_card import fetch_atg_race_card_bundle, is_atg_game_id
 from vai.card import build_card, default_odds_dir, is_card_game_id
 from vai.expert_stats import expert_horse_stats_for_round
@@ -1328,6 +1328,13 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         Sources, in order: local YAML race cards (inbox/race-cards, matched on date+game),
         then recorded start snapshots. No live ATG fetch (keeps POST fast and offline-safe).
         """
+        card = self._local_card_lookup(date, game)
+        if card is not None:
+            return card
+        return snapshot_card(self._get_bet_store(), date, game)
+
+    def _local_card_lookup(self, date: str, game: str) -> dict[int, dict[str, Any]] | None:
+        """Local YAML race card (inbox/race-cards) as {leg: starters, scratched, startTime} or None."""
         try:
             for path in sorted(self.race_cards_dir.glob("*.yaml")):
                 try:
@@ -1336,12 +1343,16 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
                     continue
                 if str(card.date) == date and card.game.lower() == game.lower():
                     return {
-                        leg.leg: {"starters": set(leg.horses), "scratched": set(leg.scratches)}
+                        leg.leg: {
+                            "starters": set(leg.horses),
+                            "scratched": set(leg.scratches),
+                            "startTime": parse_start_time(leg.start_time, date),
+                        }
                         for leg in card.legs
                     }
         except OSError:
             pass
-        return snapshot_card(self._get_bet_store(), date, game)
+        return None
 
     def _read_json_or_400(self) -> dict[str, Any] | None:
         try:
@@ -1386,12 +1397,16 @@ class VaiRequestHandler(BaseHTTPRequestHandler):
         body = self._read_json_or_400()
         if body is None:
             return
+        # K-35: exactly one snapshot per request (manual Update press); no retries/background work.
+        card = None
+        if isinstance(body.get("date"), str) and isinstance(body.get("game"), str):
+            card = self._local_card_lookup(body["date"], body["game"].strip())
         try:
-            n = record_snapshots(self._get_bet_store(), body)
+            result = record_snapshots(self._get_bet_store(), body, card)
         except BetValidationError as exc:
             self._send_json(HTTPStatus.UNPROCESSABLE_ENTITY, {"errors": exc.errors})
             return
-        self._send_json(HTTPStatus.OK, {"upserted": n})
+        self._send_json(HTTPStatus.CREATED, result)
 
     def _read_json_body(self) -> dict[str, Any]:
         length = int(self.headers.get("Content-Length", "0"))

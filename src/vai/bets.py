@@ -67,6 +67,37 @@ CREATE TABLE IF NOT EXISTS start_snapshots (
     captured_at TEXT NOT NULL,
     PRIMARY KEY (date, game, leg, start_no)
 );
+-- K-35: manual snapshot history (one row per Update press in `snapshots`).
+-- start_snapshots above is the legacy T-35 upsert table; it is no longer written or read.
+CREATE TABLE IF NOT EXISTS snapshots (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT NOT NULL,
+    game TEXT NOT NULL,
+    track TEXT,
+    source TEXT NOT NULL CHECK (source = 'manual'),
+    phase TEXT NOT NULL CHECK (phase IN ('pre', 'final')),
+    taken_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS snapshot_starts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    snapshot_id INTEGER NOT NULL REFERENCES snapshots(id) ON DELETE CASCADE,
+    date TEXT NOT NULL,
+    game TEXT NOT NULL,
+    track TEXT,
+    leg INTEGER NOT NULL,
+    start_no INTEGER NOT NULL,
+    horse_name TEXT,
+    scratched INTEGER NOT NULL DEFAULT 0,
+    odds REAL,
+    streck_pct REAL,
+    source TEXT NOT NULL CHECK (source = 'manual'),
+    phase TEXT NOT NULL CHECK (phase IN ('pre', 'final')),
+    taken_at TEXT NOT NULL,
+    start_time TEXT,
+    minutes_to_start REAL,
+    winner_start_no INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_snapshot_starts_key ON snapshot_starts(date, game, leg, start_no, phase);
 """
 
 MAX_LEGS = 20
@@ -356,14 +387,15 @@ class BetStore:
         picks: dict[int, set[int]] = {}
         for p in conn.execute("SELECT leg, start_no FROM bet_picks WHERE bet_id=?", (bet_id,)):
             picks.setdefault(p["leg"], set()).add(p["start_no"])
-        # Final odds / streck from snapshots.
+        # Final odds / streck: latest phase='final' snapshot row per leg/start (K-35).
+        latest = (
+            "FROM snapshot_starts s WHERE s.date=? AND s.game=? AND s.phase='final'"
+            " AND s.leg=bet_picks.leg AND s.start_no=bet_picks.start_no"
+            " ORDER BY s.taken_at DESC, s.id DESC LIMIT 1"
+        )
         conn.execute(
-            "UPDATE bet_picks SET"
-            " final_odds=(SELECT s.final_odds FROM start_snapshots s WHERE s.date=? AND s.game=?"
-            "   AND s.leg=bet_picks.leg AND s.start_no=bet_picks.start_no),"
-            " final_streck_pct=(SELECT s.streck_pct FROM start_snapshots s WHERE s.date=? AND s.game=?"
-            "   AND s.leg=bet_picks.leg AND s.start_no=bet_picks.start_no)"
-            " WHERE bet_id=?",
+            f"UPDATE bet_picks SET final_odds=(SELECT s.odds {latest}),"
+            f" final_streck_pct=(SELECT s.streck_pct {latest}) WHERE bet_id=?",
             (date, game, date, game, bet_id),
         )
         all_known = all(leg in winners for leg in picks)
@@ -398,60 +430,213 @@ def _rows_by_correct(picks: dict[int, set[int]], winners: dict[int, int]) -> dic
     return dist
 
 
-# --- snapshots --------------------------------------------------------------
-def record_snapshots(store: BetStore, body: dict[str, Any]) -> int:
+# --- snapshots (card K-35: manual odds/streck snapshots) ---------------------
+# JR legal decision: a snapshot is taken ONLY when Jonas presses "Update" in the UI.
+# One HTTP call = one snapshot. There is deliberately no retry, loop, timer,
+# scheduler or ATG fetch anywhere in this code path. Do not add one.
+SNAPSHOT_SOURCES = ("manual",)
+SNAPSHOT_PHASES = ("pre", "final")
+CARD_TZ = "Europe/Stockholm"
+
+
+def _card_tz():
+    from zoneinfo import ZoneInfo
+
+    return ZoneInfo(CARD_TZ)
+
+
+def parse_start_time(value: Any, date: str | None = None) -> datetime | None:
+    """ISO datetime (naive = Swedish local time) or 'HH:MM' on ``date``. Returns aware UTC or None."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    v = value.strip()
+    try:
+        if len(v) <= 5 and ":" in v and date:
+            hh, mm = v.split(":")
+            dt = datetime.strptime(date, "%Y-%m-%d").replace(hour=int(hh), minute=int(mm))
+        else:
+            dt = datetime.fromisoformat(v.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=_card_tz())
+    return dt.astimezone(timezone.utc)
+
+
+def _err(reason: str, leg: Any = None, start_no: Any = None, field: str | None = None) -> dict[str, Any]:
+    e: dict[str, Any] = {"leg": leg, "startNo": start_no, "reason": reason}
+    if field:
+        e["field"] = field
+    return e
+
+
+def _prior_field(conn: sqlite3.Connection, date: str, game: str) -> dict[int, set[int]]:
+    out: dict[int, set[int]] = {}
+    for r in conn.execute("SELECT DISTINCT leg, start_no FROM snapshot_starts WHERE date=? AND game=?", (date, game)):
+        out.setdefault(r["leg"], set()).add(r["start_no"])
+    return out
+
+
+def record_snapshots(
+    store: BetStore,
+    body: dict[str, Any],
+    card: dict[int, dict[str, Any]] | None = None,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Store one manual snapshot (one Update press). Inserts history rows; never overwrites.
+
+    ``card``: optional local race card {leg: {"starters": set, "scratched": set, "startTime": datetime|None}}
+    (from inbox/race-cards YAML). Without it, prior snapshots define the known field.
+    """
+    taken = (now or datetime.now(timezone.utc)).astimezone(timezone.utc).replace(microsecond=0)
     errors: list[dict[str, Any]] = []
-    if not _valid_date(body.get("date")):
-        errors.append({"leg": None, "startNo": None, "reason": "invalid_value", "field": "date"})
-    if not isinstance(body.get("game"), str) or not body.get("game", "").strip():
-        errors.append({"leg": None, "startNo": None, "reason": "invalid_value", "field": "game"})
-    starts = body.get("starts")
-    if not isinstance(starts, list) or not starts:
-        errors.append({"leg": None, "startNo": None, "reason": "invalid_value", "field": "starts"})
-        starts = []
-    for s in starts:
-        ok = (
-            isinstance(s, dict)
-            and _int(s.get("leg"), 1, MAX_LEGS)
-            and _int(s.get("startNo"), 1, MAX_START_NO)
-            and _num(s.get("finalOdds"), lo=1.0, hi=100000)
-            and _num(s.get("streckPct"), lo=0, hi=100)
-            and (s.get("horseName") is None or isinstance(s.get("horseName"), str))
-            and (s.get("scratched") is None or isinstance(s.get("scratched"), bool))
-        )
-        if not ok:
-            errors.append({"leg": s.get("leg") if isinstance(s, dict) else None,
-                           "startNo": s.get("startNo") if isinstance(s, dict) else None,
-                           "reason": "invalid_value"})
-    if errors:
+    if body.get("source") not in SNAPSHOT_SOURCES:
+        errors.append(_err("invalid_source", field="source"))
+    phase = body.get("phase")
+    if phase not in SNAPSHOT_PHASES:
+        errors.append(_err("invalid_value", field="phase"))
+    date, game = body.get("date"), body.get("game")
+    if not _valid_date(date):
+        errors.append(_err("invalid_value", field="date"))
+    if not isinstance(game, str) or not game.strip():
+        errors.append(_err("invalid_value", field="game"))
+    if body.get("track") is not None and not isinstance(body.get("track"), str):
+        errors.append(_err("invalid_value", field="track"))
+    legs = body.get("legs")
+    if not isinstance(legs, list) or not legs or len(legs) > MAX_LEGS:
+        errors.append(_err("invalid_value", field="legs"))
+        legs = []
+    if errors and not legs:
         raise BetValidationError(errors)
-    now = _now()
+    game = game.strip() if isinstance(game, str) else game
+
     conn = store.connect()
     try:
-        with conn:
-            for s in starts:
-                conn.execute(
-                    "INSERT INTO start_snapshots(date, game, track, leg, start_no, horse_name, scratched,"
-                    " final_odds, streck_pct, captured_at) VALUES (?,?,?,?,?,?,?,?,?,?)"
-                    " ON CONFLICT(date, game, leg, start_no) DO UPDATE SET track=excluded.track,"
-                    " horse_name=excluded.horse_name, scratched=excluded.scratched,"
-                    " final_odds=excluded.final_odds, streck_pct=excluded.streck_pct,"
-                    " captured_at=excluded.captured_at",
-                    (body["date"], body["game"].strip(), body.get("track"), s["leg"], s["startNo"],
-                     s.get("horseName"), 1 if s.get("scratched") else 0, s.get("finalOdds"),
-                     s.get("streckPct"), now),
+        prior = _prior_field(conn, date, game) if isinstance(game, str) and _valid_date(date) else {}
+        known_winners = {}
+        if isinstance(game, str):
+            known_winners = {
+                r["leg"]: r["winner_start_no"]
+                for r in conn.execute(
+                    "SELECT leg, winner_start_no FROM bet_legs WHERE date=? AND game=?", (date, game)
                 )
-        return len(starts)
+                if r["winner_start_no"] is not None
+            }
+        parsed_legs: list[dict[str, Any]] = []
+        seen_legs: set[int] = set()
+        for lo in legs:
+            if not isinstance(lo, dict) or not _int(lo.get("leg"), 1, MAX_LEGS):
+                errors.append(_err("invalid_value", field="leg"))
+                continue
+            leg = lo["leg"]
+            if leg in seen_legs:
+                errors.append(_err("duplicate", leg=leg, field="leg"))
+                continue
+            seen_legs.add(leg)
+            starts = lo.get("starts")
+            if not isinstance(starts, list) or not starts:
+                errors.append(_err("empty_leg", leg=leg))
+                continue
+            by_no: dict[int, dict[str, Any]] = {}
+            for s in starts:
+                sn = s.get("startNo") if isinstance(s, dict) else None
+                if not isinstance(s, dict) or not _int(sn, 1, MAX_START_NO):
+                    errors.append(_err("invalid_value", leg=leg, start_no=sn, field="startNo"))
+                    continue
+                if sn in by_no:
+                    errors.append(_err("duplicate", leg=leg, start_no=sn))
+                    continue
+                by_no[sn] = s
+                for f, ok in (
+                    ("odds", _num(s.get("odds"), lo=1.0, hi=100000)),
+                    ("streckPct", _num(s.get("streckPct"), lo=0, hi=100)),
+                    ("horseName", s.get("horseName") is None or isinstance(s.get("horseName"), str)),
+                    ("scratched", s.get("scratched") is None or isinstance(s.get("scratched"), bool)),
+                ):
+                    if not ok:
+                        errors.append(_err("invalid_value", leg=leg, start_no=sn, field=f))
+            # Full field check.
+            leg_card = card.get(leg) if card is not None else None
+            if card is not None and leg_card is None:
+                errors.append(_err("unknown_start", leg=leg, field="leg"))
+                continue
+            if leg_card is not None:
+                expected = set(leg_card.get("starters", set())) | set(leg_card.get("scratched", set()))
+                for sn in sorted(set(by_no) - expected):
+                    errors.append(_err("unknown_start", leg=leg, start_no=sn))
+            else:
+                expected = prior.get(leg, set())
+            for sn in sorted(expected - set(by_no)):
+                errors.append(_err("incomplete_field", leg=leg, start_no=sn))
+            # Winner.
+            winner = lo.get("winnerStartNo")
+            if winner is not None and (
+                not _int(winner, 1, MAX_START_NO) or winner not in by_no or by_no[winner].get("scratched")
+            ):
+                errors.append(_err("invalid_value", leg=leg, start_no=winner, field="winnerStartNo"))
+                winner = None
+            # Start time: local card first, else payload.
+            st = leg_card.get("startTime") if leg_card is not None else None
+            if st is None and lo.get("startTime") is not None:
+                st = parse_start_time(lo.get("startTime"), date if isinstance(date, str) else None)
+                if st is None:
+                    errors.append(_err("invalid_value", leg=leg, field="startTime"))
+            mts = round((st - taken).total_seconds() / 60.0, 1) if st is not None else None
+            if phase == "final":
+                decided = winner is not None or leg in known_winners or (mts is not None and mts < 0)
+                if not decided:
+                    errors.append(_err("not_decided", leg=leg, field="phase"))
+            parsed_legs.append({"leg": leg, "starts": by_no, "startTime": st, "minutesToStart": mts,
+                                "winner": winner})
+        if errors:
+            raise BetValidationError(errors)
+        taken_iso = taken.isoformat()
+        with conn:
+            cur = conn.execute(
+                "INSERT INTO snapshots(date, game, track, source, phase, taken_at) VALUES (?,?,?,?,?,?)",
+                (date, game, body.get("track"), body["source"], phase, taken_iso),
+            )
+            snap_id = cur.lastrowid
+            n = 0
+            for pl in parsed_legs:
+                st_iso = pl["startTime"].isoformat() if pl["startTime"] is not None else None
+                for sn in sorted(pl["starts"]):
+                    s = pl["starts"][sn]
+                    conn.execute(
+                        "INSERT INTO snapshot_starts(snapshot_id, date, game, track, leg, start_no, horse_name,"
+                        " scratched, odds, streck_pct, source, phase, taken_at, start_time, minutes_to_start,"
+                        " winner_start_no) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (snap_id, date, game, body.get("track"), pl["leg"], sn, s.get("horseName"),
+                         1 if s.get("scratched") else 0, s.get("odds"), s.get("streckPct"), body["source"],
+                         phase, taken_iso, st_iso, pl["minutesToStart"], pl["winner"]),
+                    )
+                    n += 1
+        return {
+            "snapshotId": snap_id,
+            "takenAt": taken_iso,
+            "source": body["source"],
+            "phase": phase,
+            "inserted": n,
+            "legs": [
+                {"leg": pl["leg"], "starts": len(pl["starts"]), "minutesToStart": pl["minutesToStart"],
+                 "startTime": pl["startTime"].isoformat() if pl["startTime"] is not None else None,
+                 "winnerStartNo": pl["winner"]}
+                for pl in sorted(parsed_legs, key=lambda x: x["leg"])
+            ],
+        }
     finally:
         conn.close()
 
 
 def snapshot_card(store: BetStore, date: str, game: str) -> dict[int, dict[str, set[int]]] | None:
-    """Starters/scratches per leg from recorded snapshots, or None if none recorded."""
+    """Starters/scratches per leg from the latest snapshot of each leg, or None if none recorded."""
     conn = store.connect()
     try:
         rows = conn.execute(
-            "SELECT leg, start_no, scratched FROM start_snapshots WHERE date=? AND game=?", (date, game)
+            "SELECT s.leg, s.start_no, s.scratched FROM snapshot_starts s"
+            " WHERE s.date=? AND s.game=? AND s.snapshot_id=(SELECT MAX(t.snapshot_id) FROM snapshot_starts t"
+            "   WHERE t.date=s.date AND t.game=s.game AND t.leg=s.leg)",
+            (date, game),
         ).fetchall()
     finally:
         conn.close()
