@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly VAI backup (Sun 03:15 Europe/Malta)
+
+[Timer]
+OnCalendar=Sun *-*-* 03:15 Europe/Malta
+Persistent=true
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target
