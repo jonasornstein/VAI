@@ -4,7 +4,7 @@
 |-------|-------|
 | **Version** | 0.1 |
 | **Owner** | ornstein |
-| **Last updated** | 2026-10-03 |
+| **Last updated** | 2026-10-16 |
 
 Optional audit trail of significant project decisions and AIRUP **Update** events. ornstein requests entries; agents suggest but do not append without direction.
 
@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-10-16 | U | Assistant | **#5 Sportappen import (T-5/K-05)** — `python -m vai.sportapp_import` parses manually downloaded start list / result .xlsx into `sportapp_races/starts/results` (idempotent); manual files only, no network, no API/UI until K-01; JR's data terms documented | [sportapp-import.md](sportapp-import.md), [sportapp_import.py](../src/vai/sportapp_import.py) |
 | 2026-10-03 | P | ornstein | **End of session (O&O)** — FUNDAMENTAL Tränare v1.3.7 pushed; session closed. Prod still v1.3.6 until sudo deploy | See [§ End of session — 2026-10-03 (fundamental tranare)](#end-of-session--2026-10-03-fundamental-tranare) |
 | 2026-10-03 | P | Assistant | **Commit + push v1.3.7** — `bd910b6` + tag `v1.3.7` on `origin/master`; FUNDAMENTAL Tränare and Tränare km; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.7` |
 | 2026-10-03 | U | Assistant | **FUNDAMENTAL Tränare** — trainer name and estimated home-track km beside Kusk, from `horse.trainer` | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), mockup, [start_info.py](../../src/vai/start_info.py) |
