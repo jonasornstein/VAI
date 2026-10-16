@@ -1,4 +1,5 @@
-"""API-key protection for VAI write endpoints (POST/PUT/DELETE that modify data).
+"""API-key protection for VAI write endpoints (POST/PUT/DELETE that modify data)
+and for all /api/bets and /api/snapshots requests (reads included).
 
 Key comes from env ``VAI_API_KEY`` (production: ``/etc/vai/vai.env`` via systemd
 ``EnvironmentFile=``; never commit it). Clients send it in header ``X-API-Key``.
@@ -23,8 +24,15 @@ UNPROTECTED_POSTS = frozenset(
 )
 
 
+# T-35: bets/snapshots are protected for every method, including GET (no read access
+# without protection until password protection exists).
+PROTECTED_PREFIXES = ("/api/bets", "/api/snapshots")
+
+
 def is_protected(method: str, path: str) -> bool:
     method = method.upper()
+    if method != "OPTIONS" and any(path == p or path.startswith(p + "/") for p in PROTECTED_PREFIXES):
+        return True
     if method not in ("POST", "PUT", "DELETE"):
         return False
     if method == "POST" and path in UNPROTECTED_POSTS:

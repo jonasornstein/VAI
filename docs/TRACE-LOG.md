@@ -14,6 +14,7 @@ Optional audit trail of significant project decisions and AIRUP **Update** event
 
 | Date | AIRUP phase | Actor | Summary | Artifact / link |
 |------|-------------|-------|---------|-----------------|
+| 2026-10-16 | U | Assistant | **K-35 snapshot fixes** — AST guard test now fails on any `while`, threading use beyond `threading.Lock`, sched/asyncio/time/socket/http/urllib/requests/subprocess imports, sleep/Timer/Thread in `bets.py` (verified by injection); `horseName` filled server-side from YAML `horse_names` or latest prior snapshot (snapshots + bets GET). Local commit on `feature/snapshots`, not pushed | [api-bets.md](api-bets.md), [bets.py](../src/vai/bets.py), [test_snapshots.py](../tests/test_snapshots.py) |
 | 2026-10-03 | P | ornstein | **End of session (O&O)** — FUNDAMENTAL Tränare v1.3.7 pushed; session closed. Prod still v1.3.6 until sudo deploy | See [§ End of session — 2026-10-03 (fundamental tranare)](#end-of-session--2026-10-03-fundamental-tranare) |
 | 2026-10-03 | P | Assistant | **Commit + push v1.3.7** — `bd910b6` + tag `v1.3.7` on `origin/master`; FUNDAMENTAL Tränare and Tränare km; **prod deploy blocked** (sudo password). Run: `sudo bash /opt/vai/deploy/update-server.sh` | https://github.com/jonasornstein/VAI ; tag `v1.3.7` |
 | 2026-10-03 | U | Assistant | **FUNDAMENTAL Tränare** — trainer name and estimated home-track km beside Kusk, from `horse.trainer` | [fundamental-v1.md](../../outbox/specs/fundamental-v1.md), mockup, [start_info.py](../../src/vai/start_info.py) |
@@ -1397,3 +1398,7 @@ curl -sI https://vai.ornstein.work/vai-stats.html | head -5
 - Merged feature/api-key. All write endpoints (betslips, expert-tips, experts) require header `X-API-Key`. The key is `VAI_API_KEY` in `/etc/vai/vai.env` (root, 600), loaded by a systemd drop-in for vai.service (`/etc/systemd/system/vai.service.d/api-key.conf`). Wrong/missing key → 401; key unset on server → 503 (fail closed).
 - UI asks for the key at the first 401 and stores it in localStorage. Expert collector reads `~/.config/vai/api_key` (chmod 600).
 - Not yet deployed (sudo deploy needed).
+
+## 2026-10-16: K-35 manual odds/streck snapshots
+- JR legal decision: snapshots only on manual Update press (one call, no retries/timers/collector, no ATG scraping). source must be manual (422 invalid_source); full field per leg (422 incomplete_field); takenAt UTC + minutesToStart server-side; phase pre/final, final only when the leg is decided; history kept (insert-only), settle uses latest final row. See docs/api-bets.md.
+- Branch feature/snapshots (local only, not deployed).

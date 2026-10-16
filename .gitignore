@@ -42,3 +42,6 @@ betslips/*.yml
 # Runtime race-card caches (v1.3.8)
 inbox/card-odds/
 inbox/card-form/
+
+# Runtime SQLite DB (T-35 bets; VAI_DB_PATH, default data/vai.sqlite)
+data/
